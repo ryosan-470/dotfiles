@@ -42,7 +42,7 @@ echo '###########################################################'
 echo ' We will download and install dependences'
 echo ' Do you really install now?(yes/no)[RECOMMENDED]'
 read ans
-if [ "$ans" # "yes" ]
+if [ "$ans" = "yes" ]
 then
     # oh-my-zsh installing
     echo 'installing oh-my-zsh...'
