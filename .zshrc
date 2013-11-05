@@ -81,7 +81,7 @@ setopt inc_append_history
 bindkey "^R" history-incremental-search-backward
 bindkey "^S" history-incremental-search-forward
 
-# source /Users/rsk-mac/.dotconfig/zaw/zaw.zsh
+source /Users/rsk-mac/.dotconfig/zaw/zaw.zsh
 function do_enter() {                                                                                        
     if [ -n "$BUFFER" ]; then                                                                                
         zle accept-line                                                                                      

@@ -50,7 +50,8 @@ then
     curl -L https://github.com/robbyrussell/oh-my-zsh/raw/master/tools/install.sh | sh
     # remove zshrc which makes after installing zshrc
     rm -rf $HOME/.zshrc
-    ln -s  ${REPO}/.zshrc $HOME/.zshrc
+    # 各環境に対応できないのでコピーにする 
+    cp  ${REPO}/.zshrc $HOME/.zshrc
     echo '###########################################################'
     echo 'installing zaw...'
     cd $HOME/.dotconfig/
