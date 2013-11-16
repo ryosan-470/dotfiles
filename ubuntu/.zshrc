@@ -1,4 +1,3 @@
-tmux
 # Common settings
 # Path to your oh-my-zsh configuration.
 ZSH=$HOME/.oh-my-zsh
@@ -43,7 +42,7 @@ ZSH_THEME="ys"
 # Which plugins would you like to load? (plugins can be found in ~/.oh-my-zsh/plugins/*)
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
-plugins=(git ruby bundler emoji-clock)
+plugins=(git ruby emoji-clock)
 
 source $ZSH/oh-my-zsh.sh
 
@@ -81,15 +80,15 @@ setopt inc_append_history
 bindkey "^R" history-incremental-search-backward
 bindkey "^S" history-incremental-search-forward
 
-source /Users/rsk-mac/.dotconfig/zaw/zaw.zsh
-function do_enter() {                                                                                        
-    if [ -n "$BUFFER" ]; then                                                                                
-        zle accept-line                                                                                      
-        return 0                                                                                             
+source /home/rsk-ubuntu1310/.dotconfig/zaw/zaw.zsh
+function do_enter() {
+    if [ -n "$BUFFER" ]; then
+        zle accept-line
+        return 0
     fi
     echo
     ls
-    if [ "$(git rev-parse --is-inside-work-tree 2> /dev/null)" = 'true' ]; then                              
+    if [ "$(git rev-parse --is-inside-work-tree 2> /dev/null)" = 'true' ]; then
         echo -e "\e[0;33m--- git status ---\e[0m"
         git status -sb
     fi
@@ -100,8 +99,14 @@ zle -N do_enter
 bindkey '^m' do_enter
 # Alias
 alias e='emacs -nw'          
+alias ec='emacsclient -nw'
+alias kill-emacs="emacsclient -e '(kill-emacs)'"
 alias v=vim
 alias g=git
 alias s='source ~/.zshrc'
 alias l='ls -G'
-alias t=tmux                                                                                                 
+alias t=tmux
+function emacs-restart(){
+	 kill-emacs
+	 emacs --daemon	
+}
