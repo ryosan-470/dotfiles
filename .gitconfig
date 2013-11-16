@@ -1,0 +1,5 @@
+[user]
+	email = example@example.com
+	name = hogehoge
+[core]
+	editor = "ec"
