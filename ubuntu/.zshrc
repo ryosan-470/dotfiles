@@ -42,7 +42,7 @@ ZSH_THEME="ys"
 # Which plugins would you like to load? (plugins can be found in ~/.oh-my-zsh/plugins/*)
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
-plugins=(git ruby bundler emoji-clock)
+plugins=(git ruby emoji-clock)
 
 source $ZSH/oh-my-zsh.sh
 
@@ -106,3 +106,8 @@ alias g=git
 alias s='source ~/.zshrc'
 alias l='ls -G'
 alias t=tmux
+
+function emacs-restart(){
+	 kill-emacs
+	 emacs --daemon	
+}
