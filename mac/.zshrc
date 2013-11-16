@@ -48,7 +48,7 @@ plugins=(git ruby bundler emoji-clock)
 source $ZSH/oh-my-zsh.sh
 
 # Customize to your needs...
-export PATH=$PATH:/usr/lib/lightdm/lightdm:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games
+export PATH=$PATH:/usr/lib/lightdm/lightdm:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/Users/rsk-mac/bin
 
 # zsh customize
 setopt auto_cd
@@ -82,26 +82,9 @@ bindkey "^R" history-incremental-search-backward
 bindkey "^S" history-incremental-search-forward
 
 source /Users/rsk-mac/.dotconfig/zaw/zaw.zsh
-function do_enter() {                                                                                        
-    if [ -n "$BUFFER" ]; then                                                                                
-        zle accept-line                                                                                      
-        return 0                                                                                             
-    fi
-    echo
-    ls
-    if [ "$(git rev-parse --is-inside-work-tree 2> /dev/null)" = 'true' ]; then                              
-        echo -e "\e[0;33m--- git status ---\e[0m"
-        git status -sb
-    fi
-    zle reset-prompt
-    return 0
-}
-zle -N do_enter
-bindkey '^m' do_enter
+
 # Alias
-alias e='emacs -nw'          
+alias rmtex="~/bin/rmtex"
 alias v=vim
-alias g=git
-alias s='source ~/.zshrc'
-alias l='ls -G'
-alias t=tmux                                                                                                 
+alias tm='/usr/local/bin/tmuxx'
+alias gcc="gcc-4.9"
