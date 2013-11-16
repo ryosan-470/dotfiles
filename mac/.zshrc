@@ -82,9 +82,23 @@ bindkey "^R" history-incremental-search-backward
 bindkey "^S" history-incremental-search-forward
 
 source /Users/rsk-mac/.dotconfig/zaw/zaw.zsh
-
+function do_enter(){
+    if [ -n "$BUFFER" ]; then
+	zle accept-line
+	return 0
+    fi
+}
 # Alias
-alias rmtex="~/bin/rmtex"
+alias e='emacs -nw'
+alias emacsclient="/Applications/Emacs.app/Contents/MacOS/bin/emacsclient"
+alias ec='emacsclient -nw'
+alias kill-emacs="emacsclient -e '(kill-emacs)'"
 alias v=vim
-alias tm='/usr/local/bin/tmuxx'
+alias g=git
+alias s='source ~/.zshrc'
+alias t=tmux
+function emacs-restart(){
+    kill-emacs
+    emacs --daemon
+}
 alias gcc="gcc-4.9"

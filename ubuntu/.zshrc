@@ -98,7 +98,8 @@ function do_enter() {
 zle -N do_enter
 bindkey '^m' do_enter
 # Alias
-alias e='emacs -nw'          
+alias e='emacs -nw'
+alias emacsclient="/Applications/Emacs.app/Contents/MacOS/bin/emacsclient"
 alias ec='emacsclient -nw'
 alias kill-emacs="emacsclient -e '(kill-emacs)'"
 alias v=vim
