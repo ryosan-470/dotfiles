@@ -100,14 +100,14 @@ export $EDITOR='emacs -nw'
 # zsh customize
 setopt auto_cd
 function chpwd() { ls -F }
-# '^' を押すと上のディレクトリに移動する
-function cdup() {
-echo
-cd ..
-zle reset-prompt
-}
-zle -N cdup
-bindkey '\^' cdup
+# '' を押すと上のディレクトリに移動する git reset --hard HEAD^ に競合
+# function cdup() {
+# echo
+# cd ..
+# zle reset-prompt
+# }
+# zle -N cdup
+bindkey '\' cdup
 # zaw setting
 # search history key bind ''})''})'C-h'
 bindkey '^h' zaw-history
