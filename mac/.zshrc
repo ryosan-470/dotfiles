@@ -83,13 +83,33 @@ plugins=(git ruby bundler emoji-clock)
 source $ZSH/oh-my-zsh.sh
 
 # Customize to your needs...
-export PATH=$PATH:/usr/lib/lightdm/lightdm:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/Users/rsk-mac/bin
+########################################
+# OS 別の設定
+case ${OSTYPE} in
+    darwin*)
+	#Mac用の設定
+	export PATH=$PATH:/usr/lib/lightdm/lightdm:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/Users/rsk-mac/bin
+	;;
+    linux*)
+	#Linux用の設定
+	;;
+esac
 
+export GREP_OPTIONS='--binary-files=without-match'
+export $EDITOR='emacs -nw'
 # zsh customize
 setopt auto_cd
-function chpwd() { ls }
+function chpwd() { ls -F }
+# '^' を押すと上のディレクトリに移動する
+function cdup() {
+echo
+cd ..
+zle reset-prompt
+}
+zle -N cdup
+bindkey '\^' cdup
 # zaw setting
-# search history key bind 'C-h'
+# search history key bind ''})''})'C-h'
 bindkey '^h' zaw-history
 # history search
 bindkey '^P' history-beginning-search-backward
@@ -115,8 +135,8 @@ setopt inc_append_history
 # インクリメンタルからの検索
 bindkey "^R" history-incremental-search-backward
 bindkey "^S" history-incremental-search-forward
-
-source /Users/rsk-mac/.dotconfig/zaw/zaw.zsh
+# zaw
+source $HOME/.dotconfig/zaw/zaw.zsh
 # Enter を押すと ls or git status
 function do_enter() {
     if [ -n "$BUFFER" ]; then
@@ -125,7 +145,7 @@ function do_enter() {
     fi
     echo
     ls
-    # ↓おすすめ
+    # おすすめ
     # ls_abbrev
     if [ "$(git rev-parse --is-inside-work-tree 2> /dev/null)" = 'true' ]; then
         echo
