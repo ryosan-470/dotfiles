@@ -96,7 +96,6 @@ case ${OSTYPE} in
 esac
 
 export GREP_OPTIONS='--binary-files=without-match'
-export $EDITOR='emacs -nw'
 # zsh customize
 setopt auto_cd
 function chpwd() { ls -F }
