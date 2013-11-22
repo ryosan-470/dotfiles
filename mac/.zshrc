@@ -89,9 +89,11 @@ case ${OSTYPE} in
     darwin*)
 	#Mac用の設定
 	export PATH=$PATH:/usr/lib/lightdm/lightdm:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/Users/rsk-mac/bin
+	alias emacsclient="/Applications/Emacs.app/Contents/MacOS/bin/emacsclient"
 	;;
     linux*)
 	#Linux用の設定
+	export PATH=$PATH:/usr/lib/lightdm/lightdm:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/home/rsk-ubuntu1310/bin
 	;;
 esac
 
@@ -159,7 +161,6 @@ bindkey '^m' do_enter
 
 # Alias
 alias e='emacs -nw'
-alias emacsclient="/Applications/Emacs.app/Contents/MacOS/bin/emacsclient"
 alias ec='emacsclient -nw'
 alias kill-emacs="emacsclient -e '(kill-emacs)'"
 alias v=vim
@@ -167,6 +168,8 @@ alias g=git
 alias s='source ~/.zshrc'
 alias t=tmux
 alias gcc="gcc-4.9"
+alias gpl='git pull origin master'
+alias gps='git push origin master'
 function emacs-restart(){
     kill-emacs
     emacs --daemon
