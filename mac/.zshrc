@@ -43,7 +43,7 @@ ZSH=$HOME/.oh-my-zsh
 # Optionally, if you set this to "random", it'll load a random theme each
 # time that oh-my-zsh is loaded.
 ZSH_THEME="ys"
-# ZSH_THEME="agnoster"
+#ZSH_THEME="agnoster"
 
 # Example aliases
 # alias zshconfig="mate ~/.zshrc"
@@ -167,6 +167,8 @@ alias g=git
 alias s='source ~/.zshrc'
 alias t=tmux
 alias gcc="gcc-4.9"
+alias gps='git push origin master'
+alias gpl='git pull origin master'
 function emacs-restart(){
     kill-emacs
     emacs --daemon
