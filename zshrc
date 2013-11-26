@@ -90,6 +90,7 @@ case ${OSTYPE} in
 	#Mac用の設定
 	export PATH=$PATH:/usr/lib/lightdm/lightdm:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/Users/rsk-mac/bin
 	alias emacsclient="/Applications/Emacs.app/Contents/MacOS/bin/emacsclient"
+	alias vim="/usr/local/Cellar/vim/7.4.052/bin/vim"
 	;;
     linux*)
 	#Linux用の設定
@@ -170,6 +171,8 @@ alias t='tmux new $SHELL'
 alias gcc="gcc-4.9"
 alias gpl='git pull origin master'
 alias gps='git push origin master'
+alias j=java
+alias jc=javac
 function emacs-restart(){
     kill-emacs
     emacs --daemon
