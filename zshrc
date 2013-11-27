@@ -91,6 +91,7 @@ case ${OSTYPE} in
 	export PATH=$PATH:/usr/lib/lightdm/lightdm:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/Users/rsk-mac/bin
 	alias emacsclient="/Applications/Emacs.app/Contents/MacOS/bin/emacsclient"
 	alias vim="/usr/local/Cellar/vim/7.4.052/bin/vim"
+	alias git="/usr/local/Cellar/git/1.8.4.3/bin/git"
 	;;
     linux*)
 	#Linux用の設定
