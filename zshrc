@@ -92,6 +92,7 @@ case ${OSTYPE} in
 	alias emacsclient="/Applications/Emacs.app/Contents/MacOS/bin/emacsclient"
 	alias vim="/usr/local/Cellar/vim/7.4.052/bin/vim"
 	alias git="/usr/local/Cellar/git/1.8.4.3/bin/git"
+	alias gcc="gcc-4.9"
 	;;
     linux*)
 	#Linux用の設定
@@ -169,7 +170,6 @@ alias v=vim
 alias g=git
 alias s='source ~/.zshrc'
 alias t='tmux new $SHELL'
-alias gcc="gcc-4.9"
 alias gpl='git pull origin master'
 alias gps='git push origin master'
 alias j=java
