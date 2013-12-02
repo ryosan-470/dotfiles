@@ -97,6 +97,7 @@ case ${OSTYPE} in
     linux*)
 	#Linux用の設定
 	export PATH=$PATH:/usr/lib/lightdm/lightdm:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/home/rsk-ubuntu1310/bin
+	alias open='gnome-open'
 	;;
 esac
 
