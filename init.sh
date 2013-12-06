@@ -3,6 +3,8 @@
 # under control files
 files="
 .tmux.conf
+.zshrc
+.vimrc
 "
 REPO="${PWD}"
 TARGET_DIR=${HOME}/.dotconfig/dotfiles

@@ -1,3 +1,39 @@
+## tmux自動起動
+# http://d.hatena.ne.jp/tyru/20100828/run_tmux_or_screen_at_shell_startup
+is_screen_running() {
+    # tscreen also uses this varariable.
+    [ ! -z "$WINDOW" ]
+}
+is_tmux_runnning() {
+    [ ! -z "$TMUX" ]
+}
+is_screen_or_tmux_running() {
+    is_screen_running || is_tmux_runnning
+}
+shell_has_started_interactively() {
+    [ ! -z "$PS1" ]
+}
+resolve_alias() {
+    cmd="$1"
+    while \
+        whence "$cmd" >/dev/null 2>/dev/null \
+        && [ "$(whence "$cmd")" != "$cmd" ]
+    do
+        cmd=$(whence "$cmd")
+    done
+    echo "$cmd"
+}
+
+
+if ! is_screen_or_tmux_running && shell_has_started_interactively; then
+    for cmd in tmux tscreen screen; do
+        if whence $cmd >/dev/null 2>/dev/null; then
+            $(resolve_alias "$cmd")
+            break
+        fi
+    done
+fi
+
 # Common settings
 # Path to your oh-my-zsh configuration.
 ZSH=$HOME/.oh-my-zsh
@@ -7,7 +43,7 @@ ZSH=$HOME/.oh-my-zsh
 # Optionally, if you set this to "random", it'll load a random theme each
 # time that oh-my-zsh is loaded.
 ZSH_THEME="ys"
-# ZSH_THEME="agnoster"
+#ZSH_THEME="agnoster"
 
 # Example aliases
 # alias zshconfig="mate ~/.zshrc"
@@ -42,18 +78,43 @@ ZSH_THEME="ys"
 # Which plugins would you like to load? (plugins can be found in ~/.oh-my-zsh/plugins/*)
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
-plugins=(git ruby emoji-clock)
+plugins=(git ruby bundler emoji-clock)
 
 source $ZSH/oh-my-zsh.sh
 
 # Customize to your needs...
-export PATH=$PATH:/usr/lib/lightdm/lightdm:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games
+########################################
+# OS 別の設定
+case ${OSTYPE} in
+    darwin*)
+	#Mac用の設定
+	export PATH=$PATH:/usr/lib/lightdm/lightdm:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/Users/rsk-mac/bin
+	alias emacsclient="/Applications/Emacs.app/Contents/MacOS/bin/emacsclient"
+	alias vim="/usr/local/Cellar/vim/7.4.052/bin/vim"
+	alias git="/usr/local/Cellar/git/1.8.4.3/bin/git"
+	alias gcc="gcc-4.9"
+	;;
+    linux*)
+	#Linux用の設定
+	export PATH=$PATH:/usr/lib/lightdm/lightdm:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/home/rsk-ubuntu1310/bin
+	alias open='gnome-open'
+	;;
+esac
 
+export GREP_OPTIONS='--binary-files=without-match'
 # zsh customize
 setopt auto_cd
-function chpwd() { ls }
+function chpwd() { ls -F }
+# '' を押すと上のディレクトリに移動する git reset --hard HEAD^ に競合
+# function cdup() {
+# echo
+# cd ..
+# zle reset-prompt
+# }
+# zle -N cdup
+bindkey '\' cdup
 # zaw setting
-# search history key bind 'C-h'
+# search history key bind ''})''})'C-h'
 bindkey '^h' zaw-history
 # history search
 bindkey '^P' history-beginning-search-backward
@@ -79,8 +140,9 @@ setopt inc_append_history
 # インクリメンタルからの検索
 bindkey "^R" history-incremental-search-backward
 bindkey "^S" history-incremental-search-forward
-
-source /home/rsk-ubuntu1310/.dotconfig/zaw/zaw.zsh
+# zaw
+source $HOME/.dotconfig/zaw/zaw.zsh
+# Enter を押すと ls or git status
 function do_enter() {
     if [ -n "$BUFFER" ]; then
         zle accept-line
@@ -88,7 +150,10 @@ function do_enter() {
     fi
     echo
     ls
+    # おすすめ
+    # ls_abbrev
     if [ "$(git rev-parse --is-inside-work-tree 2> /dev/null)" = 'true' ]; then
+        echo
         echo -e "\e[0;33m--- git status ---\e[0m"
         git status -sb
     fi
@@ -97,17 +162,20 @@ function do_enter() {
 }
 zle -N do_enter
 bindkey '^m' do_enter
+
 # Alias
 alias e='emacs -nw'
-alias emacsclient="/Applications/Emacs.app/Contents/MacOS/bin/emacsclient"
 alias ec='emacsclient -nw'
 alias kill-emacs="emacsclient -e '(kill-emacs)'"
 alias v=vim
 alias g=git
 alias s='source ~/.zshrc'
-alias l='ls -G'
-alias t=tmux
+alias t='tmux new $SHELL'
+alias gpl='git pull origin master'
+alias gps='git push origin master'
+alias j=java
+alias jc=javac
 function emacs-restart(){
-	 kill-emacs
-	 emacs --daemon	
+    kill-emacs
+    emacs --daemon
 }
