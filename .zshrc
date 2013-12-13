@@ -112,7 +112,7 @@ function chpwd() { ls -F }
 # zle reset-prompt
 # }
 # zle -N cdup
-bindkey '\' cdup
+# bindkey '\' cdup
 # zaw setting
 # search history key bind ''})''})'C-h'
 bindkey '^h' zaw-history
