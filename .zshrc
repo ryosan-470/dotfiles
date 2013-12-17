@@ -117,3 +117,4 @@ source $HOME/.dotconfig/zaw/zaw.zsh
 
 # load alias
 source $HOME/.dotconfig/dotfiles/.zsh.d/alias.zsh
+
