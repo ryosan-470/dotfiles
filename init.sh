@@ -2,9 +2,9 @@
 # coding utf-8
 # under control files
 files="
-.tmux.conf
 .zshrc
 .vimrc
+.tmux
 "
 REPO="${PWD}"
 TARGET_DIR=${HOME}/.dotconfig/dotfiles
