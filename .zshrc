@@ -116,5 +116,5 @@ bindkey "^S" history-incremental-search-forward
 source $HOME/.dotconfig/zaw/zaw.zsh
 
 # load alias
-source $HOME/.dotconfig/dotfiles/.zsh.d/alias.zsh
+source $HOME/.dotconfig/dotfiles/zsh.d/alias.zsh
 
