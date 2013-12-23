@@ -77,14 +77,14 @@ export GREP_OPTIONS='--binary-files=without-match'
 # zsh customize
 setopt auto_cd
 function chpwd() { ls -F }
-# '' を押すと上のディレクトリに移動する git reset --hard HEAD^ に競合
+# # '' を押すと上のディレクトリに移動する git reset --hard HEAD^ に競合
 # function cdup() {
 # echo
 # cd ..
 # zle reset-prompt
 # }
 # zle -N cdup
-# bindkey '\' cdup
+# bindkey '\^' cdup
 # zaw setting
 # search history key bind ''})''})'C-h'
 bindkey '^h' zaw-history
@@ -118,3 +118,5 @@ source $HOME/.dotconfig/zaw/zaw.zsh
 # load alias
 source $HOME/.dotconfig/dotfiles/zsh.d/alias.zsh
 
+
+PATH=$PATH:$HOME/.rvm/bin # Add RVM to PATH for scripting
