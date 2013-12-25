@@ -2,9 +2,10 @@
 # coding utf-8
 # under control files
 files="
-.tmux.conf
 .zshrc
 .vimrc
+.tmux
+.tmux.conf
 "
 REPO="${PWD}"
 TARGET_DIR=${HOME}/.dotconfig/dotfiles
@@ -12,7 +13,7 @@ echo '==========================================================='
 echo ' We will make symbolic link to your computer(And first setup)'
 if [ ! -d $TARGET_DIR ]
 then
-    echo 'Abort installing. Please move this directory to ${TARGET_DIR}'
+    echo 'Abort installing. Please move this directory to "~/.dotconfig/"'
     exit 0
 fi
 echo ' zshrc, tmux.conf'
@@ -68,6 +69,7 @@ fi
 
 echo '###########################################################'
 echo ' Finished and completed installing...'
+echo 'Please read README to install some fonts'
 
 
 # .zshrcを各環境ごとに書き換える

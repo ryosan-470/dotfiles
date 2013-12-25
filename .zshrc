@@ -1,39 +1,3 @@
-## tmux自動起動
-# http://d.hatena.ne.jp/tyru/20100828/run_tmux_or_screen_at_shell_startup
-is_screen_running() {
-    # tscreen also uses this varariable.
-    [ ! -z "$WINDOW" ]
-}
-is_tmux_runnning() {
-    [ ! -z "$TMUX" ]
-}
-is_screen_or_tmux_running() {
-    is_screen_running || is_tmux_runnning
-}
-shell_has_started_interactively() {
-    [ ! -z "$PS1" ]
-}
-resolve_alias() {
-    cmd="$1"
-    while \
-        whence "$cmd" >/dev/null 2>/dev/null \
-        && [ "$(whence "$cmd")" != "$cmd" ]
-    do
-        cmd=$(whence "$cmd")
-    done
-    echo "$cmd"
-}
-
-
-if ! is_screen_or_tmux_running && shell_has_started_interactively; then
-    for cmd in tmux tscreen screen; do
-        if whence $cmd >/dev/null 2>/dev/null; then
-            $(resolve_alias "$cmd")
-            break
-        fi
-    done
-fi
-
 # Common settings
 # Path to your oh-my-zsh configuration.
 ZSH=$HOME/.oh-my-zsh
@@ -84,19 +48,28 @@ source $ZSH/oh-my-zsh.sh
 
 # Customize to your needs...
 ########################################
+# General Settings
+# Default Editor
+export EDITOR="emacs -nw"
+# Default encording
+export LANG=ja_JP.UTF-8
+
 # OS 別の設定
 case ${OSTYPE} in
-    darwin*)
-	#Mac用の設定
-	export PATH=$PATH:/usr/lib/lightdm/lightdm:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/Users/rsk-mac/bin
+    darwin13.0)
+	#For MacBook Air
+	export PATH=$PATH:${HOME}/bin
 	alias emacsclient="/Applications/Emacs.app/Contents/MacOS/bin/emacsclient"
 	alias vim="/usr/local/Cellar/vim/7.4.052/bin/vim"
 	alias git="/usr/local/Cellar/git/1.8.4.3/bin/git"
-	alias gcc="gcc-4.9"
+	alias gcc="/usr/local/bin/gcc"
+	;;
+    darwin10.0)
+	#For iMac of COINS 
+	alias emacsclient="~/bin/Emacs.app/Contents/MacOS/bin/emacsclient"
 	;;
     linux*)
-	#Linux用の設定
-	export PATH=$PATH:/usr/lib/lightdm/lightdm:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/home/rsk-ubuntu1310/bin
+	#For Linux General
 	alias open='gnome-open'
 	;;
 esac
@@ -105,14 +78,14 @@ export GREP_OPTIONS='--binary-files=without-match'
 # zsh customize
 setopt auto_cd
 function chpwd() { ls -F }
-# '' を押すと上のディレクトリに移動する git reset --hard HEAD^ に競合
+# # '' を押すと上のディレクトリに移動する git reset --hard HEAD^ に競合
 # function cdup() {
 # echo
 # cd ..
 # zle reset-prompt
 # }
 # zle -N cdup
-bindkey '\' cdup
+# bindkey '\^' cdup
 # zaw setting
 # search history key bind ''})''})'C-h'
 bindkey '^h' zaw-history
@@ -142,41 +115,8 @@ bindkey "^R" history-incremental-search-backward
 bindkey "^S" history-incremental-search-forward
 # zaw
 source $HOME/.dotconfig/zaw/zaw.zsh
-# Enter を押すと ls or git status
-function do_enter() {
-    if [ -n "$BUFFER" ]; then
-        zle accept-line
-        return 0
-    fi
-    echo
-    ls
-    # おすすめ
-    # ls_abbrev
-    if [ "$(git rev-parse --is-inside-work-tree 2> /dev/null)" = 'true' ]; then
-        echo
-        echo -e "\e[0;33m--- git status ---\e[0m"
-        git status -sb
-    fi
-    zle reset-prompt
-    return 0
-}
-zle -N do_enter
-bindkey '^m' do_enter
-alias e='emacs -nw'
-alias ec='emacsclient -nw'
-alias kill-emacs="emacsclient -e '(kill-emacs)'"
-alias v=vim
-alias g=git
-alias s='source ~/.zshrc'
-alias tr='tmux source-file ~/.tmux.conf'
-alias gpl='git pull origin master'
-alias gps='git push origin master'
-alias gf='git fetch origin master'
-alias j=java
-alias jc=javac
-function emacs-restart(){
-    kill-emacs
-    emacs --daemon
-}
-zle -N emacs-restart
-bindkey '^e' emacs-restart
+# load alias
+source $HOME/.dotconfig/dotfiles/zsh.d/alias.zsh
+
+
+PATH=$PATH:$HOME/.rvm/bin # Add RVM to PATH for scripting
