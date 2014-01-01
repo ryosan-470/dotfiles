@@ -120,3 +120,7 @@ source $HOME/.dotconfig/dotfiles/zsh.d/alias.zsh
 
 
 PATH=$PATH:$HOME/.rvm/bin # Add RVM to PATH for scripting
+# if .zshrc is newer than .zshrc.zwc, do zcompile
+if [ ~/.zshrc -nt ~/.zshrc.zwc ]; then
+   zcompile ~/.zshrc
+fi
