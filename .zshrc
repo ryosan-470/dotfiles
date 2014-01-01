@@ -61,7 +61,7 @@ case ${OSTYPE} in
 	export PATH=$PATH:${HOME}/bin
 	alias emacsclient="/Applications/Emacs.app/Contents/MacOS/bin/emacsclient"
 	alias vim="/usr/local/Cellar/vim/7.4.052/bin/vim"
-	alias git="/usr/local/Cellar/git/1.8.4.3/bin/git"
+	alias git="/usr/local/Cellar/git/1.8.5.2/bin/git"
 	alias gcc="/usr/local/bin/gcc"
 	;;
     darwin10.0)
@@ -120,3 +120,7 @@ source $HOME/.dotconfig/dotfiles/zsh.d/alias.zsh
 
 
 PATH=$PATH:$HOME/.rvm/bin # Add RVM to PATH for scripting
+# if .zshrc is newer than .zshrc.zwc, do zcompile
+if [ ~/.zshrc -nt ~/.zshrc.zwc ]; then
+   zcompile ~/.zshrc
+fi
