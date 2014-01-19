@@ -70,6 +70,8 @@ case ${OSTYPE} in
     linux*)
 	#For Linux General
 	alias open='gnome-open'
+	alias pbcopy='xsel --clipboard --input'
+	alias pbpaste='xsel --clipboard --output'
 	;;
 esac
 
@@ -117,6 +119,3 @@ source $HOME/.dotconfig/zaw/zaw.zsh
 
 # load alias
 source $HOME/.dotconfig/dotfiles/zsh.d/alias.zsh
-
-
-PATH=$PATH:$HOME/.rvm/bin # Add RVM to PATH for scripting
