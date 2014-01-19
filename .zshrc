@@ -124,3 +124,4 @@ PATH=$PATH:$HOME/.rvm/bin # Add RVM to PATH for scripting
 if [ ~/.zshrc -nt ~/.zshrc.zwc ]; then
    zcompile ~/.zshrc
 fi
+
