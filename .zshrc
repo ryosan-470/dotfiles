@@ -70,6 +70,8 @@ case ${OSTYPE} in
     linux*)
 	#For Linux General
 	alias open='gnome-open'
+	alias pbcopy='xsel --clipboard --input'
+	alias pbpaste='xsel --clipboard --output'
 	;;
 esac
 
@@ -115,9 +117,7 @@ bindkey "^S" history-incremental-search-forward
 # zaw
 source $HOME/.dotconfig/zaw/zaw.zsh
 
-# load alias
 source $HOME/.dotconfig/dotfiles/zsh.d/alias.zsh
-
 
 PATH=$PATH:$HOME/.rvm/bin # Add RVM to PATH for scripting
 # if .zshrc is newer than .zshrc.zwc, do zcompile
