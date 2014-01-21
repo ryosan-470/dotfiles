@@ -1,4 +1,4 @@
-#
+#!/bin/zsh
 # alias.zsh
 #
 # @author Ryosuke Sato <tango@jtwp470.net>
@@ -11,12 +11,14 @@ alias v=vim
 alias g=git
 alias s='source ~/.zshrc'
 alias tr='tmux source-file ~/.tmux.conf'
-alias gpl='git pull origin master'
-alias gps='git push origin master'
-alias gf='git fetch origin master'
 alias j=java
 alias jc=javac
 
+# alias git
+alias gpl='git pull origin master'
+alias gps='git push origin master'
+alias gf='git fetch origin master'
+alias gl="git log --graph --date=short --decorate=short --pretty=format:'%Cgreen%h %Creset%cd %Cgreen%cn %Cred%d %Creset%s'"
 # Functions
 # Enter を押すと ls or git status
 function do_enter() {
@@ -30,7 +32,7 @@ function do_enter() {
     if [ "$(git rev-parse --is-inside-work-tree 2> /dev/null)" = 'true' ]; then
         echo
         echo -e "\e[0;33m--- git status ---\e[0m"
-        git status -sb
+        git status -s
     fi
     zle reset-prompt
     return 0
@@ -44,7 +46,6 @@ function emacs-restart(){
 }
 zle -N emacs-restart
 bindkey '^e' emacs-restart
-
 ## tmux自動起動
 # http://d.hatena.ne.jp/tyru/20100828/run_tmux_or_screen_at_shell_startup
 is_screen_running() {
