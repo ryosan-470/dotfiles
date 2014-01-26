@@ -6,6 +6,7 @@ files="
 .vimrc
 .tmux
 .tmux.conf
+.gitconfig
 "
 REPO="${PWD}"
 TARGET_DIR=${HOME}/.dotconfig/dotfiles
