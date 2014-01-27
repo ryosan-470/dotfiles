@@ -3,6 +3,7 @@
 # under control files
 files="
 .zshrc
+.zshenv
 .vimrc
 .tmux
 .tmux.conf

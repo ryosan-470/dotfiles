@@ -47,23 +47,11 @@ plugins=(git ruby bundler emoji-clock themes)
 
 source $ZSH/oh-my-zsh.sh
 
-# Customize to your needs...
 ########################################
-# General Settings
-# Default Editor
-export EDITOR="emacs -nw"
-# Default encording
-export LANG=ja_JP.UTF-8
-# PATH
-export PATH=$PATH:${HOME}/bin
 # OS 別の設定
 case ${OSTYPE} in
     darwin13.0)
 	#For MacBook Air
-	alias emacsclient="/Applications/Emacs.app/Contents/MacOS/bin/emacsclient"
-	alias vim="/usr/local/Cellar/vim/7.4.052/bin/vim"
-	alias git="/usr/local/Cellar/git/1.8.5.3/bin/git"
-	alias gcc="/usr/local/bin/gcc"
 	;;
     darwin10.0)
 	#For iMac of COINS 
@@ -139,8 +127,15 @@ alias gf='git fetch origin master'
 alias j=java
 alias jc=javac
 alias ll='ls -lh'
+alias p=python
+alias p3=python3
+alias ip=ipython
+################################################
 # Functions
-# Enter を押すと ls or git status
+################################################
+################################################
+# if you press enter key, do ls or git status
+################################################
 function do_enter() {
     if [ -n "$BUFFER" ]; then
         zle accept-line
@@ -159,7 +154,9 @@ function do_enter() {
 }
 zle -N do_enter
 bindkey '^m' do_enter
+################################################
 # emacs-restart C-e
+################################################
 function emacs-restart(){
     kill-emacs
     emacs --daemon
@@ -167,8 +164,9 @@ function emacs-restart(){
 zle -N emacs-restart
 bindkey '^e' emacs-restart
 
+################################################
 ## tmux自動起動
-# http://d.hatena.ne.jp/tyru/20100828/run_tmux_or_screen_at_shell_startup
+################################################
 is_screen_running() {
     # tscreen also uses this varariable.
     [ ! -z "$WINDOW" ]
@@ -200,3 +198,22 @@ if ! is_screen_or_tmux_running && shell_has_started_interactively; then
         fi
     done
 fi
+################################################
+# hoge.tar.gz を ./hoge.tar.gz で展開
+################################################
+function extract() {
+    case $1 in
+        *.tar.gz|*.tgz) tar xzvf $1 ;;
+        *.tar.xz) tar Jxvf $1 ;;
+        *.zip) unzip $1 ;;
+        *.lzh) lha e $1 ;;
+        *.tar.bz2|*.tbz) tar xjvf $1 ;;
+        *.tar.Z) tar zxvf $1 ;;
+        *.gz) gzip -dc $1 ;;
+        *.bz2) bzip2 -dc $1 ;;
+        *.Z) uncompress $1 ;;
+        *.tar) tar xvf $1 ;;
+        *.arj) unarj $1 ;;
+    esac
+}
+alias -s {gz,tgz,zip,lzh,bz2,tbz,Z,tar,arj,xz}=extract
