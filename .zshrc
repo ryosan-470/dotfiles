@@ -54,7 +54,7 @@ case ${OSTYPE} in
 	#For MacBook Air
 	;;
     darwin10.0)
-	#For iMac of COINS 
+	#For iMac of COINS
 	;;
     linux*)
 	#For Linux General
@@ -63,6 +63,8 @@ case ${OSTYPE} in
 	alias pbpaste='xsel --clipboard --output'
 	;;
 esac
+# OS固有の設定
+source $HOME/.local.zsh
 
 export GREP_OPTIONS='--binary-files=without-match'
 # zsh customize
