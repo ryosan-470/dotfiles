@@ -42,27 +42,16 @@ ZSH_THEME="ys"
 # Which plugins would you like to load? (plugins can be found in ~/.oh-my-zsh/plugins/*)
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
-plugins=(git ruby bundler emoji-clock)
+# theme コマンドで実際にテーマを指定できる
+plugins=(git ruby bundler emoji-clock themes)
 
 source $ZSH/oh-my-zsh.sh
 
-# Customize to your needs...
 ########################################
-# General Settings
-# Default Editor
-export EDITOR="emacs -nw"
-# Default encording
-export LANG=ja_JP.UTF-8
-
 # OS 別の設定
 case ${OSTYPE} in
     darwin13.0)
 	#For MacBook Air
-	export PATH=$PATH:${HOME}/bin
-	alias emacsclient="/Applications/Emacs.app/Contents/MacOS/bin/emacsclient"
-	alias vim="/usr/local/Cellar/vim/7.4.052/bin/vim"
-	alias git="/usr/local/Cellar/git/1.8.4.3/bin/git"
-	alias gcc="/usr/local/bin/gcc"
 	;;
     darwin10.0)
 	#For iMac of COINS 
@@ -71,6 +60,8 @@ case ${OSTYPE} in
     linux*)
 	#For Linux General
 	alias open='gnome-open'
+	alias pbcopy='xsel --clipboard --input'
+	alias pbpaste='xsel --clipboard --output'
 	;;
 esac
 
@@ -115,8 +106,85 @@ bindkey "^R" history-incremental-search-backward
 bindkey "^S" history-incremental-search-forward
 # zaw
 source $HOME/.dotconfig/zaw/zaw.zsh
-# load alias
-source $HOME/.dotconfig/dotfiles/zsh.d/alias.zsh
 
+# if .zshrc is newer than .zshrc.zwc, do zcompile
+if [ ~/.zshrc -nt ~/.zshrc.zwc ]; then
+   zcompile ~/.zshrc
+fi
 
-PATH=$PATH:$HOME/.rvm/bin # Add RVM to PATH for scripting
+############################################################################
+##    Alias
+############################################################################
+alias e='emacs -nw'
+alias ec='emacsclient -nw'
+alias kill-emacs="emacsclient -e '(kill-emacs)'"
+alias v=vim
+alias g=git
+alias s='source ~/.zshrc'
+alias tr='tmux source-file ~/.tmux.conf'
+alias gpl='git pull origin master'
+alias gps='git push origin master'
+alias gf='git fetch origin master'
+alias j=java
+alias jc=javac
+alias ll='ls -lh'
+alias p=python
+alias p3=python3
+alias ip=ipython
+################################################
+# Functions
+################################################
+################################################
+# if you press enter key, do ls or git status
+################################################
+function do_enter() {
+    if [ -n "$BUFFER" ]; then
+        zle accept-line
+        return 0
+    fi
+    echo
+    ls
+    # ls_abbrev
+    if [ "$(git rev-parse --is-inside-work-tree 2> /dev/null)" = 'true' ]; then
+        echo
+        echo -e "\e[0;33m--- git status ---\e[0m"
+        git status -sb
+    fi
+    zle reset-prompt
+    return 0
+}
+zle -N do_enter
+bindkey '^m' do_enter
+################################################
+# emacs-restart C-e
+################################################
+function emacs-restart(){
+    kill-emacs
+    emacs --daemon
+}
+zle -N emacs-restart
+bindkey '^e' emacs-restart
+
+################################################
+## tmux自動起動
+################################################
+[[ -z "$TMUX" && ! -z "$PS1" ]] && tmux
+################################################
+# hoge.tar.gz を ./hoge.tar.gz で展開
+################################################
+function extract() {
+    case $1 in
+        *.tar.gz|*.tgz) tar xzvf $1 ;;
+        *.tar.xz) tar Jxvf $1 ;;
+        *.zip) unzip $1 ;;
+        *.lzh) lha e $1 ;;
+        *.tar.bz2|*.tbz) tar xjvf $1 ;;
+        *.tar.Z) tar zxvf $1 ;;
+        *.gz) gzip -dc $1 ;;
+        *.bz2) bzip2 -dc $1 ;;
+        *.Z) uncompress $1 ;;
+        *.tar) tar xvf $1 ;;
+        *.arj) unarj $1 ;;
+    esac
+}
+alias -s {gz,tgz,zip,lzh,bz2,tbz,Z,tar,arj,xz}=extract

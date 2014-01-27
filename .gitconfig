@@ -1,0 +1,27 @@
+[user]
+	name = Ryosuke Sato
+	email = tango@jtwp470.net
+[core]
+	editor = "emacsclient -nw"
+[color]
+	ui = auto		
+	status  = auto
+	diff = auto
+	branch = auto
+	interactive = auto
+	grep = auto
+[push]
+	default = tracking
+[include]
+	path = .gitconfig.os
+[alias]
+	b = branch -a
+	br = browse-remote
+	cm = commit
+	cma = commit --amend
+	co = checkout
+	d = diff
+	f = fetch
+	st = status
+	ss = status -s
+	l = log --graph --date=short --pretty=format:'%C(red reverse)%d%Creset%C(white reverse) %h% Creset %C(green reverse) %an %Creset %C(cyan)%ai%Creset%n%C(white bold)%w(80)%s%Creset%n%n%w(80,2,2)%b'
