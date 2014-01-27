@@ -4,6 +4,7 @@
 files="
 .zshrc
 .zshenv
+.zlogout
 .vimrc
 .tmux
 .tmux.conf

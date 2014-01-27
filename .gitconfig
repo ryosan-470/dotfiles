@@ -12,6 +12,8 @@
 	grep = auto
 [push]
 	default = tracking
+[include]
+	path = .gitconfig.os
 [alias]
 	b = branch -a
 	br = browse-remote
