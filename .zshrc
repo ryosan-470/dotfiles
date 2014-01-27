@@ -64,6 +64,8 @@ case ${OSTYPE} in
 	alias pbpaste='xsel --clipboard --output'
 	;;
 esac
+# OS固有の設定
+source $HOME/.local.zsh
 
 export GREP_OPTIONS='--binary-files=without-match'
 # zsh customize
