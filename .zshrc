@@ -54,7 +54,8 @@ case ${OSTYPE} in
 	#For MacBook Air
 	;;
     darwin10.0)
-	#For iMac of COINS
+	#For iMac of COINS 
+	alias emacsclient="~/bin/Emacs.app/Contents/MacOS/bin/emacsclient"
 	;;
     linux*)
 	#For Linux General
