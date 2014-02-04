@@ -55,6 +55,7 @@ case ${OSTYPE} in
 	;;
     darwin10.0)
 	#For iMac of COINS 
+	alias emacsclient="~/bin/Emacs.app/Contents/MacOS/bin/emacsclient"
 	;;
     linux*)
 	#For Linux General
@@ -63,6 +64,8 @@ case ${OSTYPE} in
 	alias pbpaste='xsel --clipboard --output'
 	;;
 esac
+# OS固有の設定
+source $HOME/.local.zsh
 
 export GREP_OPTIONS='--binary-files=without-match'
 # zsh customize
