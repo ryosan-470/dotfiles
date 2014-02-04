@@ -115,11 +115,12 @@ fi
 ##    Alias
 ############################################################################
 alias e='emacs -nw'
-alias ec='emacsclient -nw'
+alias ec='emacsclient -nw -a ""'
 alias kill-emacs="emacsclient -e '(kill-emacs)'"
 alias v=vim
 alias g=git
 alias s='source ~/.zshrc'
+alias t=tmux
 alias tr='tmux source-file ~/.tmux.conf'
 alias gpl='git pull origin master'
 alias gps='git push origin master'
@@ -127,8 +128,8 @@ alias gf='git fetch origin master'
 alias j=java
 alias jc=javac
 alias ll='ls -lh'
-alias p=python
-alias p3=python3
+alias p2=python
+alias p=python3
 alias ip=ipython
 ################################################
 # Functions
