@@ -53,10 +53,6 @@ case ${OSTYPE} in
     darwin13.0)
 	#For MacBook Air
 	;;
-    darwin10.0)
-	#For iMac of COINS 
-	alias emacsclient="~/bin/Emacs.app/Contents/MacOS/bin/emacsclient"
-	;;
     linux*)
 	#For Linux General
 	alias open='gnome-open'
@@ -71,16 +67,6 @@ export GREP_OPTIONS='--binary-files=without-match'
 # zsh customize
 setopt auto_cd
 function chpwd() { ls -F }
-# # '' を押すと上のディレクトリに移動する git reset --hard HEAD^ に競合
-# function cdup() {
-# echo
-# cd ..
-# zle reset-prompt
-# }
-# zle -N cdup
-# bindkey '\^' cdup
-# zaw setting
-# search history key bind ''})''})'C-h'
 bindkey '^h' zaw-history
 # history search
 bindkey '^P' history-beginning-search-backward
@@ -159,14 +145,14 @@ function do_enter() {
 zle -N do_enter
 bindkey '^m' do_enter
 ################################################
-# emacs-restart C-e
+# emacs-restart C-f
 ################################################
 function emacs-restart(){
     kill-emacs
     emacs --daemon
 }
 zle -N emacs-restart
-bindkey '^e' emacs-restart
+bindkey '^f' emacs-restart
 
 ################################################
 ## tmux自動起動
