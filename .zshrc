@@ -52,6 +52,7 @@ source $ZSH/oh-my-zsh.sh
 case ${OSTYPE} in
     darwin13.0)
 	#For MacBook Air
+	alias tmux="tmux -f ~/.dotconfig/dotfiles/.tmux.conf.osx"
 	;;
     linux*)
 	#For Linux General
