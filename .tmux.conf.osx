@@ -71,6 +71,8 @@ bind h split-window -h
 bind C-k confirm-before -p "kill-pane #W? (y/n)" kill-pane
 # ウィンドウ終了
 bind C-c confirm-before -p "kill-window #W? (y/n)" kill-window
+# 分割ペインを元に戻す
+bind 1 confirm-before -p "break-pane #W? (y/n)" break-pane
 # 直前のウィンドウ t
 bind C-t last-window
 # タイトル変更 A
