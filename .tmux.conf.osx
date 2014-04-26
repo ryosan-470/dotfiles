@@ -84,3 +84,7 @@ bind C-@ copy-mode
 bind C-y paste-buffer
 # Enable pbcopy on mac
 set-option -g default-command "reattach-to-user-namespace -l zsh"
+# Command Sequence for nested tmux session on remote host
+bind C-q send-prefix
+# Aggressive Resize
+setw -g aggressive-resize on
