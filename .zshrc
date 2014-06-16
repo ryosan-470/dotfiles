@@ -39,12 +39,6 @@ ZSH_THEME="ys"
 # much faster.
 # DISABLE_UNTRACKED_FILES_DIRTY="true"
 
-# Which plugins would you like to load? (plugins can be found in ~/.oh-my-zsh/plugins/*)
-# Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
-# Example format: plugins=(rails git textmate ruby lighthouse)
-# theme コマンドで実際にテーマを指定できる
-plugins=(git ruby bundler emoji-clock themes)
-
 source $ZSH/oh-my-zsh.sh
 
 ########################################
@@ -53,12 +47,14 @@ case ${OSTYPE} in
     darwin13.0)
 	#For MacBook Air
 	alias tmux="tmux -f ~/.dotconfig/dotfiles/.tmux.conf.osx"
+	plugins=(git ruby bundler emoji-clock themes cp pip brew osx python git-extras)
 	;;
     linux*)
 	#For Linux General
 	alias open='gnome-open'
 	alias pbcopy='xsel --clipboard --input'
 	alias pbpaste='xsel --clipboard --output'
+	plugins=(git ruby bundler emoji-clock themes cp pip python git-extras)
 	;;
 esac
 # OS固有の設定
@@ -97,7 +93,7 @@ bindkey "^S" history-incremental-search-forward
 source $HOME/.dotconfig/zaw/zaw.zsh
 
 # if .zshrc is newer than .zshrc.zwc, do zcompile
-if [ ~/.zshrc -nt ~/.zshrc.zwc ]; then
+if [ ! -f ~/.zshrc.zwc -o ~/.zshrc -nt ~/.zshrc.zwc ];then
    zcompile ~/.zshrc
 fi
 
@@ -115,12 +111,15 @@ alias tr='tmux source-file ~/.tmux.conf'
 alias gpl='git pull origin master'
 alias gps='git push origin master'
 alias gf='git fetch origin master'
+alias gss='git status -s'
 alias j=java
 alias jc=javac
 alias ll='ls -lh'
 alias p2=python
 alias p=python3
 alias ip=ipython
+alias rmclass="rm *.class"
+alias rmtex="rm *.aux, *.dvi, *.log"
 ################################################
 # Functions
 ################################################
@@ -150,7 +149,7 @@ bindkey '^m' do_enter
 ################################################
 function emacs-restart(){
     kill-emacs
-    emacs --daemon
+    ec
 }
 zle -N emacs-restart
 bindkey '^f' emacs-restart
