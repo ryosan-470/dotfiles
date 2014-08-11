@@ -102,16 +102,22 @@ fi
 ############################################################################
 alias e='emacs -nw'
 alias ec='emacsclient -nw -a ""'
+alias ecw='emacsclient -c'
 alias kill-emacs="emacsclient -e '(kill-emacs)'"
 alias v=vim
 alias g=git
 alias s='source ~/.zshrc'
 alias t=tmux
 alias tr='tmux source-file ~/.tmux.conf'
+alias ta="tmux attach -t 0"
+alias td="tmux detach"
+alias tl="tmux ls"
 alias gpl='git pull origin master'
 alias gps='git push origin master'
 alias gf='git fetch origin master'
 alias gss='git status -s'
+alias gc='git commit'
+alias gcv='git commit -v'
 alias j=java
 alias jc=javac
 alias ll='ls -lh'
@@ -145,14 +151,14 @@ function do_enter() {
 zle -N do_enter
 bindkey '^m' do_enter
 ################################################
-# emacs-restart C-f
+# emacs-restart C-x e
 ################################################
 function emacs-restart(){
     kill-emacs
     ec
 }
 zle -N emacs-restart
-bindkey '^f' emacs-restart
+bindkey '^xe' emacs-restart
 
 ################################################
 ## tmux自動起動
