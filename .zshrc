@@ -59,7 +59,7 @@ case ${OSTYPE} in
 esac
 # OS固有の設定
 source $HOME/.local.zsh
-
+bindkey -e # キーバインドをEmacs風にする
 export GREP_OPTIONS='--binary-files=without-match'
 # zsh customize
 setopt auto_cd
@@ -91,6 +91,8 @@ bindkey "^R" history-incremental-search-backward
 bindkey "^S" history-incremental-search-forward
 # zaw
 source $HOME/.dotconfig/zaw/zaw.zsh
+# zsh 拡張glob
+setopt extendedglob
 
 # if .zshrc is newer than .zshrc.zwc, do zcompile
 if [ ! -f ~/.zshrc.zwc -o ~/.zshrc -nt ~/.zshrc.zwc ];then
@@ -123,9 +125,7 @@ alias jc=javac
 alias ll='ls -lh'
 alias p2=python
 alias p=python3
-alias ip=ipython
-alias rmclass="rm *.class"
-alias rmtex="rm *.aux, *.dvi, *.log"
+alias fds='du -h -d 1'
 ################################################
 # Functions
 ################################################
@@ -163,7 +163,14 @@ bindkey '^xe' emacs-restart
 ################################################
 ## tmux自動起動
 ################################################
-[[ -z "$TMUX" && ! -z "$PS1" ]] && tmux
+if [ "$TMUX" = "" ]; then
+    tmux attach;
+
+    # detachしてない場合
+    if [ $? ]; then
+        tmux;
+    fi
+fi
 ################################################
 # hoge.tar.gz を ./hoge.tar.gz で展開
 ################################################
