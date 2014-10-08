@@ -190,3 +190,15 @@ function extract() {
     esac
 }
 alias -s {gz,tgz,zip,lzh,bz2,tbz,Z,tar,arj,xz}=extract
+################################################
+# rmtex
+################################################
+function rmtex() {
+    NAME=`basename $1 .tex`
+    rm $NAME.(aux|log|dvi)
+    if [ $? -ne 0 ]; then
+	echo "Failed to remove"
+    else
+	echo "Success!"
+    fi
+}

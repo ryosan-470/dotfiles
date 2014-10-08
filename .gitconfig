@@ -2,7 +2,7 @@
 	name = Ryosuke Sato
 	email = tango@jtwp470.net
 [core]
-	editor = "emacsclient -nw"
+	editor = "emacsclient -nw -t" --alternate-editor "emacs -nw"
 [color]
 	ui = auto		
 	status  = auto
