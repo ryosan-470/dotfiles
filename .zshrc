@@ -93,7 +93,12 @@ bindkey "^S" history-incremental-search-forward
 source $HOME/.dotconfig/zaw/zaw.zsh
 # zsh 拡張glob
 setopt extendedglob
-
+# killコマンドを便利に
+zstyle ':completion:*:processes' command "ps -u $USER -o pid,stat,%cpu,%mem,cputime,command"
+# コマンドラインを任意のテキストエディタで編集する
+autoload -Uz edit-command-line
+zle -N edit-command-line
+bindkey '^xe' edit-command-line
 # if .zshrc is newer than .zshrc.zwc, do zcompile
 if [ ! -f ~/.zshrc.zwc -o ~/.zshrc -nt ~/.zshrc.zwc ];then
    zcompile ~/.zshrc
@@ -151,14 +156,14 @@ function do_enter() {
 zle -N do_enter
 bindkey '^m' do_enter
 ################################################
-# emacs-restart C-x e
+# emacs-restart C-r e
 ################################################
 function emacs-restart(){
     kill-emacs
     ec
 }
 zle -N emacs-restart
-bindkey '^xe' emacs-restart
+bindkey '^re' emacs-restart
 
 ################################################
 ## tmux自動起動
@@ -201,4 +206,11 @@ function rmtex() {
     else
 	echo "Success!"
     fi
+}
+################################################
+# copy to clipboard
+################################################
+function c2b() {
+    TARGET=$1
+    cat $TARGET | pbcopy
 }

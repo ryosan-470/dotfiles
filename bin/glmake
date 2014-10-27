@@ -1,0 +1,19 @@
+#!/bin/bash -x
+# OpenGLのC言語コードをコンパイル&ビルド for OSX
+SOURCECODE=$1
+OPTIONS=$2
+OUTPUTFILE=${SOURCECODE%.*}.out
+OS=`uname`
+CC=clang++
+case $OS in
+    'Linux')
+	$CC $OPTIONS -lglut -lm -lGL -lGLU $SOURCECODE -o $OUTPUTFILE;;
+    'Darwin')
+        # -Wno-deprecated で OSX 10.9以降の警告?を出さないようにしておく
+	$CC $OPTIONS -Wno-deprecated -framework OpenGL -framework GLUT -framework Foundation $SOURCECODE -o $OUTPUTFILE;;
+    *)
+	echo "Error. We can't compile your program on $OS"
+	exit;;
+esac
+
+./$OUTPUTFILE
