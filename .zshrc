@@ -43,7 +43,7 @@ source $ZSH/oh-my-zsh.sh
 
 ########################################
 # OS 別の設定
-OS = `uname`
+OS=`uname`
 case ${OS} in
     "Darwin")
 	#For MacBook Air
