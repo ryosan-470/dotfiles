@@ -19,3 +19,12 @@ My configuration for zsh, tmux and Vim.
 ## How would you like to use Emacs?
 
 -> Answer:[jtwp470/dotemacs](https://github.com/jtwp470/dotemacs)
+
+## Plugins
+
+* [tmux yank](https://github.com/tmux-plugins/tmux-yank)
+
+=> Enables copying to system clipboard in tmux. Works on Linux and OSX.
+
+Linux requirements:```xsel```
+OSX requirements  :```reattach-to-user-namespace```
