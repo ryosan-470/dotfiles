@@ -1,0 +1,3 @@
+[submodule ".tmux/tmux-yank"]
+	path = .tmux/tmux-yank
+	url = https://github.com/tmux-plugins/tmux-yank.git

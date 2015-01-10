@@ -43,13 +43,13 @@ source $ZSH/oh-my-zsh.sh
 
 ########################################
 # OS 別の設定
-case ${OSTYPE} in
-    darwin13.0)
+OS=`uname`
+case ${OS} in
+    "Darwin")
 	#For MacBook Air
-	alias tmux="tmux -f ~/.dotconfig/dotfiles/.tmux.conf.osx"
 	plugins=(git ruby bundler emoji-clock themes cp pip brew osx python git-extras)
 	;;
-    linux*)
+    "Linux")
 	#For Linux General
 	alias open='gnome-open'
 	alias pbcopy='xsel --clipboard --input'
