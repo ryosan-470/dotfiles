@@ -1,3 +1,6 @@
 [submodule ".tmux/tmux-yank"]
 	path = .tmux/tmux-yank
 	url = https://github.com/tmux-plugins/tmux-yank.git
+[submodule "zsh.d/zsh-syntax-highlighting"]
+	path = zsh.d/zsh-syntax-highlighting
+	url = https://github.com/zsh-users/zsh-syntax-highlighting.git

@@ -30,7 +30,6 @@ ZSH_THEME="ys"
 
 # Uncomment following line if you want to disable command autocorrection
 # DISABLE_CORRECTION="true"
-
 # Uncomment following line if you want red dots to be displayed while waiting for completion
 # COMPLETION_WAITING_DOTS="true"
 
@@ -214,3 +213,9 @@ function c2b() {
     TARGET=$1
     cat $TARGET | pbcopy
 }
+################################################
+# zsh-syntax-highlighting
+################################################
+if [ -f ~/.dotconfig/dotfiles/zsh.d/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ]; then
+    source ~/.dotconfig/dotfiles/zsh.d/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+fi

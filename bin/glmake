@@ -5,6 +5,11 @@ OPTIONS=$2
 OUTPUTFILE=${SOURCECODE%.*}.out
 OS=`uname`
 CC=clang++
+if [ -z $SOURCECODE ]; then
+    echo "Error! Please assign input file!"
+    exit
+fi
+
 case $OS in
     'Linux')
 	$CC $OPTIONS -lglut -lm -lGL -lGLU $SOURCECODE -o $OUTPUTFILE;;
