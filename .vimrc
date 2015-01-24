@@ -1,11 +1,11 @@
+"" Delete key が動かない問題対策
+set backspace=indent,eol,start
 "" 色の設定
-" シンタックスオン（色つける）
-syntax on
 set nohlsearch
 set cursorline
-
-" 色テーマの指定（おまかせ）
-colorscheme darkblue
+syntax on
+" 色テーマ
+colorscheme desert
 " 背景透過
 highlight Normal ctermbg=none
 " 現在のカーソルの色をつける
@@ -47,12 +47,43 @@ set smartindent "改行時に入力された行の末尾に合わせて次の行
 
 " 文字コードの自動判別
 set encoding=utf-8
-set fileencodings=iso-2022-jp,euc-jp,sjis,utf-8
-set fileformats=unix,mac,dos
 
-" カッコとクォーテーションの補完
-inoremap { {}<LEFT>
-inoremap [ []<LEFT>
-inoremap ( ()<LEFT>
-inoremap " ""<LEFT>
-inoremap ' ''<LEFT>
+" Note: Skip initialization for vim-tiny or vim-small.
+if !1 | finish | endif
+
+if has('vim_starting')
+   if &compatible
+     set nocompatible               " Be iMproved
+   endif
+
+   " Required:
+   set runtimepath+=~/.dotconfig/dotfiles/vim.d/bundle/neobundle.vim/
+ endif
+
+ " Required:
+  call neobundle#begin(expand('~/.dotconfig/dotfiles/vim.d/bundle/'))
+
+ " Let NeoBundle manage NeoBundle
+ " Required:
+  NeoBundleFetch 'Shougo/neobundle.vim'
+
+ " My Bundles here:
+ " Refer to |:NeoBundle-examples|.
+ " Note: You don't set neobundle setting in .gvimrc!
+	NeoBundle 'altercation/vim-colors-solarized'
+	" Vim Powerline
+	NeoBundle 'alpaca-tc/alpaca_powertabline'
+	NeoBundle 'Lokaltog/powerline', { 'rtp' : 'powerline/bindings/vim'}
+	NeoBundle 'Lokaltog/powerline-fontpatcher'
+	
+	call neobundle#end()
+
+ " Required:
+ filetype plugin indent on
+
+" If there are uninstalled bundles found on startup,
+ " this will conveniently prompt you to install them.
+ NeoBundleCheck
+
+syntax enable
+colorscheme desert
