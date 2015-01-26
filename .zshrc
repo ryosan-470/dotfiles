@@ -122,7 +122,8 @@ alias gpl='git pull origin master'
 alias gps='git push origin master'
 alias gf='git fetch origin master'
 alias gss='git status -s'
-alias gc='git commit'
+alias gcm='git commit'
+alias gcmm='git commit -m'
 alias gcv='git commit -v'
 alias j=java
 alias jc=javac
@@ -158,12 +159,10 @@ bindkey '^m' do_enter
 # emacs-restart C-r e
 ################################################
 function emacs-restart(){
-    kill-emacs
-    ec
+    emacsclient -e '(kill-emacs)' && emacsclient -nw -a ""
 }
 zle -N emacs-restart
 bindkey '^re' emacs-restart
-
 ################################################
 ## tmux自動起動
 ################################################
@@ -219,3 +218,12 @@ function c2b() {
 if [ -f ~/.dotconfig/dotfiles/zsh.d/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ]; then
     source ~/.dotconfig/dotfiles/zsh.d/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 fi
+################################################
+# git submodule deinit 
+################################################
+function git-submodule-delete() {
+    REPO=$1
+    git submodule deinit $REPO
+    git rm $REPO
+}
+alias "git submodule delete"=git-submodule-delete
