@@ -10,3 +10,9 @@
 [submodule "vim.d/bundle/vimproc"]
 	path = vim.d/bundle/vimproc
 	url = https://github.com/Shougo/vimproc
+[submodule "zsh.d/zsh-bd"]
+	path = zsh.d/zsh-bd
+	url = https://github.com/Tarrasch/zsh-bd.git
+[submodule "zsh.d/zaw"]
+	path = zsh.d/zaw
+	url = https://github.com/zsh-users/zaw.git

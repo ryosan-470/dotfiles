@@ -1,0 +1,25 @@
+[global_config]
+[keybindings]
+  paste = <Primary>v
+  hide_window = <Primary>t
+  toggle_scrollbar = <Primary><Alt>h
+[profiles]
+  [[default]]
+    palette = "#000000:#aa0000:#00aa00:#aa5500:#6f6ff4:#aa00aa:#00aaaa:#aaaaaa:#555555:#ff5555:#55ff55:#c2c216:#5555ff:#ff55ff:#55ffff:#ffffff"
+    font = Ricty for Powerline 13
+    background_image = None
+    background_darkness = 0.7
+    background_type = transparent
+    use_system_font = False
+    foreground_color = "#ffffff"
+    show_titlebar = False
+    copy_on_selection = True
+[layouts]
+  [[default]]
+    [[[child1]]]
+      type = Terminal
+      parent = window0
+    [[[window0]]]
+      type = Window
+      parent = ""
+[plugins]

@@ -1,3 +1,4 @@
+ZSHD_PATH=$HOME/.dotconfig/dotfiles/zsh.d
 # Common settings
 # Path to your oh-my-zsh configuration.
 ZSH=$HOME/.oh-my-zsh
@@ -6,8 +7,8 @@ ZSH=$HOME/.oh-my-zsh
 # Look in ~/.oh-my-zsh/themes/
 # Optionally, if you set this to "random", it'll load a random theme each
 # time that oh-my-zsh is loaded.
-ZSH_THEME="ys"
-#ZSH_THEME="agnoster"
+# ZSH_THEME="ys"
+# ZSH_THEME="agnoster"
 
 # Example aliases
 # alias zshconfig="mate ~/.zshrc"
@@ -39,7 +40,7 @@ ZSH_THEME="ys"
 # DISABLE_UNTRACKED_FILES_DIRTY="true"
 
 source $ZSH/oh-my-zsh.sh
-
+source ~/.dotconfig/dotfiles/zsh.d/themes.zsh
 ########################################
 # OS 別の設定
 OS=`uname`
@@ -53,17 +54,16 @@ case ${OS} in
 	alias open='gnome-open'
 	alias pbcopy='xsel --clipboard --input'
 	alias pbpaste='xsel --clipboard --output'
-	plugins=(git ruby bundler emoji-clock themes cp pip python git-extras)
+	plugins=(git ruby bundler emoji-clock themes cp pip python git-extras autojump)
 	;;
 esac
-# OS固有の設定
+# OS固有の設定を書くファイル(ignoreされている)
 source $HOME/.local.zsh
 bindkey -e # キーバインドをEmacs風にする
 export GREP_OPTIONS='--binary-files=without-match'
 # zsh customize
 setopt auto_cd
 function chpwd() { ls -F }
-bindkey '^h' zaw-history
 # history search
 bindkey '^P' history-beginning-search-backward
 bindkey '^N' history-beginning-search-forward
@@ -76,20 +76,18 @@ setopt hist_ignore_space
 # ヒストリを呼び出してから実行する間に一旦編集可能
 setopt hist_verify
 # 余分な空白は詰めて記録
-setopt hist_reduce_blanks  
-# 古いコマンドと同じものは無視 
+setopt hist_reduce_blanks
+# 古いコマンドと同じものは無視
 setopt hist_save_no_dups
 # historyコマンドは履歴に登録しない
 setopt hist_no_store
-# 補完時にヒストリを自動的に展開         
+# 補完時にヒストリを自動的に展開
 setopt hist_expand
 # 履歴をインクリメンタルに追加
 setopt inc_append_history
 # インクリメンタルからの検索
 bindkey "^R" history-incremental-search-backward
 bindkey "^S" history-incremental-search-forward
-# zaw
-source $HOME/.dotconfig/zaw/zaw.zsh
 # zsh 拡張glob
 setopt extendedglob
 # killコマンドを便利に
@@ -215,11 +213,11 @@ function c2b() {
 ################################################
 # zsh-syntax-highlighting
 ################################################
-if [ -f ~/.dotconfig/dotfiles/zsh.d/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ]; then
-    source ~/.dotconfig/dotfiles/zsh.d/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+if [ -f $ZSHD_PATH/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ]; then
+    source $ZSHD_PATH/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 fi
 ################################################
-# git submodule deinit 
+# git submodule deinit
 ################################################
 function git-submodule-delete() {
     REPO=$1
@@ -227,3 +225,27 @@ function git-submodule-delete() {
     git rm $REPO
 }
 alias "git submodule delete"=git-submodule-delete
+################################################
+# bd
+################################################
+if [ -f $ZSHD_PATH/zsh-bd/bd.zsh ]; then
+    source $ZSHD_PATH/zsh-bd/bd.zsh
+fi
+# zaw
+if [ -f $ZSHD_PATH/zaw/zaw.zsh ]; then
+    autoload -Uz chpwd_recent_dirs cdr add-zsh-hook
+    add-zsh-hook chpwd chpwd_recent_dirs
+    zstyle ':chpwd:*' recent-dirs-max 500 # cdrの履歴を保存する個数
+    zstyle ':chpwd:*' recent-dirs-default yes
+    zstyle ':completion:*' recent-dirs-insert both
+    zstyle ':filter-select:highlight' selected fg=black,bg=white,standout
+    zstyle ':filter-select' case-insensitive yes
+    source $ZSHD_PATH/zaw/zaw.zsh
+    bindkey '^@' zaw-cdr
+    bindkey '^R' zaw-history
+    bindkey '^X^F' zaw-git-files
+    bindkey '^X^B' zaw-git-branches
+    bindkey '^X^P' zaw-process
+    bindkey '^X^A' zaw-tmux
+    bindkey '^h' zaw-history
+fi
