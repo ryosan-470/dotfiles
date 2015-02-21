@@ -129,6 +129,7 @@ alias ll='ls -lh'
 alias p2=python
 alias p=python3
 alias fds='du -h -d 1'
+alias gpp=g++
 ################################################
 # Functions
 ################################################

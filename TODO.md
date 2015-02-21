@@ -9,3 +9,6 @@
 * エイリアス整備
 * セットアップ用スクリプトを改善する
 * [dotfiles駆動開発とGitHubで管理する運用方法](http://qiita.com/b4b4r07/items/b70178e021bef12cd4a2
+
+## 注意
+terminator_config は ~/.config/terminator/config にある.
