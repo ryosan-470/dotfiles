@@ -1,0 +1,8 @@
+language: python
+python:
+  - 3.4
+  - nightly
+before_install:
+  - sudo apt-get install zsh vim python3
+script:
+  - "python3 install.py all"

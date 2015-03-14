@@ -67,7 +67,7 @@ function update_git_info() {
 # %n: ユーザ名
 # %?: 最後に実行したコマンドの終了ステータス
 # %(x.true-text.false-text): xが真のときはtrue-textになり偽のときはfalse-textになる。
-PROMPT_HOST='%{%b%F{gray}%K{blue}%} %(?.%{%F{green}%}✔.%{%F{red}%}✘)%{%F{black}%} %n %{%F{blue}%}'
+PROMPT_HOST='%{%b%F{gray}%K{blue}%} %(?.%{%F{green}%}✔.%{%F{red}%}✘)%{%F{black}%} %n@%M %{%F{blue}%}'
 PROMPT_DIR='%{%F{black}%} %~%  '
 PROMPT_SU='%(!.%{%k%F{blue}%K{black}%}⮀%{%F{yellow}%} ⚡ %{%k%F{black}%}.%{%k%F{magenta}%})⮀%{%f%k%b%}'
 PROMPT='

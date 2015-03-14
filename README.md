@@ -1,5 +1,7 @@
 # dotfiles
-My configuration for zsh, tmux and Vim.
+[![Build Status](https://travis-ci.org/jtwp470/dotfiles.svg?branch=feature%2Ftravis)](https://travis-ci.org/jtwp470/dotfiles)
+
+My confifeature/travisd Vim.
 
 ## How to setup
 
