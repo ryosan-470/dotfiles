@@ -1,5 +1,17 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+"""
+install.py
+
+The setup script for me. Linux and Mac OSX supports.
+
+Copyright (C) 2015 Ryosuke SATO (jtwp470)
+
+
+This software is released under the MIT License.
+
+Please refer to http://jtwp470.mit-license.org to know this license.
+"""
 import argparse
 import enum
 import os
