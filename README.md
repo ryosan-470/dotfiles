@@ -1,5 +1,5 @@
 # dotfiles
-[![Build Status](https://travis-ci.org/jtwp470/dotfiles.svg?branch=development)](https://travis-ci.org/jtwp470/dotfiles)
+[![Build Status](https://travis-ci.org/jtwp470/dotfiles.svg)](https://travis-ci.org/jtwp470/dotfiles)
 [![License](http://img.shields.io/:license-mit-blue.svg)](http://jtwp470.mit-license.org/)
 
 This is a repository with my configuration files, those that in Linux/OSX normally are those files under the ```{$HOME}``` directory that are hidden and preceded by a dot, AKA, **dotfiles**.

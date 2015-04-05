@@ -130,6 +130,7 @@ alias p2=python
 alias p=python3
 alias fds='du -h -d 1'
 alias gpp=g++
+alias el2elc="emacs -batch -f batch-byte-compile"
 ################################################
 # Functions
 ################################################
@@ -250,3 +251,5 @@ if [ -f $ZSHD_PATH/zaw/zaw.zsh ]; then
     bindkey '^X^A' zaw-tmux
     bindkey '^h' zaw-history
 fi
+
+source ${ZSHD_PATH}/run.zsh
