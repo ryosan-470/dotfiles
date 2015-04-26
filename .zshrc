@@ -43,11 +43,12 @@ source $ZSH/oh-my-zsh.sh
 source ~/.dotconfig/dotfiles/zsh.d/themes.zsh
 ########################################
 # OS 別の設定
-OS=`uname`
-case ${OS} in
+
+case `uname` in
     "Darwin")
 	#For MacBook Air
 	plugins=(git ruby bundler emoji-clock themes cp pip brew osx python git-extras)
+        alias update="brew -v update && brew -v upgrade"
 	;;
     "Linux")
 	#For Linux General
@@ -55,6 +56,12 @@ case ${OS} in
 	alias pbcopy='xsel --clipboard --input'
 	alias pbpaste='xsel --clipboard --output'
 	plugins=(git ruby bundler emoji-clock themes cp pip python git-extras autojump)
+        if [ -e /etc/lsb-relase ]; then
+            # Ubuntu
+            alias update="sudo apt-get update && sudo apt-get upgrade"
+        else
+            alias update="echo 'Not support your using distribution.'"
+        fi
 	;;
 esac
 # OS固有の設定を書くファイル(ignoreされている)
