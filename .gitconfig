@@ -1,10 +1,10 @@
 [user]
 	name = Ryosuke Sato
-	email = tango@jtwp470.net
+	email = rskjtwp@gmail.com
 [core]
-	editor = "emacsclient -nw -t" --alternate-editor "emacs -nw"
+	editor = "emacsclient -nw -a ''" --alternate-editor "vim"
 [color]
-	ui = auto		
+	ui = auto
 	status  = auto
 	diff = auto
 	branch = auto

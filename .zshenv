@@ -1,4 +1,5 @@
 # environment settings
+typeset -U path PATH
 export PATH=/usr/local/bin:$HOME/bin:$PATH
 export PAGER=lv
 export LANG=en_US.UTF-8
