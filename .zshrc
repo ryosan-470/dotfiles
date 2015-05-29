@@ -260,3 +260,12 @@ if [ -f $ZSHD_PATH/zaw/zaw.zsh ]; then
 fi
 
 source ${ZSHD_PATH}/run.zsh
+##################################################
+# keydump (RSA key dumped using openssl)
+##################################################
+function keydump() {
+    KEYFILE=$1
+    CIPHER=$2
+    # public keyを見たい場合はrsa -pubin オプションを使うらしい
+    openssl ${CIPHER:='rsa'} -in ${KEYFILE:='id_rsa.pub'} -text -noout
+}

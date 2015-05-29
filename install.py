@@ -90,7 +90,7 @@ def deploy():
         print("link {src} to {dst}".format(src=src, dst=dst))
         try:
             os.symlink(src, dst)
-        except FileExistsError:
+        except:
             print("symlink exists.")
             pass
 
@@ -105,6 +105,15 @@ def initialize():
             subprocess.check_call(shlex.split("bash " + commands))
         except OSError:
             sys.exit("[Error:initialize()]Command not found.")
+
+
+def ttest():
+    command = "zsh {home}.zshrc".format(home=DOTFILES)
+    try:
+        subprocess.check_call(shlex.split(command))
+    except:
+        print("Error")
+        sys.exit(1)
 
 
 def help_description():
@@ -136,6 +145,9 @@ def main():
     parser_help = subparser.add_parser("help")
     parser_help.set_defaults(func=help_description)
 
+    parser_test = subparser.add_parser("test", help="test section using Travis-CI")
+    parser_test.set_defaults(func=ttest)
+
     parser_all = subparser.add_parser("all")
     parser_all.set_defaults(func=all_run)
     args = parser.parse_args()
@@ -144,6 +156,7 @@ def main():
     if args == argparse.Namespace():
         args = parser.parse_args(["help"])
     args.func()
+
 
 if __name__ == "__main__":
     main()
