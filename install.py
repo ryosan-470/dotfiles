@@ -107,7 +107,7 @@ def initialize():
             sys.exit("[Error:initialize()]Command not found.")
 
 
-def ttest():
+def test():
     command = "zsh {home}.zshrc".format(home=DOTFILES)
     try:
         subprocess.check_call(shlex.split(command))
@@ -146,7 +146,7 @@ def main():
     parser_help.set_defaults(func=help_description)
 
     parser_test = subparser.add_parser("test", help="test section using Travis-CI")
-    parser_test.set_defaults(func=ttest)
+    parser_test.set_defaults(func=test)
 
     parser_all = subparser.add_parser("all")
     parser_all.set_defaults(func=all_run)

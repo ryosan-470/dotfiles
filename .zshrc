@@ -46,23 +46,31 @@ source ~/.dotconfig/dotfiles/zsh.d/themes.zsh
 
 case `uname` in
     "Darwin")
-	#For MacBook Air
-	plugins=(git ruby bundler emoji-clock themes cp pip brew osx python git-extras)
-        alias update="brew -v update && brew -v upgrade"
-	;;
+	      #For MacBook Air
+	      plugins=(git ruby bundler emoji-clock themes cp pip brew osx python git-extras)
+        alias update="brew -v update && brew -v upgrade --all"
+	      ;;
     "Linux")
-	#For Linux General
-	alias open='gnome-open'
-	alias pbcopy='xsel --clipboard --input'
-	alias pbpaste='xsel --clipboard --output'
-	plugins=(git ruby bundler emoji-clock themes cp pip python git-extras autojump)
-        if [ -e /etc/lsb-relase ]; then
+	      #For Linux General
+	      alias open='gnome-open'
+	      alias pbcopy='xsel --clipboard --input'
+	      alias pbpaste='xsel --clipboard --output'
+	      plugins=(git ruby bundler emoji-clock themes cp pip python git-extras autojump)
+        local UPDATE_CMD=""
+        if [ -e /etc/lsb-release ]; then
             # Ubuntu
-            alias update="sudo apt-get update && sudo apt-get upgrade"
+            UPDATE_CMD="sudo apt-get update && sudo apt-get upgrade"
+        elif [ -e /etc/arch-release ]; then
+            # ArchLinux
+            UPDATE_CMD="sudo pacman -Syu"
+        elif [ -e /etc/redhat-release ]; then
+            # CentOS
+            UPDATE_CMD="sudo yum update";
         else
-            alias update="echo 'Not support your using distribution.'"
+            UPDATE_CMD="echo 'Not support your using distribution.'"
         fi
-	;;
+        alias update=UPDATE_CMD
+	      ;;
 esac
 # OS固有の設定を書くファイル(ignoreされている)
 source $HOME/.local.zsh
@@ -138,6 +146,7 @@ alias p=python3
 alias fds='du -h -d 1'
 alias gpp=g++
 alias el2elc="emacs -batch -f batch-byte-compile"
+alias dl=`docker ps -l -q`
 ################################################
 # Functions
 ################################################
