@@ -70,7 +70,7 @@ def downloading_dotfiles():
         # git clone --recursive ${REPO_URL} ${DOTFILES}
         # git  --recursive option is then do submodule init & submodule update
         print("Clone repository")
-        commands = "git clone -b development --single-branch {repo} {dst} --recursive".format(
+        commands = "git clone {repo} {dst} --recursive".format(
             repo=REPOS_URL, dst=DOTFILES)
         print(commands)
         subprocess.check_call(shlex.split(commands))
