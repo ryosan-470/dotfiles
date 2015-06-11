@@ -3,6 +3,7 @@ python:
   - 3.4
   - nightly
 before_install:
-  - sudo apt-get install zsh vim python3
+  - sudo apt-get install zsh vim python3 zsh
 script:
   - "python3 install.py all"
+  - "python3 install.py test"

@@ -1,3 +1,4 @@
+#!/usr/bin/env zsh  -xv
 # 参考:http://qiita.com/fujimisakari/items/7f16bd617b312e6b1b52
 autoload vcs_info
 zstyle ":vcs_info:*" enable git
@@ -32,7 +33,7 @@ git_info_pull(){
 git_info_push(){
     if [ -n "$(git_is_track_branch)" ]; then
         local current_branch="$(git rev-parse --abbrev-ref HEAD)"
-        local push_count=$(git rev-list origin/"$current_branch".."$current_branch" 2>/dev/null | wc -l)
+        local push_count=`echo $(git rev-list origin/"$current_branch".."$current_branch" 2>/dev/null | wc -l)`
         if [ "$push_count" -gt 0 ]; then
             echo " ⮁ Can Be Pushed($push_count)"
         fi

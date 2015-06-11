@@ -43,19 +43,34 @@ source $ZSH/oh-my-zsh.sh
 source ~/.dotconfig/dotfiles/zsh.d/themes.zsh
 ########################################
 # OS 別の設定
-OS=`uname`
-case ${OS} in
+
+case `uname` in
     "Darwin")
-	#For MacBook Air
-	plugins=(git ruby bundler emoji-clock themes cp pip brew osx python git-extras)
-	;;
+	      #For MacBook Air
+	      plugins=(git ruby bundler emoji-clock themes cp pip brew osx python git-extras)
+        alias update="brew -v update && brew -v upgrade --all"
+	      ;;
     "Linux")
-	#For Linux General
-	alias open='gnome-open'
-	alias pbcopy='xsel --clipboard --input'
-	alias pbpaste='xsel --clipboard --output'
-	plugins=(git ruby bundler emoji-clock themes cp pip python git-extras autojump)
-	;;
+	      #For Linux General
+	      alias open='gnome-open'
+	      alias pbcopy='xsel --clipboard --input'
+	      alias pbpaste='xsel --clipboard --output'
+	      plugins=(git ruby bundler emoji-clock themes cp pip python git-extras autojump)
+        local UPDATE_CMD=""
+        if [ -e /etc/lsb-release ]; then
+            # Ubuntu
+            UPDATE_CMD="sudo apt-get update && sudo apt-get upgrade"
+        elif [ -e /etc/arch-release ]; then
+            # ArchLinux
+            UPDATE_CMD="sudo pacman -Syu"
+        elif [ -e /etc/redhat-release ]; then
+            # CentOS
+            UPDATE_CMD="sudo yum update";
+        else
+            UPDATE_CMD="echo 'Not support your using distribution.'"
+        fi
+        alias update=${UPDATE_CMD}
+	      ;;
 esac
 # OS固有の設定を書くファイル(ignoreされている)
 source $HOME/.local.zsh
@@ -253,3 +268,12 @@ if [ -f $ZSHD_PATH/zaw/zaw.zsh ]; then
 fi
 
 source ${ZSHD_PATH}/run.zsh
+##################################################
+# keydump (RSA key dumped using openssl)
+##################################################
+function keydump() {
+    KEYFILE=$1
+    CIPHER=$2
+    # public keyを見たい場合はrsa -pubin オプションを使うらしい
+    openssl ${CIPHER:='rsa'} -in ${KEYFILE:='id_rsa.pub'} -text -noout
+}
