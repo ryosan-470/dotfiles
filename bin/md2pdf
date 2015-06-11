@@ -1,0 +1,22 @@
+#!/bin/bash
+# Github flavored markdown to pdf (portable document format)
+# Listings: listing-setup.tex
+# Header:   luatexja.tex
+FILE=$1
+FILENAME=${FILE%.*}  # 拡張子なしのファイル名
+FILEEXT=${FILE##*.}  # 拡張子のみ
+CLPATH=`dirname "${0}"`
+if [ $# -ne 1 ]; then
+    echo "Argument Error!"
+    echo "Usage md2pdf [markdown text]"
+    exit 1
+fi
+
+# main
+pandoc ${FILE} -f markdown_github --latex-engine=lualatex \
+       --listings -H ${CLPATH}/md2pdf-tex/listing-setup.tex \
+       -H ${CLPATH}/md2pdf-tex/h-luatexja.tex  \
+       -o ${FILENAME}.pdf
+
+# open in preview
+open ${FILENAME}.pdf

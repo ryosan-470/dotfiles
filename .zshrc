@@ -69,7 +69,7 @@ case `uname` in
         else
             UPDATE_CMD="echo 'Not support your using distribution.'"
         fi
-        alias update=UPDATE_CMD
+        alias update=${UPDATE_CMD}
 	      ;;
 esac
 # OS固有の設定を書くファイル(ignoreされている)
@@ -146,7 +146,6 @@ alias p=python3
 alias fds='du -h -d 1'
 alias gpp=g++
 alias el2elc="emacs -batch -f batch-byte-compile"
-alias dl=`docker ps -l -q`
 ################################################
 # Functions
 ################################################

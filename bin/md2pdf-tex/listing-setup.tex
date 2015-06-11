@@ -1,0 +1,45 @@
+% Content of listings-setup.tex
+% How to use: $ pandoc in.md --listings -H listing-setup.tex -o out.tex
+%\usepackage{jlisting}
+\usepackage{xcolor}
+
+\lstset{
+    basicstyle=\ttfamily,
+    numbers=left,
+    numberstyle=\footnotesize,
+    stepnumber=1,
+    numbersep=5pt,
+    backgroundcolor=\color{black!10},
+    showspaces=false,
+    showstringspaces=false,
+    showtabs=false,
+    tabsize=2,
+    captionpos=b,
+    breaklines=true,
+    breakatwhitespace=true,
+    breakautoindent=true,
+    commentstyle=\small\itshape\color[cmyk]{1,0.4,1,0},% 注釈の書体
+    keywordstyle=\small\bfseries\color[cmyk]{0,1,0,0}, % キーワードの書体
+    % linewidth=\textwidth
+}
+
+% \lstset{
+%   language={Java},% 使用言語
+%   basicstyle={\ttfamily},% 書体の設定
+%   identifierstyle={\small},%
+%   commentstyle={\small\itshape\color[cmyk]{1,0.4,1,0}},% 注釈の書体
+%   keywordstyle={\small\bfseries\color[cmyk]{0,1,0,0}},% キーワードの書体
+%   ndkeywordstyle={\small},%
+%   stringstyle={\small\ttfamily\color[rgb]{0,0,1}},
+%   frame={single},
+%   breaklines=true,% 行が長い時の改行
+%   columns=[l]{fullflexible},%
+%   numbers=left,%
+%   xrightmargin=0zw,%
+%   xleftmargin=3zw,%
+%   numberstyle={\scriptsize},%
+%   stepnumber=1,% 行番号増分
+%   numbersep=1zw,
+%   lineskip=-0.5ex,
+%   showstringspaces=false % 空白に文字を表示させない
+% }
