@@ -1,3 +1,44 @@
+" NeoBundle
+" Note: Skip initialization for vim-tiny or vim-small.
+if !1 | finish | endif
+
+if has('vim_starting')
+   if &compatible
+     set nocompatible               " Be iMproved
+   endif
+
+   " Required:
+   set runtimepath+=~/.dotconfig/dotfiles/vim.d/bundle/neobundle.vim/
+ endif
+
+ " Required:
+  call neobundle#begin(expand('~/.dotconfig/dotfiles/vim.d/bundle/'))
+
+ " Let NeoBundle manage NeoBundle
+ " Required:
+  NeoBundleFetch 'Shougo/neobundle.vim'
+
+ " My Bundles here:
+ " Refer to |:NeoBundle-examples|.
+ " Note: You don't set neobundle setting in .gvimrc!
+	NeoBundle 'altercation/vim-colors-solarized'
+	" Vim Powerline
+	NeoBundle 'powerline/powerline', {'rtp': 'powerline/bindings/vim/'}
+  " nginx syntax
+  NeoBundle 'vim-scripts/nginx.vim'
+  NeoBundle 'tomasr/molokai'
+	call neobundle#end()
+
+ " Required:
+ filetype plugin indent on
+
+" If there are uninstalled bundles found on startup,
+ " this will conveniently prompt you to install them.
+ NeoBundleCheck
+
+syntax enable
+
+
 "" Delete key が動かない問題対策
 set backspace=indent,eol,start
 "" 色の設定
@@ -48,51 +89,14 @@ set expandtab "タブ入力を複数の空白入力に置き換える
 set ignorecase "検索時に大文字小文字の区別をなくす
 " OSのクリップボードをレジスタ指定無しで Yank, Put 出来るようにする
 set clipboard=unnamed,unnamedplus
-" Note: Skip initialization for vim-tiny or vim-small.
-if !1 | finish | endif
-
-if has('vim_starting')
-   if &compatible
-     set nocompatible               " Be iMproved
-   endif
-
-   " Required:
-   set runtimepath+=~/.dotconfig/dotfiles/vim.d/bundle/neobundle.vim/
- endif
-
- " Required:
-  call neobundle#begin(expand('~/.dotconfig/dotfiles/vim.d/bundle/'))
-
- " Let NeoBundle manage NeoBundle
- " Required:
-  NeoBundleFetch 'Shougo/neobundle.vim'
-
- " My Bundles here:
- " Refer to |:NeoBundle-examples|.
- " Note: You don't set neobundle setting in .gvimrc!
-	NeoBundle 'altercation/vim-colors-solarized'
-	" Vim Powerline
-	NeoBundle 'alpaca-tc/alpaca_powertabline'
-	NeoBundle 'Lokaltog/powerline', { 'rtp' : 'powerline/bindings/vim'}
-	NeoBundle 'Lokaltog/powerline-fontpatcher'
-	
-  " nginx syntax
-  NeoBundle 'vim-scripts/nginx.vim'
-  NeoBundle 'tomasr/molokai'
-	call neobundle#end()
-
- " Required:
- filetype plugin indent on
-
-" If there are uninstalled bundles found on startup,
- " this will conveniently prompt you to install them.
- NeoBundleCheck
-
-syntax enable
-
 " Powerline
+python from powerline.vim import setup as powerline_setup
+python powerline_setup()
+python del powerline_setup
 set laststatus=2
-set rtp+=~/.dotconfig/dotfiles/vim.d/bundle/powerline/powerline/bindings/vim
+set showtabline=2
+" set rtp+=~/.dotconfig/dotfiles/vim.d/bundle/powerline/powerline/bindings/vim
+
 let g:Powerline_symbols = 'fancy'
 set noshowmode
 
