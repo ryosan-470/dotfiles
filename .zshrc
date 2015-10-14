@@ -47,7 +47,7 @@ source ~/.dotconfig/dotfiles/zsh.d/themes.zsh
 case `uname` in
     "Darwin")
 	      #For MacBook Air
-	      plugins=(git ruby bundler emoji-clock themes cp pip brew osx python git-extras)
+	      plugins=(git ruby bundler emoji-clock themes cp pip brew osx python git-extras brew-cask vagrant docker emacs go heroku nmap perl scala)
         alias update="brew -v update && brew -v upgrade --all"
 	      ;;
     "Linux")

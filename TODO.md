@@ -12,3 +12,14 @@
 
 ## 注意
 terminator_config は ~/.config/terminator/config にある.
+
+
+## メモ
+
+.local.zshをEmacsでシェルモードで開くために以下のように頭に書いておくと良い.
+
+```
+# Local Variables:
+# mode: shell-script
+# End:
+```

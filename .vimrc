@@ -90,12 +90,9 @@ set ignorecase "検索時に大文字小文字の区別をなくす
 " OSのクリップボードをレジスタ指定無しで Yank, Put 出来るようにする
 set clipboard=unnamed,unnamedplus
 " Powerline
-python from powerline.vim import setup as powerline_setup
-python powerline_setup()
-python del powerline_setup
+set rtp+=~/.dotconfig/dotfiles/vim.d/powerline/powerline/bindings/vim
 set laststatus=2
 set showtabline=2
-" set rtp+=~/.dotconfig/dotfiles/vim.d/bundle/powerline/powerline/bindings/vim
 
 let g:Powerline_symbols = 'fancy'
 set noshowmode
