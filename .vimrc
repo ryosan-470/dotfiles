@@ -107,14 +107,9 @@ imap { {}<LEFT>
 imap [ []<LEFT>
 imap ( ()<LEFT>
 """"""""""""""""""""""""""""""
-" Emacs風キーバインド
-imap <C-k> <ESC>d$i
-imap <C-y> <ESC>pi
-imap <C-d> <ESC>xi
-
-imap <C-a>  <Home>
-imap <C-e>  <End>
-imap <C-b>  <Left>
-imap <C-f>  <Right>
 " インサートモードのEscをjjに
 inoremap <silent> jj <ESC>
+inoremap <C-e> <Esc>$a
+inoremap <C-a> <Esc>^a
+noremap <C-e> <Esc>$a
+noremap <C-a> <Esc>^a

@@ -2,9 +2,10 @@
 typeset -U path PATH
 export PATH=/usr/local/bin:$HOME/bin:$PATH
 export PAGER=lv
-export LANG=en_US.UTF-8
-export LC_ALL=en_US.UTF-8
-
+# export LANG=en_US.UTF-8
+# export LC_ALL=en_US.UTF-8
+export LANG=ja_JP.UTF-8
+export LC_ALL=ja_JP.UTF-8
 ################################################################################
 ## Qiita: tmuxのウィンドウ名をsshでつないでいるときは接続先ホストにする
 ################################################################################

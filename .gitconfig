@@ -3,6 +3,7 @@
 	email = rskjtwp@gmail.com
 [core]
 	editor = "emacsclient -nw -a ''" --alternate-editor "vim"
+	excludesfile = /Users/jtwp470/.gitignore_global
 [color]
 	ui = auto
 	status  = auto

@@ -46,16 +46,16 @@ source ~/.dotconfig/dotfiles/zsh.d/themes.zsh
 
 case `uname` in
     "Darwin")
-	      #For MacBook Air
-	      plugins=(git ruby bundler emoji-clock themes cp pip brew osx python git-extras brew-cask vagrant docker emacs go heroku nmap perl scala)
+	    #For MacBook Air
+	    plugins=(git ruby cp pip brew osx python git-extras brew-cask vagrant docker go heroku nmap perl scala)
         alias update="brew -v update && brew -v upgrade --all"
-	      ;;
+	    ;;
     "Linux")
-	      #For Linux General
-	      alias open='gnome-open'
-	      alias pbcopy='xsel --clipboard --input'
-	      alias pbpaste='xsel --clipboard --output'
-	      plugins=(git ruby bundler emoji-clock themes cp pip python git-extras autojump)
+	    #For Linux General
+	    alias open='gnome-open'
+	    alias pbcopy='xsel --clipboard --input'
+	    alias pbpaste='xsel --clipboard --output'
+	    plugins=(git ruby bundler emoji-clock themes cp pip python git-extras autojump)
         local UPDATE_CMD=""
         if [ -e /etc/lsb-release ]; then
             # Ubuntu
@@ -70,7 +70,7 @@ case `uname` in
             UPDATE_CMD="echo 'Not support your using distribution.'"
         fi
         alias update=${UPDATE_CMD}
-	      ;;
+	    ;;
 esac
 # OS固有の設定を書くファイル(ignoreされている)
 source $HOME/.local.zsh
@@ -113,7 +113,7 @@ zle -N edit-command-line
 bindkey '^xe' edit-command-line
 # if .zshrc is newer than .zshrc.zwc, do zcompile
 if [ ! -f ~/.zshrc.zwc -o ~/.zshrc -nt ~/.zshrc.zwc ];then
-   zcompile ~/.zshrc
+    zcompile ~/.zshrc
 fi
 
 ############################################################################
@@ -219,9 +219,9 @@ function rmtex() {
     NAME=`basename $1 .tex`
     rm $NAME.(aux|log|dvi)
     if [ $? -ne 0 ]; then
-	echo "Failed to remove"
+	    echo "Failed to remove"
     else
-	echo "Success!"
+	    echo "Success!"
     fi
 }
 ################################################
@@ -268,7 +268,7 @@ if [ -f $ZSHD_PATH/zaw/zaw.zsh ]; then
     bindkey '^X^B' zaw-git-branches
     bindkey '^X^P' zaw-process
     bindkey '^X^A' zaw-tmux
-    bindkey '^h' zaw-history
+    bindkey '^X^H' zaw-history
 fi
 
 source ${ZSHD_PATH}/run.zsh
@@ -281,3 +281,7 @@ function keydump() {
     # public keyを見たい場合はrsa -pubin オプションを使うらしい
     openssl ${CIPHER:='rsa'} -in ${KEYFILE:='id_rsa.pub'} -text -noout
 }
+
+# fpath
+fpath=(/usr/local/share/zsh/site-functions $fpath)
+autoload -U compinit; compinit
