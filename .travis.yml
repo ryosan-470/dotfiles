@@ -8,4 +8,3 @@ before_install:
   - sudo apt-get install zsh vim tmux
 script:
   - "python install.py all"
-  - "python install.py test"
