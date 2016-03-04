@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
 install.py
@@ -13,7 +13,6 @@ This software is released under the MIT License.
 Please refer to http://jtwp470.mit-license.org to know this license.
 """
 import argparse
-import enum
 import os
 import sys
 import subprocess
@@ -23,41 +22,6 @@ import shlex
 DOT_HOME_FILES = (".zshrc", ".zshenv", ".vimrc", ".tmux.conf", ".gitconfig")
 HOME = os.path.expanduser("~") + "/"  # User Home Directory
 DOTFILES = HOME + ".dotconfig/dotfiles/"
-
-
-class OS(enum.Enum):
-    # Supported distribution
-    darwin = "Mac OSX"         # Mac OSX
-    windows = "Windows"        # Windows (future support)
-    # prefix L_ is Linux
-    L_ubuntu = "Ubuntu"        # Ubuntu Linux
-    L_debian = "Debian"        # Debian
-    L_archlinux = "ArchLinux"  # Arch Linux (future support)
-
-    other = "Other"
-
-    def __str__(self):
-        return self.value
-
-
-def getDistribution():
-    # 参考:Linuxのディストリビューションを判別する
-    # http://qiita.com/koara-local/items/1377ddb06796ec8c628a
-    o = sys.platform
-    if o is "darwin":
-        return OS.darwin
-    elif o is "win32" or o is "cygwin":
-        return OS.windows
-    else:
-        if os.path.exists("/etc/debian_version") or os.path.exists("/etc/debian_release"):
-            if os.path.exists("/etc/lsb-release"):
-                return OS.L_ubuntu
-            else:
-                return OS.L_debian
-        elif os.path.exists("/etc/arch-release"):
-            return OS.L_archlinux
-        else:
-            return OS.other
 
 
 def downloading_dotfiles():
