@@ -11,16 +11,8 @@ This is a repository with my configuration files, those that in Linux/OSX normal
 
 The easiest way to install the dotfiles is open to up a terminal, type the installation command below:
 
-```
-$ wget https://https://raw.githubusercontent.com/jtwp470/dotfiles/development/install.py
-$ python3 install.py all
-```
-
-Use shortest address is bellow:
-
-```
-$ wget http://urx.nu/itNN -O install.py
-$ python3 install.py all
+```bash
+$ curl -sL http://dot.jtwp470.net > install.py && python install.py all
 ```
 
 Incidentally, ```install.py all``` will perform the following tasks.

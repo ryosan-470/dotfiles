@@ -1,9 +1,11 @@
 language: python
 python:
-  - 3.4
-  - nightly
+  - "2.6"
+  - "2.7"
+  - "3.4"
+  - "nightly"
 before_install:
-  - sudo apt-get install zsh vim python3 zsh
+  - sudo apt-get install zsh vim
 script:
-  - "python3 install.py all"
-  - "python3 install.py test"
+  - "python install.py all"
+  - "python install.py test"
