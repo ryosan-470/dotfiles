@@ -135,8 +135,8 @@ alias gpl='git pull origin master'
 alias gps='git push origin master'
 alias gf='git fetch origin master'
 alias gss='git status -s'
-alias gcm='git commit'
-alias gcmm='git commit -m'
+alias gc='git commit'
+alias gcm='git commit -m'
 alias gcv='git commit -v'
 alias j=java
 alias jc=javac
@@ -150,6 +150,9 @@ alias ipy3=ipython3
 alias fds='du -h -d 1'
 alias gpp=g++
 alias el2elc="emacs -batch -f batch-byte-compile"
+alias pip-update="pip list -o | awk '{ print $1 }' | xargs pip install -U"
+alias pip3-update="pip3 list -o | awk '{ print $1 }' | xargs pip3 install -U"
+alias ru="ruby"
 ################################################
 # Functions
 ################################################
@@ -209,9 +212,13 @@ function extract() {
         *.Z) uncompress $1 ;;
         *.tar) tar xvf $1 ;;
         *.arj) unarj $1 ;;
+        *.rar) unrar $1 ;;
+        *.7z) 7z x $1 ;;         # require: p7zip p7zip-full
+        *.cab) cabextract $1 ;;  # require: cabextract
+        *.jar) java -jar $1 & ;; # Launch java app
     esac
 }
-alias -s {gz,tgz,zip,lzh,bz2,tbz,Z,tar,arj,xz}=extract
+alias -s {gz,tgz,zip,lzh,bz2,tbz,Z,tar,arj,xz,rar,7z,cab,jar}=extract
 ################################################
 # rmtex
 ################################################
