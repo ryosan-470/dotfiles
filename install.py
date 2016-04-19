@@ -19,7 +19,10 @@ import subprocess
 import shlex
 
 # ホームディレクトリ上にシンボリックリンクを貼るファイルの名前
-DOT_HOME_FILES = (".zshrc", ".zshenv", ".vimrc", ".tmux.conf", ".gitconfig")
+DOT_HOME_FILES = (".zshrc", ".zshenv", ".zlogout",
+                  ".tmux.conf", ".tmux",
+                  ".gitconfig",
+                  ".vimrc", ".tigrc", ".sqliterc",)
 HOME = os.path.expanduser("~") + "/"  # User Home Directory
 DOTFILES = HOME + ".dotconfig/dotfiles/"
 
