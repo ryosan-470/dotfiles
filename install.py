@@ -121,7 +121,7 @@ def main():
 
     # オプションがないとき
     if args == argparse.Namespace():
-        args = parser.parse_args(["help"])
+        args = parser.parse_args(["all"])
     args.func()
 
 
