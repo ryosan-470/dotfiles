@@ -77,7 +77,7 @@ If you use Linux to install,  ```xsel```, else if you use OS X to install ```rea
 
 ### Vim
 
-* Vim package manager **NeoBundle** [NeoBundle](https://github.com/Shougo/neobundle.vim)
+* Vim package manager **dein.vim** [dein.vim](https://github.com/Shougo/dein.vim)
 
 ### Powerline Fonts
 Please install the fonts patched Powerline. If you get pre-patched fonts, go to [Powerline fonts](https://github.com/powerline/fonts).
