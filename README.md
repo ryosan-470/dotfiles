@@ -29,13 +29,42 @@ Incidentally, ```install.py all``` will perform the following tasks.
 2. Deploy (ex. create symlink) (```install.py deploy```)
 3. Initialize (```install.py init```)
 
+## Try my confs
+Try my conf to use Docker container.
+
+1. Install [docker](https://docs.docker.com/engine/installation/)
+2. Clone this repository and build container like this:
+   ```bash
+   $ git clone https://github.com/jtwp470/dotfiles
+   $ cd dotfiles
+   ```
+
+3. Pull or build container. ([Docker hub repo](https://hub.docker.com/r/jtwp470/dotfiles/))
+   Pull container like this: (**recommended**)
+   ```bash
+   $ docker pull jtwp470/dotfiles
+   ```
+   or you want to build container, like this:
+   ```bash
+   $ docker build -t jtwp470/dotfiles .
+   ```
+
+4. Run container and try.
+   ```bash
+   $ docker run -i -t --rm jtwp470/dotfiles:latest /bin/zsh  # Remove container when you exit process
+   $ cd ~/.dotconfig/dotfiles
+   $ git checkout <if-you-change-branch> # If you change branch, run this.
+   ```
+
 ## Requirements
 
 * zsh  (>= 5.0.2)
-* tmux (<= 1.9a) (Although, in tmux 2.0, Emacs cursor is hidden at iTerm2.)
+* tmux
 * Vim 7.4
-* OS X Yosemite (MacBook Air) or Ubuntu 14.04 LTS
+* OS X 10.9 or higher
+* Ubuntu 14.04 or higher
 * iTerm2 (in OSX)
+* Powerline fonts
 
 ## How would you like to use Emacs?
 I am a Emacser. I have my configuration for Emacs. Please refer to [dotemacs](https://github.com/jtwp470/dotemacs)
@@ -43,15 +72,21 @@ I am a Emacser. I have my configuration for Emacs. Please refer to [dotemacs](ht
 ## Feature
 ### tmux
 
-* Enables copying to system clipboard in tmux. Works on Linux and OSX.
-[tmux yank](https://github.com/tmux-plugins/tmux-yank)
-
-Linux needs ```xsel```, OS X needs ```reatach-to-user-namespace```
-* tmux status bar looks like vim-powerline. [tmux-powerline](https://github.com/erikw/tmux-powerline)
+* Enables copying to system clipboard in tmux. Works on Linux and OSX.  [tmux yank](https://github.com/tmux-plugins/tmux-yank)
+If you use Linux to install,  ```xsel```, else if you use OS X to install ```reatach-to-user-namespace```. **Windows** NOT SUPPORT.
 
 ### Vim
 
 * Vim package manager **NeoBundle** [NeoBundle](https://github.com/Shougo/neobundle.vim)
+
+### Powerline Fonts
+Please install the fonts patched Powerline. If you get pre-patched fonts, go to [Powerline fonts](https://github.com/powerline/fonts).
+If you use OS X and Homebrew, you can install using `brew` like this:
+
+```bash
+$ brew tap sanemat/fonts
+$ brew install ricty --powerline --vim-powerline
+```
 
 ## Reference
 
