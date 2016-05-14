@@ -1,6 +1,8 @@
 [[plugins]]
 repo = 'Shougo/dein.vim'
 repo = 'vim-scripts/nginx.vim' # Nginx用
+repo = 'cespare/vim-toml'
+repo = 'vim-airline/vim-airline'
 # git clone 後、実行すべきコマンドがある場合はこんな感じ
 [[plugins]]
 repo = 'Shougo/vimproc.vim'

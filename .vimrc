@@ -50,7 +50,7 @@ highlight Normal ctermbg=none
 " 現在のカーソルの色をつける
 set cursorline
 hi Comment ctermfg=103
-hi CursorLine term=none cterm=none ctermbg=17 guibg=236
+hi CursorLine term=none cterm=none ctermbg=17 guibg=blue
 " 検索したときのハイライトをつける
 set hlsearch
 " 行番号の表示
@@ -67,11 +67,6 @@ set omnifunc=csscomplete#CompleteCSS
 set omnifunc=xmlcomplete#CompleteTags
 set omnifunc=phpcomplete#CompletePHP
 
-" ステータスラインの設定
-set cmdheight=1
-set laststatus=2
-set statusline=%<%F\ %m%r%h%w%{'['.(&fenc!=''?&fenc:&enc).']['.&ff.']'}%=%l,\ [TYPE=%Y]\ [ASCII=\%03.3b]\ [HEX=\%02.2B]\ %c%V%8P
-
 " Ctrl-L で検索ハイライトを消す
 nmap <C-l> <C-l>:nohlsearch<CR>
 
@@ -85,13 +80,7 @@ set expandtab "タブ入力を複数の空白入力に置き換える
 set ignorecase "検索時に大文字小文字の区別をなくす
 " OSのクリップボードをレジスタ指定無しで Yank, Put 出来るようにする
 set clipboard=unnamed,unnamedplus
-" Powerline
-set rtp+=~/.dotconfig/dotfiles/vim.d/powerline/powerline/bindings/vim
-set laststatus=2
 set showtabline=2
-
-let g:Powerline_symbols = 'fancy'
-set noshowmode
 
 set paste " paste時にインデントがずれたりする問題を直す
 au BufRead,BufNewFile /etc/nginx/* set ft=nginx " nginx conf syntax highlight
@@ -109,3 +98,10 @@ inoremap <C-e> <Esc>$a
 inoremap <C-a> <Esc>^a
 noremap <C-e> <Esc>$a
 noremap <C-a> <Esc>^a
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" vim-airline
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+let g:airline_powerline_fonts = 1
+set cmdheight=1
+set laststatus=2

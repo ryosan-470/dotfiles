@@ -10,6 +10,3 @@
 [submodule "zsh.d/zaw"]
 	path = zsh.d/zaw
 	url = https://github.com/zsh-users/zaw.git
-[submodule "vim.d/powerline"]
-	path = vim.d/powerline
-	url = https://github.com/powerline/powerline
