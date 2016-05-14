@@ -70,17 +70,23 @@ set omnifunc=phpcomplete#CompletePHP
 " Ctrl-L で検索ハイライトを消す
 nmap <C-l> <C-l>:nohlsearch<CR>
 
-set tabstop=2 "画面上でタブ文字が占める幅
-set shiftwidth=2 "自動インデントでずれる幅
-set softtabstop=2 "連続した空白に対してタブキーやバックスペースキーでカーソルが動く幅
-set autoindent "改行時に前の行のインデントを継続する
-set smartindent "改行時に入力された行の末尾に合わせて次の行のインデントを増減する
+set tabstop=2      "画面上でタブ文字が占める幅
+set shiftwidth=4   "自動インデントでずれる幅
+set softtabstop=4  "連続した空白に対してタブキーやバックスペースキーでカーソルが動く幅
+set autoindent     "改行時に前の行のインデントを継続する
+set smartindent    "改行時に入力された行の末尾に合わせて次の行のインデントを増減する
 set encoding=utf-8
-set expandtab "タブ入力を複数の空白入力に置き換える
-set ignorecase "検索時に大文字小文字の区別をなくす
+set expandtab      "タブ入力を複数の空白入力に置き換える
+set ignorecase     "検索時に大文字小文字の区別をなくす
+set showmatch      "対応するカッコを強調表示する
 " OSのクリップボードをレジスタ指定無しで Yank, Put 出来るようにする
 set clipboard=unnamed,unnamedplus
 set showtabline=2
+
+" ------ For python -------
+autocmd FileType python setl smartindent cinwords=if,elif,else,for,while,try,except,finally,def,class
+    " 改行時自動インデントする宣言
+let python_highlight_all =1 " Python用のシンタックスハイライトを全てONに
 
 set paste " paste時にインデントがずれたりする問題を直す
 au BufRead,BufNewFile /etc/nginx/* set ft=nginx " nginx conf syntax highlight
@@ -92,8 +98,8 @@ imap { {}<LEFT>
 imap [ []<LEFT>
 imap ( ()<LEFT>
 """"""""""""""""""""""""""""""
-" インサートモードのEscをjjに
-inoremap <silent> jj <ESC>
+" Like Emacs
+" ノーマルモード中にC-eを押すとカーソルを行末に移動し挿入モードとなる
 inoremap <C-e> <Esc>$a
 inoremap <C-a> <Esc>^a
 noremap <C-e> <Esc>$a
