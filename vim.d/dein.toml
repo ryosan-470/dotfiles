@@ -3,18 +3,3 @@ repo = 'Shougo/dein.vim'
 repo = 'vim-scripts/nginx.vim' # Nginx用
 repo = 'cespare/vim-toml'
 repo = 'vim-airline/vim-airline'
-# git clone 後、実行すべきコマンドがある場合はこんな感じ
-[[plugins]]
-repo = 'Shougo/vimproc.vim'
-hook_post_update = '''
-  if dein#util#_is_windows()
-    let cmd = 'tools\\update-dll-mingw'
-  elseif dein#util#_is_cygwin()
-    let cmd = 'make -f make_cygwin.mak'
-  elseif executable('gmake')
-    let cmd = 'gmake'
-  else
-    let cmd = 'make'
-  endif
-  let g:dein#plugin.build = cmd
-'''
