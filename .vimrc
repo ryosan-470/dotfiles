@@ -1,43 +1,39 @@
-" NeoBundle
-" Note: Skip initialization for vim-tiny or vim-small.
-if !1 | finish | endif
+" dein.vim ref to http://qiita.com/delphinus35/items/00ff2c0ba972c6e41542
+" プラグインが実際にインストールされるディレクトリ
+let s:dein_dir = expand('~/.cache/dein')
+" dein.vim 本体
+let s:dein_repo_dir = s:dein_dir . '/repos/github.com/Shougo/dein.vim'
 
-if has('vim_starting')
-   if &compatible
-     set nocompatible               " Be iMproved
-   endif
+" dein.vim がなければ github から落としてくる
+if &runtimepath !~# '/dein.vim'
+  if !isdirectory(s:dein_repo_dir)
+    execute '!git clone https://github.com/Shougo/dein.vim' s:dein_repo_dir
+  endif
+  execute 'set runtimepath^=' . fnamemodify(s:dein_repo_dir, ':p')
+endif
+" 設定のファイルを保存しているディレクトリ
+let g:rc_dir = expand("~/.dotconfig/dotfiles/vim.d")
+" 設定開始
+" if dein#load_state(s:dein_dir)
+  call dein#begin(s:dein_dir)
 
-   " Required:
-   set runtimepath+=~/.dotconfig/dotfiles/vim.d/bundle/neobundle.vim/
- endif
+  " プラグインリストを収めた TOML ファイル
+  let s:toml      = g:rc_dir . '/dein.toml'
+  let s:lazy_toml = g:rc_dir . '/dein_lazy.toml'
 
- " Required:
-  call neobundle#begin(expand('~/.dotconfig/dotfiles/vim.d/bundle/'))
+  " TOML を読み込み、キャッシュしておく
+  call dein#load_toml(s:toml,      {'lazy': 0})
+  call dein#load_toml(s:lazy_toml, {'lazy': 1})
 
- " Let NeoBundle manage NeoBundle
- " Required:
-  NeoBundleFetch 'Shougo/neobundle.vim'
+  " 設定終了
+  call dein#end()
+  " call dein#save_state()
+" 1endif
 
- " My Bundles here:
- " Refer to |:NeoBundle-examples|.
- " Note: You don't set neobundle setting in .gvimrc!
-	NeoBundle 'altercation/vim-colors-solarized'
-	" Vim Powerline
-	NeoBundle 'powerline/powerline', {'rtp': 'powerline/bindings/vim/'}
-  " nginx syntax
-  NeoBundle 'vim-scripts/nginx.vim'
-  NeoBundle 'tomasr/molokai'
-	call neobundle#end()
-
- " Required:
- filetype plugin indent on
-
-" If there are uninstalled bundles found on startup,
- " this will conveniently prompt you to install them.
- NeoBundleCheck
-
-syntax enable
-
+" もし、未インストールものものがあったらインストール
+if dein#check_install()
+  call dein#install()
+endif
 
 "" Delete key が動かない問題対策
 set backspace=indent,eol,start

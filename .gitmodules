@@ -4,12 +4,6 @@
 [submodule "zsh.d/zsh-syntax-highlighting"]
 	path = zsh.d/zsh-syntax-highlighting
 	url = https://github.com/zsh-users/zsh-syntax-highlighting.git
-[submodule "vim.d/bundle/neobundle.vim"]
-	path = vim.d/bundle/neobundle.vim
-	url = https://github.com/Shougo/neobundle.vim
-[submodule "vim.d/bundle/vimproc"]
-	path = vim.d/bundle/vimproc
-	url = https://github.com/Shougo/vimproc
 [submodule "zsh.d/zsh-bd"]
 	path = zsh.d/zsh-bd
 	url = https://github.com/Tarrasch/zsh-bd.git

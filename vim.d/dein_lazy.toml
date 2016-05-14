@@ -1,0 +1,14 @@
+# 特定の条件であとから読み込むもの
+# インサートモードに入ったら読み込む
+[[plugins]]
+repo = 'Shougo/neocomplete.vim'
+on_i = 1
+
+[[plugins]]
+repo   = 'Shougo/unite.vim'
+
+# unite.vim を読み込んだら一緒に読み込む
+[[plugins]]
+repo      = 'Shougo/neomru.vim'
+on_source = ['unite.vim']
+
