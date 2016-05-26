@@ -3,7 +3,7 @@
 	email = rskjtwp@gmail.com
 [core]
 	editor = "emacsclient -nw -a ''" --alternate-editor "vim"
-	excludesfile = /Users/jtwp470/.gitignore_global
+	excludesfile = ~/.gitignore_global
 [color]
 	ui = auto
 	status  = auto
@@ -16,14 +16,16 @@
 [include]
 	path = .gitconfig.os
 [alias]
-	b = branch -a
-	br = browse-remote
-	cm = commit
-	cma = commit --amend
-	co = checkout
-	d = diff
-	f = fetch
-	sb = show-branch
-	st = status
-	ss = status -s
+	branches = branch -a              # ブランチの一覧
+	stashes = stash list              # stash した一覧
+	unstage = reset -q HEAD --
+	discard = checkout --
+	uncommit = reset --mixed HEAD~
+	amend = commit --amend
+	nevermind = !git reset --hard HEAD && git clean -d -f
+	# リアルタイムのタイムラインを見ることができる
+	precommit = diff --cached --diff-algorithm=minimal -w
+	last = log -1 HEAD --format=format:"%Cred%H"
+	untrack = rm -r --cached
+	mergetrail = log --ancestry-path --merges
 	l = log --graph --date=short --pretty=format:'%C(red reverse)%d%Creset%C(white reverse) %h% Creset %C(green reverse) %an %Creset %C(cyan)%ai%Creset%n%C(white bold)%w(80)%s%Creset%n%n%w(80,2,2)%b'
