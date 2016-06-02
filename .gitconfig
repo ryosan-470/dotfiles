@@ -30,6 +30,7 @@
 	untrack = rm -r --cached
 	mergetrail = log --ancestry-path --merges
 	l = log --graph --date=short --pretty=format:'%C(red reverse)%d%Creset%C(white reverse) %h% Creset %C(green reverse) %an %Creset %C(cyan)%ai%Creset%n%C(white bold)%w(80)%s%Creset%n%n%w(80,2,2)%b'
+	sha1 = rev-parse
 [gpg]
 	program = gpg2
 [commit]
