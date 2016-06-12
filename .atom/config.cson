@@ -1,0 +1,16 @@
+"*":
+  core:
+    projectHome: "/Users/jtwp470"
+    themes: [
+      "atom-dark-ui"
+      "atom-dark-syntax"
+    ]
+  editor:
+    fontSize: 16
+  "exception-reporting":
+    userId: "809a8e7c-44a9-ddd1-88b1-5f147833b212"
+  "git-diff":
+    showIconsInEditorGutter: true
+  linter: {}
+  welcome:
+    showOnStartup: false

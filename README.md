@@ -66,6 +66,19 @@ Try my conf to use Docker container.
 * iTerm2 (in OSX)
 * Powerline fonts
 
+## Atom
+最近になってようやく[Atom](https://atom.io)を使い始めました.今のところはEmacsと併用使いですがこれからどうなるかわかりません.
+各環境で適当にAtomをインストールし, いい感じに使うしかなさそうです.
+
+* Atomにインストールしているパッケージ一覧を吐き出す.
+  ```bash
+  $ apm list --installed --bare > atom-packages.txt
+  ```
+* Atomのパッケージ一覧からインストールする
+  ```bash
+  $ apm install --packages-file atom-packages.txt
+  ```
+
 ## How would you like to use Emacs?
 I am a Emacser. I have my configuration for Emacs. Please refer to [dotemacs](https://github.com/jtwp470/dotemacs)
 
