@@ -1,5 +1,8 @@
 "*":
+  "atom-autocomplete-php":
+    verboseErrors: true
   core:
+    packagesWithKeymapsDisabled: []
     projectHome: "/Users/jtwp470"
     themes: [
       "atom-dark-ui"
@@ -7,10 +10,17 @@
     ]
   editor:
     fontSize: 16
+    showInvisibles: true
+    tabLength: 4
+    tabType: "soft"
   "exception-reporting":
     userId: "809a8e7c-44a9-ddd1-88b1-5f147833b212"
   "git-diff":
     showIconsInEditorGutter: true
-  linter: {}
+  linter:
+    showErrorPanel: false
   welcome:
     showOnStartup: false
+".ini.source":
+  editor:
+    tabLength: 4
