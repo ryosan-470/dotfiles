@@ -35,3 +35,9 @@
 	program = gpg2
 [commit]
 	gpgsign = true
+[diff]
+	compactionHeuristic = true
+[pager]
+	diff = diff-highlight | less
+	show = diff-highlight | less
+	log = diff-highlight | less
