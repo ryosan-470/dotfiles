@@ -35,6 +35,7 @@
 	program = gpg2
 [commit]
 	gpgsign = true
+	template = ~/.dotconfig/dotfiles/.git_commit_template.txt
 [diff]
 	compactionHeuristic = true
 [pager]
