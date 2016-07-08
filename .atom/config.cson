@@ -2,6 +2,10 @@
   "atom-autocomplete-php":
     verboseErrors: true
   core:
+    disabledPackages: [
+      "symbols-view"
+      "symbols-tree-view"
+    ]
     packagesWithKeymapsDisabled: []
     projectHome: "/Users/jtwp470"
     themes: [
@@ -9,7 +13,7 @@
       "atom-dark-syntax"
     ]
   editor:
-    fontSize: 16
+    fontFamily: "\"Ricty\" \"Hiragino Kaku Gothic Pro\""
     showInvisibles: true
     tabLength: 4
     tabType: "soft"
@@ -19,6 +23,10 @@
     showIconsInEditorGutter: true
   linter:
     showErrorPanel: false
+  swackets:
+    syntax: "Parentheses"
+  "symbols-tree-view":
+    autoToggle: true
   welcome:
     showOnStartup: false
 ".ini.source":
