@@ -6,3 +6,5 @@ packages
 .node-gyp
 .npm
 .apm
+
+projects.cson
