@@ -35,25 +35,23 @@ Try my conf to use Docker container.
 1. Install [docker](https://docs.docker.com/engine/installation/)
 2. Clone this repository and build container like this:
    ```bash
-   $ git clone https://github.com/jtwp470/dotfiles
-   $ cd dotfiles
+   git clone https://github.com/jtwp470/dotfiles
+   cd dotfiles
    ```
 
 3. Pull or build container. ([Docker hub repo](https://hub.docker.com/r/jtwp470/dotfiles/))
    Pull container like this: (**recommended**)
    ```bash
-   $ docker pull jtwp470/dotfiles
+   docker pull jtwp470/dotfiles
    ```
    or you want to build container, like this:
    ```bash
-   $ docker build -t jtwp470/dotfiles .
+   docker build -t jtwp470/dotfiles .
    ```
 
 4. Run container and try.
    ```bash
-   $ docker run -i -t --rm jtwp470/dotfiles:latest /bin/zsh  # Remove container when you exit process
-   $ cd ~/.dotconfig/dotfiles
-   $ git checkout <if-you-change-branch> # If you change branch, run this.
+   docker run -i -t --rm jtwp470/dotfiles:latest -v ${PWD}:/root/.dotconfig/dotfiles /bin/sh -c "cd /root/.dotconfig/dotfiles; python install.py all"
    ```
 
 ## Requirements
