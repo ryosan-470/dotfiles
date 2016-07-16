@@ -140,12 +140,11 @@ def main():
     parser_all = subparser.add_parser("all")
     parser_all.set_defaults(func=install)
     args = parser.parse_args()
-
-    # オプションがないとき
-    if args == argparse.Namespace():
-        args = parser.parse_args(["all"])
     args.func()
 
 
 if __name__ == "__main__":
+    if len(sys.argv) != 2:
+        # オプションがないときはall扱いする
+        sys.argv.append("all")
     main()

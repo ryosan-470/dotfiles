@@ -11,16 +11,14 @@ This is a repository with my configuration files, those that in Linux/OSX normal
 
 The easiest way to install the dotfiles is open to up a terminal, type the installation command below:
 
-If you can use Python 3,
-
 ```bash
-$ curl -fsSL http://dot.jtwp470.net | python3
+$ curl -L http://dot.jtwp470.net | python
 ```
 
 else:
 
 ```bash
-$ curl -fsSL http://dot.jtwp470.net > install.py && python install.py all
+$ curl -L https://raw.githubusercontent.com/jtwp470/dotfiles/master/install.py | python
 ```
 
 Incidentally, ```install.py all``` will perform the following tasks.
