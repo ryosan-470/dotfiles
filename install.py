@@ -12,13 +12,17 @@ This software is released under the MIT License.
 
 Please refer to http://jtwp470.mit-license.org to know this license.
 """
-import argparse
 import os
 import sys
 import subprocess
 import shlex
 import glob
 import shutil
+
+try:
+    import argparse
+except ImportError:
+    sys.exit("Please install or run Python 2.7 or later")
 
 
 HOME = os.path.expanduser("~")  # User Home Directory
