@@ -17,42 +17,54 @@ import os
 import sys
 import subprocess
 import shlex
+import glob
+import shutil
 
+
+HOME = os.path.expanduser("~")  # User Home Directory
+DOTFILES = os.path.join(HOME, ".dotconfig/dotfiles")
+ALL_DOTFILES = set(x[len(DOTFILES+"/"):] for x in glob.glob(DOTFILES + "/.*"))
+# 除外するファイル名の設定
+EXCLUDE_DOTFILES = set([".git", ".git_commit_template.txt",
+                        ".gitignore", ".travis.yml", ".gitmodules"])
 # ホームディレクトリ上にシンボリックリンクを貼るファイルの名前
-DOT_HOME_FILES = (".zshrc", ".zshenv", ".zlogout",
-                  ".tmux.conf", ".tmux",
-                  ".gitconfig",
-                  ".vimrc", ".tigrc", ".sqliterc",)
-HOME = os.path.expanduser("~") + "/"  # User Home Directory
-DOTFILES = HOME + ".dotconfig/dotfiles/"
+DOT_HOME_FILES = ALL_DOTFILES - EXCLUDE_DOTFILES
 
 
-def downloading_dotfiles():
-    REPOS_URL = "https://github.com/jtwp470/dotfiles.git"
-    if os.path.exists(DOTFILES):
-        print("File is exists.")
-        return
-
+def run(os_command):
+    """os_command is linux command, eg: git clone https://github.com/..."""
     try:
-        # git clone --recursive ${REPO_URL} ${DOTFILES}
-        # git  --recursive option is then do submodule init & submodule update
-        print("Clone repository")
-        commands = "git clone {repo} {dst} --recursive".format(
-            repo=REPOS_URL, dst=DOTFILES)
-        print(commands)
-        subprocess.check_call(shlex.split(commands))
-        # subprocess.Popen(shlex.split("git clone"))
-    except OSError:
-        sys.exit("Command not found. Please install git")
-    except:
-        sys.exit("Occured some error. System exit")
-    print("Success Clone repository")
+        subprocess.check_call(shlex.split(os_command))
+    except subprocess.CalledProcessError as e:
+        print("Failure command: "  + os_command)
+        return False
+    return True
+
+
+def has_required():
+    REQUIRED_COMMAND = ("tmux", "zsh", "vim", "git")
+    rest = filter(lambda x: not shutil.which(x), REQUIRED_COMMAND)
+    if rest:
+        print("Please install the command. " + ", ".join(rest))
+        return False
+    return True
+
+
+def downloading_dotfiles(branch="master"):
+    REPOS_URL = "https://github.com/jtwp470/dotfiles.git"
+    # git clone --recursive ${REPO_URL} ${DOTFILES}
+    # git  --recursive option is then do submodule init & submodule update
+    print("Clone repository. branch is " + branch)
+    command = "git clone -b {branch} {repo} {dst} --recursive".format(
+        branch=branch, repo=REPOS_URL, dst=DOTFILES)
+    print(command)
+    return True if run(command) else False
 
 
 def deploy():
     for dfs in DOT_HOME_FILES:
-        src = DOTFILES + dfs
-        dst = HOME + dfs
+        src = os.path.join(DOTFILES, dfs)
+        dst = os.path.join(HOME, dfs)
 
         print("link {src} to {dst}".format(src=src, dst=dst))
         try:
@@ -63,37 +75,43 @@ def deploy():
 
 
 def initialize():
-    scripts = os.listdir(DOTFILES + "init/")
-    scripts.remove("README.md")
+    init_directory = os.path.join(DOTFILES, "init")
+    scripts = set(glob.glob(init_directory + "/*"))
+    scripts = scripts - set([os.path.join(init_directory, "README.md")])
     for s in scripts:
         try:
-            commands = DOTFILES + "init/" + s
-            print(commands)
-            subprocess.check_call(shlex.split("bash " + commands))
+            print("Run: " + s)
+            subprocess.check_call(shlex.split("bash " + s))
         except OSError:
             sys.exit("[Error:initialize()]Command not found.")
 
 
 def test():
-    command = "zsh {home}.zshrc".format(home=DOTFILES)
-    try:
-        subprocess.check_call(shlex.split(command))
-    except:
-        print("Error")
-        sys.exit(1)
+    for x in DOT_HOME_FILES:
+        print(x)
+        assert os.path.exists(os.path.join(HOME, x))
 
 
 def help_description():
     print("help")
 
 
-def all_run():
+def install():
     print("Start...")
-    downloading_dotfiles()
+    print("starting download")
+    if os.path.exists(DOTFILES):
+        print("File is exists. So skipping git clone")
+    else:
+        if downloading_dotfiles() is False:
+            sys.exit("Download failed")
+
     print("deploy")
-    deploy()
+    if deploy() is False:
+        sys.exit("Deploy failed")
+
     print("init")
-    initialize()
+    if initialize() is False:
+        sys.exit("Initialize failed")
 
 
 def main():
@@ -116,7 +134,7 @@ def main():
     parser_test.set_defaults(func=test)
 
     parser_all = subparser.add_parser("all")
-    parser_all.set_defaults(func=all_run)
+    parser_all.set_defaults(func=install)
     args = parser.parse_args()
 
     # オプションがないとき
