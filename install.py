@@ -17,7 +17,6 @@ import sys
 import subprocess
 import shlex
 import glob
-import shutil
 
 try:
     import argparse
@@ -45,10 +44,19 @@ def run(os_command):
     return True
 
 
+def which(pgm):
+    path = os.getenv("PATH")
+    for p in path.split(os.path.pathsep):
+        p = os.path.join(p, pgm)
+        if os.path.exists(p) and os.access(p, os.X_OK):
+            return True
+    return False
+
+
 def has_required():
     REQUIRED_COMMAND = ("tmux", "zsh", "vim", "git")
-    rest = filter(lambda x: not shutil.which(x), REQUIRED_COMMAND)
-    if rest:
+    rest = list(filter(lambda x: not which(x), REQUIRED_COMMAND))
+    if rest != []:
         print("Please install the command. " + ", ".join(rest))
         return False
     return True
@@ -102,6 +110,9 @@ def help_description():
 
 def install():
     print("Start...")
+    if not has_required():
+        sys.exit("Plz install requirement first!!")
+
     print("starting download")
     if os.path.exists(DOTFILES):
         print("File is exists. So skipping git clone")
