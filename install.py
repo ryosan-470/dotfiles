@@ -128,6 +128,9 @@ def install():
     if initialize() is False:
         sys.exit("Initialize failed")
 
+    print("test")
+    test()
+
 
 def main():
     parser = argparse.ArgumentParser(description="Setup tool for my dotfiles")
