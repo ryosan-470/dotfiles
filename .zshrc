@@ -66,11 +66,14 @@ case `uname` in
         elif [ -e /etc/redhat-release ]; then
             # CentOS
             UPDATE_CMD="sudo yum update";
+        elif cat /etc/os-release | grep Raspbian >/dev/null 2>&1 ; then
+            # Raspbian
+            UPDATE_CMD="sudo apt-get update && sudo apt-get upgrade"
         else
             UPDATE_CMD="echo 'Not support your using distribution.'"
         fi
         alias update=${UPDATE_CMD}
-	    ;;
+        ;;
 esac
 # OS固有の設定を書くファイル(ignoreされている)
 source $HOME/.local.zsh
@@ -294,10 +297,12 @@ fpath=(/usr/local/share/zsh/site-functions $fpath)
 autoload -U compinit; compinit
 
 # gpg2
-pgrep gpg-agent> /dev/null 2>&1 || eval $(gpg-agent --daemon --write-env-file ${HOME}/.gpg-agent-info)
-[ -f ${HOME}/.gpg-agent-info ] && source ${HOME}/.gpg-agent-info
-export GPG_AGENT_INFO
-export GPG_TTY=`tty`
+if which gpg-agent > /dev/null; then
+    pgrep gpg-agent> /dev/null 2>&1 || eval $(gpg-agent --daemon --write-env-file ${HOME}/.gpg-agent-info)
+    [ -f ${HOME}/.gpg-agent-info ] && source ${HOME}/.gpg-agent-info
+    export GPG_AGENT_INFO
+    export GPG_TTY=`tty`
+fi
 ################################################
 # peco
 ################################################
