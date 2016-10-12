@@ -13,6 +13,9 @@
 [include]
 	path = ~/.gitconfig.local
 [alias]
+	b = branch -a
+	s = status -s
+	ap = add -p
 	branches = branch -a              # ブランチの一覧
 	stashes = stash list              # stash した一覧
 	unstage = reset -q HEAD --
@@ -26,6 +29,6 @@
 	untrack = rm -r --cached
 	mergetrail = log --ancestry-path --merges
 	l = log --graph --date=short --pretty=format:'%C(red reverse)%d%Creset%C(white reverse) %h% Creset %C(green reverse) %an %Creset %C(cyan)%ai%Creset%n%C(white bold)%w(80)%s%Creset%n%n%w(80,2,2)%b'
-	sha1 = rev-parse
+	hash = rev-parse HEAD
 [commit]
 	template = ~/.dotconfig/dotfiles/.git_commit_template.txt
