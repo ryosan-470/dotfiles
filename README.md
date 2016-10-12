@@ -97,6 +97,10 @@ $ brew tap sanemat/fonts
 $ brew install ricty --powerline --vim-powerline
 ```
 
+## GitConfig
+コミット時の名前やメールアドレスなどは各環境に依存するため, dotfilesでの管理をとりやめました.
+各環境で利用する際は, `~/.gitconfig.local` に追記する形で利用してください.
+
 ## Reference
 
 * [The B4B4R07's dotfiles](https://github.com/b4b4r07/dotfiles)

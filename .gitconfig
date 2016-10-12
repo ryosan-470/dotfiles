@@ -1,9 +1,5 @@
-[user]
-	name = Ryosuke Sato
-	email = rskjtwp@gmail.com
-	signingkey = F79BE67F
 [core]
-	editor = "emacsclient -nw -a ''" --alternate-editor "vim"
+	editor = "emacsclient -nw -a ''" --alternate-editor "vim" --alternate-editor "nano"
 	excludesfile = ~/.gitignore_global
 [color]
 	ui = auto
@@ -15,7 +11,7 @@
 [push]
 	default = tracking
 [include]
-	path = .gitconfig.os
+	path = ~/.gitconfig.local
 [alias]
 	branches = branch -a              # ブランチの一覧
 	stashes = stash list              # stash した一覧
@@ -31,14 +27,5 @@
 	mergetrail = log --ancestry-path --merges
 	l = log --graph --date=short --pretty=format:'%C(red reverse)%d%Creset%C(white reverse) %h% Creset %C(green reverse) %an %Creset %C(cyan)%ai%Creset%n%C(white bold)%w(80)%s%Creset%n%n%w(80,2,2)%b'
 	sha1 = rev-parse
-[gpg]
-	program = gpg2
 [commit]
-	gpgsign = true
 	template = ~/.dotconfig/dotfiles/.git_commit_template.txt
-[diff]
-	compactionHeuristic = true
-[pager]
-	diff = diff-highlight | less
-	show = diff-highlight | less
-	log = diff-highlight | less
