@@ -46,16 +46,16 @@ source ~/.dotconfig/dotfiles/zsh.d/themes.zsh
 
 case `uname` in
     "Darwin")
-	    #For MacBook Air
-	    plugins=(git ruby cp pip brew osx python git-extras brew-cask vagrant docker go heroku nmap perl scala)
+        #For MacBook Air
+        plugins=(git ruby cp pip brew osx python git-extras brew-cask vagrant docker go heroku nmap perl scala)
         alias update="brew -v update && brew -v upgrade --all"
-	    ;;
+        ;;
     "Linux")
-	    #For Linux General
-	    alias open='gnome-open'
-	    alias pbcopy='xsel --clipboard --input'
-	    alias pbpaste='xsel --clipboard --output'
-	    plugins=(git ruby bundler emoji-clock themes cp pip python git-extras autojump)
+        #For Linux General
+        alias open='gnome-open'
+        alias pbcopy='xsel --clipboard --input'
+        alias pbpaste='xsel --clipboard --output'
+        plugins=(git ruby bundler emoji-clock themes cp pip python git-extras autojump)
         local UPDATE_CMD=""
         if [ -e /etc/lsb-release ]; then
             # Ubuntu
@@ -226,9 +226,9 @@ function rmtex() {
     NAME=`basename $1 .tex`
     rm $NAME.(aux|log|dvi)
     if [ $? -ne 0 ]; then
-	    echo "Failed to remove"
+        echo "Failed to remove"
     else
-	    echo "Success!"
+        echo "Success!"
     fi
 }
 ################################################
