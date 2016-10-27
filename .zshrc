@@ -48,7 +48,7 @@ case `uname` in
     "Darwin")
         #For MacBook Air
         plugins=(git ruby cp pip brew osx python git-extras brew-cask vagrant docker go heroku nmap perl scala)
-        alias update="brew -v update && brew -v upgrade --all"
+        alias update="brew -v update && brew -v upgrade"
         ;;
     "Linux")
         #For Linux General
