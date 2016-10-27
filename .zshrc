@@ -49,6 +49,7 @@ case `uname` in
         #For MacBook Air
         plugins=(git ruby cp pip brew osx python git-extras brew-cask vagrant docker go heroku nmap perl scala)
         alias update="brew -v update && brew -v upgrade"
+        alias pbcopy="reattach-to-user-namespace pbcopy"
         ;;
     "Linux")
         #For Linux General
