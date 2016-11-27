@@ -333,3 +333,6 @@ function peco-cdr () {
 }
 zle -N peco-cdr
 bindkey '^@' peco-cdr
+
+bindkey '^F^F' forward-word
+bindkey '^B^B' backward-word
