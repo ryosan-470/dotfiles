@@ -45,13 +45,12 @@ values."
      c-c++
      emacs-lisp
      html
-     java
-     javascript
+     ;; java
+     ;; javascript
      php
      ruby
      shell-scripts
-     sql
-     yaml
+     ;; sql
 
      ;; tools
      nginx
@@ -68,12 +67,12 @@ values."
      ;; (shell :variables
      ;;        shell-default-height 30
      ;;        shell-default-position 'bottom)
-     spell-checking
+     ;; spell-checking
      syntax-checking
 
      version-control
-     emoji
-     gtags
+     ;; emoji
+     ;; gtags
      osx
      git
      )
@@ -280,7 +279,7 @@ values."
    ;; If non nil line numbers are turned on in all `prog-mode' and `text-mode'
    ;; derivatives. If set to `relative', also turns on relative line numbers.
    ;; (default nil)
-   dotspacemacs-line-numbers nil
+   dotspacemacs-line-numbers t
    ;; Code folding method. Possible values are `evil' and `origami'.
    ;; (default 'evil)
    dotspacemacs-folding-method 'evil
@@ -315,6 +314,7 @@ values."
    ))
 
 (defun dotspacemacs/user-init ()
+  (setq exec-path-from-shell-arguments '("-l"))
   "Initialization function for user code.
 It is called immediately after `dotspacemacs/init', before layer configuration
 executes.
@@ -330,57 +330,9 @@ layers configuration.
 This is the place where most of your configurations should be done. Unless it is
 explicitly specified that a variable should be set before a package is loaded,
 you should place your code here."
-  ;; カーソル点滅の停止
-  (blink-cursor-mode 0)
   ;; 対応するカッコを光らせる
   (show-paren-mode 1)
   ;; ウィンドウに収まらない時だけ括弧内を光らせる
-  (setq show-paren-style 'mixed)
-  ;; 現在行を光らせる
-  ;; (global-hl-line-mode t)
-  ;; バックアップファイルを作らない
-  (setq backup-inhibited t)
-  ;; 終了時にオートセーブファイルを消す
-  (setq delete-auto-save-files t)
-  ;;ファイル名補完 大文字小文字の区別をしない
-  (setq completion-ignore-case t)
-  ;; 補完時に大文字小文字の区別をしない
-  (setq read-buffer-completion-ignore-case t)
-  ;;ファイル名の補完で大文字小文字を無視
-  (setq read-file-name-completion-ignore-case t)
-  ;; Emacsが思い原因を解消できる?
-  ;; http://qiita.com/takc923/items/acebbdae04994de16c6d
-  (setq linum-delay t)
-  (defadvice linum-schedule (around my-linum-schedule () activate)
-    (run-with-idle-timer 0.2 nil #'linum-update-current))
-  (require 'linum)  
-  ;; 行番号設定
-  (global-linum-mode t)
-  ;; F6で行番号を表示
-  (global-set-key [f6] 'linum-mode)
-  (setq linum-format "%3d ")
-  ;; 同名ファイルバッファ名識別文字列の変更
-  ;;(require 'uniquify)
-  ;;(setq uniquify-buffer-name-style 'post-forward-angle-branckets)
-  ;; zshを使う
-  (setq shell-file-name "/bin/zsh")
-  ;; 起動メッセージの省略
-  (setq inhibit-startup-message t)
-  ;; リージョンをハイライト
-  (setq-default transient-mark-mode t)
-  ;; yes or no to y-or-n
-  (defalias 'yes-or-no-p 'y-or-n-p)
-  ;; GC間隔の変更
-  (setq gc-cons-threshold 134217728)
-  ;; メニューバーを非表示
-  ;; (menu-bar-mode -1)
-  ;; インデント関連の設定
-  ;; TAB文字を無効化しTABを4スペースに変換するのがデフォルトにする
-  (setq-default indent-tabs-mode nil)
-  (setq-default tab-width 4)
-  (setq-default c-basic-offset 4)
-  ;; (setq c-default-style '((java-mode . "java") (python-mode . "python") (other . "linux")))
-  (setq-default indent-tabs-mode nil) ;; スペースを使う
   ;; automatic indent
   (global-set-key (kbd "RET") 'newline-and-indent)
   ;; undo
@@ -420,21 +372,17 @@ you should place your code here."
   ;; (global-set-key (kbd "C-x <down>") 'scroll-up)
   ;; (global-set-key (kbd "C-x <up>")   'scroll-down)
   ;; Helm Ag
-  (global-set-key (kbd "C-h s") 'helm-ag)
-  (global-set-key (kbd "C-h p") 'helm-ag-pop-stack)
   ;; FlyCheck
   (global-set-key (kbd "C-c f p") 'flycheck-previous-error)
   (global-set-key (kbd "C-c f n") 'flycheck-next-error)
   (global-set-key (kbd "C-c f l") 'flycheck-list-errors)
   (global-set-key (kbd "C-c f f") 'flycheck-first-error)
-
-
+  ;; Quick Run
   (global-set-key (kbd "C-c c") 'quickrun)
   ;; Quickrun with argument
   (global-set-key (kbd "C-c C-a") 'quickrun-with-arg)
   ;; Quickrun execute region
   (global-set-key (kbd "C-c C-r") 'quickrun-region)
-
   ;; visual-regexp
   (global-set-key (kbd "C-c r") 'vr/replace)
   (global-set-key (kbd "C-c q") 'vr/query-replace)
@@ -478,7 +426,7 @@ you should place your code here."
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
    (quote
-    (quickrun helm-company helm-c-yasnippet flyspell-correct-ivy company-web web-completion-data company-tern dash-functional tern company-statistics company-shell company-go company-emoji company-emacs-eclim company-c-headers company-anaconda company auto-yasnippet ac-ispell auto-complete yaml-mode x86-lookup web-mode web-beautify vagrant-tramp vagrant tagedit sql-indent smeargle slim-mode scss-mode sass-mode rvm ruby-tools ruby-test-mode rubocop rspec-mode robe reveal-in-osx-finder rbenv rake pug-mode phpunit phpcbf php-extras php-auto-yasnippets pbcopy osx-trash osx-dictionary orgit org nginx-mode nasm-mode mwim mmm-mode minitest markdown-toc markdown-mode magit-gitflow livid-mode skewer-mode simple-httpd less-css-mode launchctl js2-refactor multiple-cursors js2-mode js-doc insert-shebang helm-themes helm-swoop helm-pydoc helm-projectile helm-mode-manager helm-gtags helm-gitignore helm-flx helm-descbinds helm-css-scss helm-ag haml-mode go-guru go-eldoc go-mode gitignore-mode gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link git-gutter-fringe+ git-gutter-fringe fringe-helper git-gutter+ git-gutter gh-md ggtags flyspell-correct-helm flyspell-correct flycheck-pos-tip pos-tip flycheck fish-mode evil-magit magit git-commit with-editor emoji-cheat-sheet-plus emmet-mode eclim yasnippet drupal-mode php-mode dockerfile-mode docker json-mode tablist magit-popup docker-tramp json-snatcher json-reformat disaster diff-hl coffee-mode cmake-mode clang-format chruby bundler inf-ruby auto-dictionary ace-jump-helm-line yatex evil-unimpaired yapfify pyvenv pytest pyenv-mode py-isort pip-requirements live-py-mode hy-mode cython-mode anaconda-mode pythonic ws-butler window-numbering which-key wgrep volatile-highlights vi-tilde-fringe uuidgen use-package toc-org spaceline powerline smex restart-emacs request rainbow-delimiters popwin persp-mode pcre2el paradox spinner org-plus-contrib org-bullets open-junk-file neotree move-text macrostep lorem-ipsum linum-relative link-hint ivy-hydra info+ indent-guide ido-vertical-mode hydra hungry-delete hl-todo highlight-parentheses highlight-numbers parent-mode highlight-indentation hide-comnt help-fns+ helm-make helm helm-core google-translate golden-ratio flx-ido flx fill-column-indicator fancy-battery eyebrowse expand-region exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-tutor evil-surround evil-search-highlight-persist evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-lisp-state smartparens evil-indent-plus evil-iedit-state iedit evil-exchange evil-escape evil-ediff evil-args evil-anzu anzu evil goto-chg undo-tree eval-sexp-fu highlight elisp-slime-nav dumb-jump popup f s diminish define-word counsel-projectile projectile pkg-info epl counsel swiper ivy column-enforce-mode clean-aindent-mode bind-map bind-key auto-highlight-symbol auto-compile packed dash async aggressive-indent adaptive-wrap ace-window ace-link avy quelpa package-build spacemacs-theme))))
+ (quickrun helm-company helm-c-yasnippet flyspell-correct-ivy company-web web-completion-data company-tern dash-functional tern company-statistics company-shell company-go company-emoji company-emacs-eclim company-c-headers company-anaconda company auto-yasnippet ac-ispell auto-complete yaml-mode x86-lookup web-mode web-beautify vagrant-tramp vagrant tagedit sql-indent smeargle slim-mode scss-mode sass-mode rvm ruby-tools ruby-test-mode rubocop rspec-mode robe reveal-in-osx-finder rbenv rake pug-mode phpunit phpcbf php-extras php-auto-yasnippets pbcopy osx-trash osx-dictionary orgit org nginx-mode nasm-mode mwim mmm-mode minitest markdown-toc markdown-mode magit-gitflow livid-mode skewer-mode simple-httpd less-css-mode launchctl js2-refactor multiple-cursors js2-mode js-doc insert-shebang helm-themes helm-swoop helm-pydoc helm-projectile helm-mode-manager helm-gtags helm-gitignore helm-flx helm-descbinds helm-css-scss helm-ag haml-mode go-guru go-eldoc go-mode gitignore-mode gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link git-gutter-fringe+ git-gutter-fringe fringe-helper git-gutter+ git-gutter gh-md ggtags flyspell-correct-helm flyspell-correct flycheck-pos-tip pos-tip flycheck fish-mode evil-magit magit git-commit with-editor emoji-cheat-sheet-plus emmet-mode eclim yasnippet drupal-mode php-mode dockerfile-mode docker json-mode tablist magit-popup docker-tramp json-snatcher json-reformat disaster diff-hl coffee-mode cmake-mode clang-format chruby bundler inf-ruby auto-dictionary ace-jump-helm-line yatex evil-unimpaired yapfify pyvenv pytest pyenv-mode py-isort pip-requirements live-py-mode hy-mode cython-mode anaconda-mode pythonic ws-butler window-numbering which-key wgrep volatile-highlights vi-tilde-fringe uuidgen use-package toc-org spaceline powerline smex restart-emacs request rainbow-delimiters popwin persp-mode pcre2el paradox spinner org-plus-contrib org-bullets open-junk-file neotree move-text macrostep lorem-ipsum linum-relative link-hint ivy-hydra info+ indent-guide ido-vertical-mode hydra hungry-delete hl-todo highlight-parentheses highlight-numbers parent-mode highlight-indentation hide-comnt help-fns+ helm-make helm helm-core google-translate golden-ratio flx-ido flx fill-column-indicator fancy-battery eyebrowse expand-region exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-tutor evil-surround evil-search-highlight-persist evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-lisp-state smartparens evil-indent-plus evil-iedit-state iedit evil-exchange evil-escape evil-ediff evil-args evil-anzu anzu evil goto-chg undo-tree eval-sexp-fu highlight elisp-slime-nav dumb-jump popup f s diminish define-word counsel-projectile projectile pkg-info epl counsel swiper ivy column-enforce-mode clean-aindent-mode bind-map bind-key auto-highlight-symbol auto-compile packed dash async aggressive-indent adaptive-wrap ace-window ace-link avy quelpa package-build spacemacs-theme))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
