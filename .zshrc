@@ -31,7 +31,7 @@ zplug "zsh-users/zaw"
 # 例: "zsh-syntax-highlighting" は compinit の前に読み込まれる必要がある
 # （10 以上は compinit 後に読み込まれるようになる）
 zplug "zsh-users/zsh-syntax-highlighting", nice:10
-# zplug "b4b4r07/enhancd", use:init.sh  # ターミナルの移動をいい感じにしてくれる
+zplug "b4b4r07/enhancd", use:init.sh  # ターミナルの移動をいい感じにしてくれる
 
 source ~/.dotconfig/dotfiles/zsh.d/themes.zsh
 
@@ -88,9 +88,6 @@ export GREP_OPTIONS='--binary-files=without-match'
 # zsh customize
 setopt auto_cd
 function chpwd() { ls -F }
-# history search
-bindkey '^P' history-beginning-search-backward
-bindkey '^N' history-beginning-search-forward
 # historyの共有
 setopt share_history
 # ヒストリに追加されるコマンド行が古いものと同じなら古いものを削除
@@ -109,9 +106,6 @@ setopt hist_no_store
 setopt hist_expand
 # 履歴をインクリメンタルに追加
 setopt inc_append_history
-# インクリメンタルからの検索
-bindkey "^R" history-incremental-search-backward
-bindkey "^S" history-incremental-search-forward
 # zsh 拡張glob
 setopt extendedglob
 # killコマンドを便利に
