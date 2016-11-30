@@ -1,62 +1,67 @@
+# When there is NOT ~/.zplug, do to install
+if [[ ! -d ~/.zplug ]]; then
+    git clone https://github.com/zplug/zplug ~/.zplug
+    source ~/.zplug/init.zsh && zplug update --self
+fi
+source ~/.zplug/init.zsh
+
 ZSHD_PATH=$HOME/.dotconfig/dotfiles/zsh.d
-# Common settings
-# Path to your oh-my-zsh configuration.
-ZSH=$HOME/.oh-my-zsh
 
-# Set name of the theme to load.
-# Look in ~/.oh-my-zsh/themes/
-# Optionally, if you set this to "random", it'll load a random theme each
-# time that oh-my-zsh is loaded.
-# ZSH_THEME="ys"
-# ZSH_THEME="agnoster"
+autoload colors && colors
+setopt prompt_subst
 
-# Example aliases
-# alias zshconfig="mate ~/.zshrc"
-# alias ohmyzsh="mate ~/.oh-my-zsh"
+# OSX, Linuxに共通するプラグイン
+zplug "plugins/git", from:oh-my-zsh
+zplug "plugins/git-extras", from:oh-my-zsh
+zplug "plugins/pip", from:oh-my-zsh
+zplug "plugins/cp", from:oh-my-zsh
+zplug "plugins/python", from:oh-my-zsh
+zplug "plugins/go", from:oh-my-zsh
+zplug "plugins/docker", from:oh-my-zsh
+zplug "plugins/vagrant", from:oh-my-zsh
+zplug "plugins/heroku", from:oh-my-zsh
+zplug "plugins/nmap", from:oh-my-zsh
+zplug "plugins/git", from:oh-my-zsh, nice:10
+zplug "plugins/aws", from:oh-my-zsh
+zplug "plugins/colorize", from:oh-my-zsh
+zplug "zsh-users/zsh-completions"
+zplug "zsh-users/zsh-history-substring-search"
+zplug "zsh-users/zaw"
+# 読み込み順序を設定する
+# 例: "zsh-syntax-highlighting" は compinit の前に読み込まれる必要がある
+# （10 以上は compinit 後に読み込まれるようになる）
+zplug "zsh-users/zsh-syntax-highlighting", nice:10
+# zplug "b4b4r07/enhancd", use:init.sh  # ターミナルの移動をいい感じにしてくれる
 
-# Set to this to use case-sensitive completion
-# CASE_SENSITIVE="true"
-
-# Uncomment this to disable bi-weekly auto-update checks
-# DISABLE_AUTO_UPDATE="true"
-
-# Uncomment to change how often before auto-updates occur? (in days)
-# export UPDATE_ZSH_DAYS=13
-
-# Uncomment following line if you want to disable colors in ls
-# DISABLE_LS_COLORS="true"
-
-# Uncomment following line if you want to disable autosetting terminal title.
-# DISABLE_AUTO_TITLE="true"
-
-# Uncomment following line if you want to disable command autocorrection
-# DISABLE_CORRECTION="true"
-# Uncomment following line if you want red dots to be displayed while waiting for completion
-# COMPLETION_WAITING_DOTS="true"
-
-# Uncomment following line if you want to disable marking untracked files under
-# VCS as dirty. This makes repository status check for large repositories much,
-# much faster.
-# DISABLE_UNTRACKED_FILES_DIRTY="true"
-
-source $ZSH/oh-my-zsh.sh
 source ~/.dotconfig/dotfiles/zsh.d/themes.zsh
-########################################
-# OS 別の設定
 
+# 未インストール項目をインストールする
+if ! zplug check --verbose; then
+    printf "Install? [y/N]: "
+    if read -q; then
+        echo; zplug install
+    fi
+fi
+
+# コマンドをリンクして、PATH に追加し、プラグインは読み込む
+zplug load --verbose
+# OS別の設定
 case `uname` in
     "Darwin")
         #For MacBook Air
-        plugins=(git ruby cp pip brew osx python git-extras brew-cask vagrant docker go heroku nmap perl scala)
+        zplug "plugins/brew", from:oh-my-zsh
+        zplug "plugins/brew-cask", from:oh-my-zsh
+        zplug "plugins/osx", from:oh-my-zsh
+        zplug "peco/peco", as:command, from:gh-r, use:"*darwin*", rename-to:peco
         alias update="brew -v update && brew -v upgrade"
         alias pbcopy="reattach-to-user-namespace pbcopy"
         ;;
     "Linux")
         #For Linux General
+        zplug "peco/peco", as:command, from:gh-r, use:"*amd64*", rename-to:peco
         alias open='gnome-open'
         alias pbcopy='xsel --clipboard --input'
         alias pbpaste='xsel --clipboard --output'
-        plugins=(git ruby bundler emoji-clock themes cp pip python git-extras autojump)
         local UPDATE_CMD=""
         if [ -e /etc/lsb-release ]; then
             # Ubuntu
@@ -154,6 +159,7 @@ alias ipy3=ipython3
 alias fds='du -h -d 1'
 alias gpp=g++
 alias el2elc="emacs -batch -f batch-byte-compile"
+alias l='ls -l'
 # alias pip-update="pip list -o | awk '{ print $1 }' | xargs pip install -U"
 # alias pip3-update="pip3 list -o | awk '{ print $1 }' | xargs pip3 install -U"
 alias ru="ruby"
@@ -189,17 +195,6 @@ function emacs-restart(){
 }
 zle -N emacs-restart
 bindkey '^re' emacs-restart
-################################################
-## tmux自動起動
-################################################
-if [ "$TMUX" = "" ]; then
-    tmux attach;
-
-    # detachしてない場合
-    if [ $? ]; then
-        tmux;
-    fi
-fi
 ################################################
 # hoge.tar.gz を ./hoge.tar.gz で展開
 ################################################
@@ -242,37 +237,20 @@ function c2b() {
     TARGET=$1
     cat $TARGET | pbcopy
 }
-################################################
-# zsh-syntax-highlighting
-################################################
-if [ -f $ZSHD_PATH/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ]; then
-    source $ZSHD_PATH/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+
+if zplug check "zsh-users/zsh-history-substring-search"; then
+    bindkey '^P' history-substring-search-up
+    bindkey '^N' history-substring-search-down
 fi
-################################################
-# git submodule deinit
-################################################
-function git-submodule-delete() {
-    REPO=$1
-    git submodule deinit $REPO
-    git rm $REPO
-}
-alias "git submodule delete"=git-submodule-delete
-################################################
-# bd
-################################################
-if [ -f $ZSHD_PATH/zsh-bd/bd.zsh ]; then
-    source $ZSHD_PATH/zsh-bd/bd.zsh
-fi
-# zaw
-if [ -f $ZSHD_PATH/zaw/zaw.zsh ]; then
+
+if zplug check "zsh-users/zaw"; then
     autoload -Uz chpwd_recent_dirs cdr add-zsh-hook
     add-zsh-hook chpwd chpwd_recent_dirs
-    zstyle ':chpwd:*' recent-dirs-max 500 # cdrの履歴を保存する個数
+    zstyle ':chpwd:*' recent-dirs-max 10000 # cdrの履歴を保存する個数
     zstyle ':chpwd:*' recent-dirs-default yes
     zstyle ':completion:*' recent-dirs-insert both
     zstyle ':filter-select:highlight' selected fg=black,bg=white,standout
     zstyle ':filter-select' case-insensitive yes
-    source $ZSHD_PATH/zaw/zaw.zsh
     bindkey '^@' zaw-cdr
     bindkey '^R' zaw-history
     bindkey '^X^F' zaw-git-files
@@ -292,10 +270,6 @@ function keydump() {
     # public keyを見たい場合はrsa -pubin オプションを使うらしい
     openssl ${CIPHER:='rsa'} -in ${KEYFILE:='id_rsa.pub'} -text -noout
 }
-
-# fpath
-fpath=(/usr/local/share/zsh/site-functions $fpath)
-autoload -U compinit; compinit
 
 # gpg2
 if which gpg-agent > /dev/null; then
@@ -336,3 +310,15 @@ bindkey '^@' peco-cdr
 
 bindkey '^F^F' forward-word
 bindkey '^B^B' backward-word
+
+################################################
+## tmux自動起動
+################################################
+if [ "$TMUX" = "" ]; then
+    tmux attach;
+
+    # detachしてない場合
+    if [ $? ]; then
+        tmux;
+    fi
+fi
