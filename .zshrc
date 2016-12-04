@@ -10,6 +10,7 @@ ZSHD_PATH=$HOME/.dotconfig/dotfiles/zsh.d
 autoload colors && colors
 setopt prompt_subst
 
+zplug "zplug/zplug"
 # OSX, Linuxに共通するプラグイン
 zplug "plugins/git", from:oh-my-zsh
 zplug "plugins/git-extras", from:oh-my-zsh
@@ -18,15 +19,24 @@ zplug "plugins/cp", from:oh-my-zsh
 zplug "plugins/python", from:oh-my-zsh
 zplug "plugins/go", from:oh-my-zsh
 zplug "plugins/docker", from:oh-my-zsh
+zplug "plugins/docker-compose", from:oh-my-zsh
 zplug "plugins/vagrant", from:oh-my-zsh
 zplug "plugins/heroku", from:oh-my-zsh
 zplug "plugins/nmap", from:oh-my-zsh
 zplug "plugins/git", from:oh-my-zsh, nice:10
 zplug "plugins/aws", from:oh-my-zsh
 zplug "plugins/colorize", from:oh-my-zsh
+zplug "plugins/common-aliases", from:oh-my-zsh
+# lib周りの読み込み順序はかなり重要
+zplug "lib/completion", from:oh-my-zsh
+zplug "lib/functions", from:oh-my-zsh
+zplug "lib/keybindings", from:oh-my-zsh
+zplug "lib/history", from:oh-my-zsh
+zplug "lib/misc", from:oh-my-zsh
 zplug "zsh-users/zsh-completions"
 zplug "zsh-users/zsh-history-substring-search"
 zplug "zsh-users/zaw"
+zplug "peco/peco", as:command, from:gh-r, frozen:1
 # 読み込み順序を設定する
 # 例: "zsh-syntax-highlighting" は compinit の前に読み込まれる必要がある
 # （10 以上は compinit 後に読み込まれるようになる）
@@ -52,13 +62,11 @@ case `uname` in
         zplug "plugins/brew", from:oh-my-zsh
         zplug "plugins/brew-cask", from:oh-my-zsh
         zplug "plugins/osx", from:oh-my-zsh
-        zplug "peco/peco", as:command, from:gh-r, use:"*darwin*", rename-to:peco
         alias update="brew -v update && brew -v upgrade"
         alias pbcopy="reattach-to-user-namespace pbcopy"
         ;;
     "Linux")
         #For Linux General
-        zplug "peco/peco", as:command, from:gh-r, use:"*amd64*", rename-to:peco
         alias open='gnome-open'
         alias pbcopy='xsel --clipboard --input'
         alias pbpaste='xsel --clipboard --output'
@@ -110,6 +118,8 @@ setopt inc_append_history
 setopt extendedglob
 # killコマンドを便利に
 zstyle ':completion:*:processes' command "ps -u $USER -o pid,stat,%cpu,%mem,cputime,command"
+# case insensitive
+zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}'
 # コマンドラインを任意のテキストエディタで編集する
 autoload -Uz edit-command-line
 zle -N edit-command-line
@@ -153,7 +163,6 @@ alias ipy3=ipython3
 alias fds='du -h -d 1'
 alias gpp=g++
 alias el2elc="emacs -batch -f batch-byte-compile"
-alias l='ls -l'
 # alias pip-update="pip list -o | awk '{ print $1 }' | xargs pip install -U"
 # alias pip3-update="pip3 list -o | awk '{ print $1 }' | xargs pip3 install -U"
 alias ru="ruby"
@@ -308,11 +317,11 @@ bindkey '^B^B' backward-word
 ################################################
 ## tmux自動起動
 ################################################
-if [ "$TMUX" = "" ]; then
-    tmux attach;
+# if [ "$TMUX" = "" ]; then
+#     tmux attach;
 
-    # detachしてない場合
-    if [ $? ]; then
-        tmux;
-    fi
-fi
+#     # detachしてない場合
+#     if [ $? ]; then
+#         tmux;
+#     fi
+# fi
