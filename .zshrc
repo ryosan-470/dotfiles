@@ -10,7 +10,6 @@ ZSHD_PATH=$HOME/.dotconfig/dotfiles/zsh.d
 autoload colors && colors
 setopt prompt_subst
 
-zplug "zplug/zplug"
 # OSX, Linuxに共通するプラグイン
 zplug "plugins/git", from:oh-my-zsh
 zplug "plugins/git-extras", from:oh-my-zsh
@@ -23,7 +22,7 @@ zplug "plugins/docker-compose", from:oh-my-zsh
 zplug "plugins/vagrant", from:oh-my-zsh
 zplug "plugins/heroku", from:oh-my-zsh
 zplug "plugins/nmap", from:oh-my-zsh
-zplug "plugins/git", from:oh-my-zsh, nice:10
+zplug "plugins/git", from:oh-my-zsh, defer:2
 zplug "plugins/aws", from:oh-my-zsh
 zplug "plugins/colorize", from:oh-my-zsh
 zplug "plugins/common-aliases", from:oh-my-zsh
@@ -39,8 +38,8 @@ zplug "zsh-users/zaw"
 zplug "peco/peco", as:command, from:gh-r, frozen:1
 # 読み込み順序を設定する
 # 例: "zsh-syntax-highlighting" は compinit の前に読み込まれる必要がある
-# （10 以上は compinit 後に読み込まれるようになる）
-zplug "zsh-users/zsh-syntax-highlighting", nice:10
+# （2 以上は compinit 後に読み込まれるようになる）
+zplug "zsh-users/zsh-syntax-highlighting", defer:2
 zplug "b4b4r07/enhancd", use:init.sh  # ターミナルの移動をいい感じにしてくれる
 
 source ~/.dotconfig/dotfiles/zsh.d/themes.zsh
