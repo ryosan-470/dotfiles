@@ -330,6 +330,7 @@ layers configuration.
 This is the place where most of your configurations should be done. Unless it is
 explicitly specified that a variable should be set before a package is loaded,
 you should place your code here."
+  (evil-leader/set-key "bl" 'ibuffer)  ;; List buffer
   ;; 対応するカッコを光らせる
   (show-paren-mode 1)
   ;; ウィンドウに収まらない時だけ括弧内を光らせる
