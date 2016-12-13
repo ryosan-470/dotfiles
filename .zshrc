@@ -139,7 +139,6 @@ alias v=vim
 alias g=git
 alias s='source ~/.zshrc'
 alias t=tmux
-alias tr='tmux source-file ~/.tmux.conf'
 alias ta="tmux attach -t 0"
 alias td="tmux detach"
 alias tl="tmux ls"
@@ -312,6 +311,14 @@ bindkey '^@' peco-cdr
 
 bindkey '^F^F' forward-word
 bindkey '^B^B' backward-word
+
+function urlencode() {
+    echo $1 | nkf -WwMQ | sed -e 's/=/%/g'
+}
+
+function urldecode() {
+    echo $1 | nkf --url-input
+}
 
 ################################################
 ## tmux自動起動
