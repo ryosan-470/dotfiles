@@ -162,8 +162,8 @@ values."
    dotspacemacs-colorize-cursor-according-to-state t
    ;; Default font, or prioritized list of fonts. `powerline-scale' allows to
    ;; quickly tweak the mode-line size to make separators look not too crappy.
-   dotspacemacs-default-font '("Ricty for Powerline"
-                               :size 17
+   dotspacemacs-default-font '("Source Code Pro"
+                               :size 16
                                :weight normal
                                :width normal
                                :powerline-scale 1.1)
@@ -416,6 +416,19 @@ you should place your code here."
   (global-set-key (kbd "C-c <right>") 'tabbar-forward-tab)
   (global-set-key (kbd "C-x t l")   'tabbar-backward-tab)
   (global-set-key (kbd "C-c <left>") 'tabbar-backward-tab)
+
+  ;; yatex
+  (require 'yatex)
+  (setq auto-mode-alist
+        (append '(("\\.tex$" . yatex-mode)
+                  ("\\.ltx$" . yatex-mode)
+                  ("\\.cls$" . yatex-mode)
+                  ("\\.sty$" . yatex-mode)
+                  ("\\.clo$" . yatex-mode)
+                  ("\\.bbl$" . yatex-mode)) auto-mode-alist))
+  (setq tex-command "platex")
+  (setq dvi2-command "open")
+  (setq YaTeX-kanji-code 4) ;; 4 == utf-8
   )
 
 ;; Do not write anything past this comment. This is where Emacs will
