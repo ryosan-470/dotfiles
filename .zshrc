@@ -35,7 +35,6 @@ zplug "lib/misc", from:oh-my-zsh
 zplug "zsh-users/zsh-completions"
 zplug "zsh-users/zsh-history-substring-search"
 zplug "zsh-users/zaw"
-zplug "peco/peco", as:command, from:gh-r, frozen:1
 # 読み込み順序を設定する
 # 例: "zsh-syntax-highlighting" は compinit の前に読み込まれる必要がある
 # （2 以上は compinit 後に読み込まれるようになる）
@@ -69,6 +68,7 @@ case `uname` in
         alias open='gnome-open'
         alias pbcopy='xsel --clipboard --input'
         alias pbpaste='xsel --clipboard --output'
+        alias ls='ls --color=auto'
         local UPDATE_CMD=""
         if [ -e /etc/lsb-release ]; then
             # Ubuntu
@@ -88,6 +88,14 @@ case `uname` in
         alias update=${UPDATE_CMD}
         ;;
 esac
+
+case `uname -m` in
+    "x86" | "x86_64")
+        zplug "peco/peco", as:command, from:gh-r, frozen:1
+        ;;
+esac
+
+
 # OS固有の設定を書くファイル(ignoreされている)
 source $HOME/.local.zsh
 bindkey -e # キーバインドをEmacs風にする
