@@ -99,7 +99,8 @@ esac
 # OS固有の設定を書くファイル(ignoreされている)
 source $HOME/.local.zsh
 bindkey -e # キーバインドをEmacs風にする
-export GREP_OPTIONS='--binary-files=without-match'
+export GREP_OPTIONS='--color=auto --binary-files=without-match'
+alias grep="grep $GREP_OPTIONS"
 # zsh customize
 setopt auto_cd
 function chpwd() { ls -F }
