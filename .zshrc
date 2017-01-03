@@ -247,8 +247,8 @@ function c2b() {
 }
 
 if zplug check "zsh-users/zsh-history-substring-search"; then
-    bindkey '^P' history-substring-search-up
-    bindkey '^N' history-substring-search-down
+    bindkey '^[[A' history-substring-search-up
+    bindkey '^[[B' history-substring-search-down
 fi
 
 if zplug check "zsh-users/zaw"; then
