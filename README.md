@@ -75,8 +75,6 @@ Try my conf to use Docker container.
 ## Spacemacs
 Spacemacsはキーバインドを hybrid にして使っています．こうすることで<keyboard>SPC</keyboard>の恩恵を受けつつ，インサートモード時はEmacsのキーバインドを最大限利用できるようになりました．
 
-今のところお試し期間なので master ブランチにマージされることはありませんが近いうち，マージされてしまうかもしれません．
-
 ## Feature
 ### tmux
 
