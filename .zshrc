@@ -20,12 +20,12 @@ zplug "plugins/go", from:oh-my-zsh
 zplug "plugins/docker", from:oh-my-zsh
 zplug "plugins/docker-compose", from:oh-my-zsh
 zplug "plugins/vagrant", from:oh-my-zsh
-zplug "plugins/heroku", from:oh-my-zsh
 zplug "plugins/nmap", from:oh-my-zsh
 zplug "plugins/git", from:oh-my-zsh, defer:2
 zplug "plugins/aws", from:oh-my-zsh
 zplug "plugins/colorize", from:oh-my-zsh
 zplug "plugins/common-aliases", from:oh-my-zsh
+zplug "plugins/heroku", from:oh-my-zsh
 # lib周りの読み込み順序はかなり重要
 zplug "lib/completion", from:oh-my-zsh
 zplug "lib/functions", from:oh-my-zsh
@@ -33,26 +33,17 @@ zplug "lib/keybindings", from:oh-my-zsh
 zplug "lib/history", from:oh-my-zsh
 zplug "lib/misc", from:oh-my-zsh
 zplug "zsh-users/zsh-completions"
-zplug "zsh-users/zsh-history-substring-search"
 zplug "zsh-users/zaw"
 # 読み込み順序を設定する
 # 例: "zsh-syntax-highlighting" は compinit の前に読み込まれる必要がある
 # （2 以上は compinit 後に読み込まれるようになる）
 zplug "zsh-users/zsh-syntax-highlighting", defer:2
+# substring-search はsyntax highlightingより後に呼び出す
+zplug "zsh-users/zsh-history-substring-search", defer:2
 zplug "b4b4r07/enhancd", use:init.sh  # ターミナルの移動をいい感じにしてくれる
-
+# テーマファイルとして読み込む
 source ~/.dotconfig/dotfiles/zsh.d/themes.zsh
 
-# 未インストール項目をインストールする
-if ! zplug check --verbose; then
-    printf "Install? [y/N]: "
-    if read -q; then
-        echo; zplug install
-    fi
-fi
-
-# コマンドをリンクして、PATH に追加し、プラグインは読み込む
-zplug load --verbose
 # OS別の設定
 case `uname` in
     "Darwin")
@@ -95,9 +86,6 @@ case `uname -m` in
         ;;
 esac
 
-
-# OS固有の設定を書くファイル(ignoreされている)
-source $HOME/.local.zsh
 bindkey -e # キーバインドをEmacs風にする
 # zsh customize
 setopt auto_cd
@@ -130,10 +118,6 @@ zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}'
 autoload -Uz edit-command-line
 zle -N edit-command-line
 bindkey '^xe' edit-command-line
-# if .zshrc is newer than .zshrc.zwc, do zcompile
-if [ ! -f ~/.zshrc.zwc -o ~/.zshrc -nt ~/.zshrc.zwc ];then
-    zcompile ~/.zshrc
-fi
 
 ############################################################################
 ##    Alias
@@ -183,7 +167,7 @@ function do_enter() {
         return 0
     fi
     echo
-    ls
+    ls --color=auto
     # ls_abbrev
     if [ "$(git rev-parse --is-inside-work-tree 2> /dev/null)" = 'true' ]; then
         echo
@@ -341,3 +325,20 @@ fi
 export GREP_OPTIONS='--color=auto --binary-files=without-match'
 alias grep="grep $GREP_OPTIONS"
 unset GREP_OPTIONS
+
+################################################
+## zplug 周りの最終確認
+################################################
+# 未インストール項目をインストールする
+if ! zplug check --verbose; then
+    printf "Install? [y/N]: "
+    if read -q; then
+        echo; zplug install
+    fi
+fi
+
+# コマンドをリンクして、PATH に追加し、プラグインは読み込む
+zplug load --verbose
+
+# OS固有の設定を書くファイル(ignoreされている) zplug load後に必要
+source ~/.local.zsh
