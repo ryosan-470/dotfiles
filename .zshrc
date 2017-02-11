@@ -119,42 +119,6 @@ autoload -Uz edit-command-line
 zle -N edit-command-line
 bindkey '^xe' edit-command-line
 
-############################################################################
-##    Alias
-############################################################################
-alias e='emacs -nw'
-alias ec='emacsclient -nw -a ""'
-alias ecw='emacsclient -c'
-alias kill-emacs="emacsclient -e '(kill-emacs)'"
-alias v=vim
-alias g=git
-alias s='source ~/.zshrc'
-alias t=tmux
-alias ta="tmux attach -t 0"
-alias td="tmux detach"
-alias tl="tmux ls"
-alias gpl='git pull origin master'
-alias gps='git push origin master'
-alias gf='git fetch origin master'
-alias gss='git status -s'
-alias gc='git commit'
-alias gcm='git commit -m'
-alias gcv='git commit -v'
-alias j=java
-alias jc=javac
-alias ll='ls -lh'
-alias p=python3
-alias p2=python2
-alias p3=python3
-alias ipy=ipython
-alias ipy2=ipython2
-alias ipy3=ipython3
-alias fds='du -h -d 1'
-alias gpp=g++
-alias el2elc="emacs -batch -f batch-byte-compile"
-# alias pip-update="pip list -o | awk '{ print $1 }' | xargs pip install -U"
-# alias pip3-update="pip3 list -o | awk '{ print $1 }' | xargs pip3 install -U"
-alias ru="ruby"
 ################################################
 # Functions
 ################################################
@@ -253,15 +217,6 @@ if zplug check "zsh-users/zaw"; then
 fi
 
 source ${ZSHD_PATH}/run.zsh
-##################################################
-# keydump (RSA key dumped using openssl)
-##################################################
-function keydump() {
-    KEYFILE=$1
-    CIPHER=$2
-    # public keyを見たい場合はrsa -pubin オプションを使うらしい
-    openssl ${CIPHER:='rsa'} -in ${KEYFILE:='id_rsa.pub'} -text -noout
-}
 
 # gpg2
 if which gpg-agent > /dev/null; then
@@ -326,6 +281,15 @@ export GREP_OPTIONS='--color=auto --binary-files=without-match'
 alias grep="grep $GREP_OPTIONS"
 unset GREP_OPTIONS
 
+function dot() {
+    ret=$PWD
+    cd ~/.dotconfig/dotfiles
+    case $1 in
+        update) git pull origin master;;
+    esac
+    cd $ret
+}
+
 ################################################
 ## zplug 周りの最終確認
 ################################################
@@ -339,6 +303,43 @@ fi
 
 # コマンドをリンクして、PATH に追加し、プラグインは読み込む
 zplug load --verbose
+
+############################################################################
+##    Alias
+############################################################################
+alias e='emacs -nw'
+alias ec='emacsclient -nw -a ""'
+alias ecw='emacsclient -c'
+alias kill-emacs="emacsclient -e '(kill-emacs)'"
+alias v=vim
+alias g=git
+alias s='source ~/.zshrc'
+alias t=tmux
+alias ta="tmux attach -t 0"
+alias td="tmux detach"
+alias tl="tmux ls"
+alias gpl='git pull origin master'
+alias gps='git push origin master'
+alias gf='git fetch origin master'
+alias gss='git status -s'
+alias gc='git commit'
+alias gcm='git commit -m'
+alias gcv='git commit -v'
+alias j=java
+alias jc=javac
+alias ll='ls -lh'
+alias p=python3
+alias p2=python2
+alias p3=python3
+alias ipy=ipython
+alias ipy2=ipython2
+alias ipy3=ipython3
+alias fds='du -h -d 1'
+alias gpp=g++
+alias el2elc="emacs -batch -f batch-byte-compile"
+# alias pip-update="pip list -o | awk '{ print $1 }' | xargs pip install -U"
+# alias pip3-update="pip3 list -o | awk '{ print $1 }' | xargs pip3 install -U"
+alias ru="ruby"
 
 # OS固有の設定を書くファイル(ignoreされている) zplug load後に必要
 source ~/.local.zsh
