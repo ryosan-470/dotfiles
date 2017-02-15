@@ -123,27 +123,6 @@ bindkey '^xe' edit-command-line
 # Functions
 ################################################
 ################################################
-# if you press enter key, do ls or git status
-################################################
-function do_enter() {
-    if [ -n "$BUFFER" ]; then
-        zle accept-line
-        return 0
-    fi
-    echo
-    ls --color=auto
-    # ls_abbrev
-    if [ "$(git rev-parse --is-inside-work-tree 2> /dev/null)" = 'true' ]; then
-        echo
-        echo -e "\e[0;33m--- git status ---\e[0m"
-        git status -sb
-    fi
-    zle reset-prompt
-    return 0
-}
-zle -N do_enter
-bindkey '^m' do_enter
-################################################
 # emacs-restart C-r e
 ################################################
 function emacs-restart(){
@@ -283,11 +262,20 @@ unset GREP_OPTIONS
 
 function dot() {
     ret=$PWD
-    cd ~/.dotconfig/dotfiles
+    help_message=$(cat << DOT
+The dot command is a controller my dotfiles based on CLI
+There are common dot commands used in various situations:
+
+update         Update your dotfiles from GitHub (e.g git fetch origin master)
+help           Print this message
+DOT
+)
     case $1 in
-        update) git pull origin master;;
+        update) cd ~/.dotconfig/dotfiles > /dev/null;
+                git pull origin master;
+                cd $ret > /dev/null;;
+        *) echo $help_message;;
     esac
-    cd $ret
 }
 
 ################################################
@@ -341,5 +329,29 @@ alias el2elc="emacs -batch -f batch-byte-compile"
 # alias pip3-update="pip3 list -o | awk '{ print $1 }' | xargs pip3 install -U"
 alias ru="ruby"
 
+################################################
+# if you press enter key, do ls or git status
+################################################
+# ls --color が適用されるために後ろで読み込む
+function do_enter() {
+    if [ -n "$BUFFER" ]; then
+        zle accept-line
+        return 0
+    fi
+    echo
+    ls --color=auto
+    # ls_abbrev
+    if [ "$(git rev-parse --is-inside-work-tree 2> /dev/null)" = 'true' ]; then
+        echo
+        echo -e "\e[0;33m--- git status ---\e[0m"
+        git status -sb
+    fi
+    zle reset-prompt
+    return 0
+}
+zle -N do_enter
+bindkey '^m' do_enter
+
 # OS固有の設定を書くファイル(ignoreされている) zplug load後に必要
+# これは最後に読み込むことにする (local.zsh側の方が上書きできる仕様)
 source ~/.local.zsh

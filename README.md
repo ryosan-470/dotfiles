@@ -29,6 +29,18 @@ Incidentally, ```install.py all``` will perform the following tasks.
 2. Deploy (ex. create symlink) (```install.py deploy```)
 3. Initialize (```install.py init```)
 
+## Update the configuration
+Use `dot` command as below:
+
+```bash
+$ dot
+The dot command is a controller my dotfiles based on CLI
+There are common dot commands used in various situations:
+
+update         Update your dotfiles from GitHub (e.g git fetch origin master)
+help           Print this message
+```
+
 ## Try my confs
 Try my conf to use Docker container.
 
@@ -63,17 +75,17 @@ Try my conf to use Docker container.
 
 ## Requirements
 
-* zsh  (>= 5.0.2)
+* zsh
 * tmux
 * Vim 7.4
-* OS X 10.9 or higher
-* Ubuntu 14.04 or higher
-* iTerm2 (in OSX)
+* macOS or Linux (and also support Windows Subsytem for Linux)
 * Powerline fonts
 * Emacs 25
 
 ## Spacemacs
-Spacemacsはキーバインドを hybrid にして使っています．こうすることで<keyboard>SPC</keyboard>の恩恵を受けつつ，インサートモード時はEmacsのキーバインドを最大限利用できるようになりました．
+I am using Spacemacs keybind as 'hybrid'. This mode can use Emacs keybind and Vim keybind (awesome!).
+Hybrid mode is very useful because when I edit, I can use Emacs keybind, when I don't edit, I can <keyboard>SPC</keyboard> leader key!
+If you are interested in Spacemacs, refer to [official documentation](http://spacemacs.org/doc/DOCUMENTATION).
 
 ## Feature
 ### tmux
