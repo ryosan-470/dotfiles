@@ -47,6 +47,7 @@ values."
      html
      ;; java
      javascript
+     react
      elixir
      yaml
      php
@@ -74,9 +75,10 @@ values."
 
      version-control
      ;; emoji
-     ;; gtags
+     gtags
      osx
      git
+     ;; git-complete
      )
    ;; List of additional packages that will be installed without being
    ;; wrapped in a layer. If you need some configuration for these
@@ -314,6 +316,10 @@ values."
    ;; delete only whitespace for changed lines or `nil' to disable cleanup.
    ;; (default nil)
    dotspacemacs-whitespace-cleanup nil
+
+   ;;; JavaScript indent
+   js2-basic-offset 2
+   js-indent-level 2
    ))
 
 (defun dotspacemacs/user-init ()
@@ -434,8 +440,6 @@ you should place your code here."
   (setq YaTeX-kanji-code nil) ;; 4 == utf-8
   ;; FAQ: 2.14 Use Spacemacs as the $EDITOR for git commits?
   (global-git-commit-mode t)
-  ;; Javascript indent size
-  (setq-default js2-basic-offset 2)
   )
 
 ;; Do not write anything past this comment. This is where Emacs will
