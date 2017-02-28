@@ -14,6 +14,9 @@
 	path = ~/.gitconfig.local
 [alias]
 	b = branch -a
+	co = checkout
+	d = diff
+	dc = diff --cached
 	s = status -s
 	ap = add -p
 	branches = branch -a              # ブランチの一覧
@@ -30,5 +33,7 @@
 	mergetrail = log --ancestry-path --merges
 	l = log --graph --date=short --pretty=format:'%C(red reverse)%d%Creset%C(white reverse) %h% Creset %C(green reverse) %an %Creset %C(cyan)%ai%Creset%n%C(white bold)%w(80)%s%Creset%n%n%w(80,2,2)%b'
 	hash = rev-parse HEAD
+	p = !git push origin `git rev-parse --abbrev-ref HEAD`
+	delete-merged-branch = !git branch --merged | grep -v \\* | grep -v master | xargs -I % git branch -d %
 [commit]
 	template = ~/.dotconfig/dotfiles/.git_commit_template.txt
