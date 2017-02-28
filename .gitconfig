@@ -37,3 +37,5 @@
 	delete-merged-branch = !git branch --merged | grep -v \\* | grep -v master | xargs -I % git branch -d %
 [commit]
 	template = ~/.dotconfig/dotfiles/.git_commit_template.txt
+[grep]
+	lineNumber = true
