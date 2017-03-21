@@ -81,7 +81,7 @@ def has_required():
 
 
 def downloading_dotfiles(branch="master"):
-    REPOS_URL = "https://github.com/jtwp470/dotfiles.git"
+    REPOS_URL = "https://github.com/ryosan-470/dotfiles.git"
     # git clone --recursive ${REPO_URL} ${DOTFILES}
     # git  --recursive option is then do submodule init & submodule update
     f.info("Clone repository. branch is " + branch)
@@ -155,7 +155,7 @@ def main():
     description = """
     The setup script for me. Linux and Mac OSX supports.
 
-    Copyright (C) 2015 Ryosuke SATO (jtwp470)
+    Copyright (C) 2015 - 2017 Ryosuke SATO (jtwp470)
     This software is released under the MIT License.
 
     Please refer to http://jtwp470.mit-license.org to know this license.
