@@ -34,6 +34,7 @@ zplug "lib/history", from:oh-my-zsh
 zplug "lib/misc", from:oh-my-zsh
 zplug "zsh-users/zsh-completions"
 zplug "zsh-users/zaw"
+zplug "zsh-users/zsh-autosuggestions"
 # 読み込み順序を設定する
 # 例: "zsh-syntax-highlighting" は compinit の前に読み込まれる必要がある
 # （2 以上は compinit 後に読み込まれるようになる）
