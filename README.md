@@ -1,6 +1,6 @@
 # dotfiles
-[![Build Status](https://travis-ci.org/ryo-san470/dotfiles.svg)](https://travis-ci.org/ryo-san470/dotfiles)
-[![License](http://img.shields.io/:license-mit-blue.svg)](http://ryo-san470.mit-license.org/)
+[![Build Status](https://travis-ci.org/ryosan-470/dotfiles.svg)](https://travis-ci.org/ryosan-470/dotfiles)
+[![License](http://img.shields.io/:license-mit-blue.svg)](http://ryosan-470.mit-license.org/)
 ![platform-osx](https://img.shields.io/badge/platform-osx-blue.svg?style=flat-square)
 ![platform-linux](https://img.shields.io/badge/platform-Linux-blue.svg?style=flat-square)
 
@@ -20,7 +20,7 @@ $ curl -L http://dot.jtwp470.net | python
 else:
 
 ```bash
-$ curl -L https://raw.githubusercontent.com/ryo-san470/dotfiles/master/install.py | python
+$ curl -L https://raw.githubusercontent.com/ryosan-470/dotfiles/master/install.py | python
 ```
 
 Incidentally, ```install.py all``` will perform the following tasks.
