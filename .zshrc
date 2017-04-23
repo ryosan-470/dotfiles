@@ -10,22 +10,26 @@ ZSHD_PATH=$HOME/.dotconfig/dotfiles/zsh.d
 autoload colors && colors
 setopt prompt_subst
 
-# OSX, Linuxに共通するプラグイン
+zplug 'zplug/zplug', hook-build:'zplug --self-manage'  # zplug under zplug
+## Tools
 zplug "plugins/git", from:oh-my-zsh
 zplug "plugins/git-extras", from:oh-my-zsh
 zplug "plugins/pip", from:oh-my-zsh
-zplug "plugins/cp", from:oh-my-zsh
-zplug "plugins/python", from:oh-my-zsh
-zplug "plugins/go", from:oh-my-zsh
-zplug "plugins/docker", from:oh-my-zsh
-zplug "plugins/docker-compose", from:oh-my-zsh
-zplug "plugins/vagrant", from:oh-my-zsh
-zplug "plugins/nmap", from:oh-my-zsh
-zplug "plugins/git", from:oh-my-zsh, defer:2
-zplug "plugins/aws", from:oh-my-zsh
-zplug "plugins/colorize", from:oh-my-zsh
+zplug "plugins/docker", from:oh-my-zsh, if:"which docker"
+zplug "plugins/docker-compose", from:oh-my-zsh, if:"which docker-compose"
+zplug "plugins/vagrant", from:oh-my-zsh, if:"which vagrant"
+zplug "plugins/nmap", from:oh-my-zsh, if:"which nmap"
+zplug "plugins/aws", from:oh-my-zsh, if:"which aws"
+zplug "plugins/heroku", from:oh-my-zsh, if:"which heroku"
+
+## OSX
+zplug "plugins/brew", from:oh-my-zsh, if:"[[ $OSTYPE == **darwin** ]]"
+zplug "plugins/brew-cask", from:oh-my-zsh, if:"[[ $OSTYPE == **darwin** ]]"
+zplug "plugins/osx", from:oh-my-zsh, if:"[[ $OSTYPE == **darwin** ]]"
+
+## Utilities
 zplug "plugins/common-aliases", from:oh-my-zsh
-zplug "plugins/heroku", from:oh-my-zsh
+
 # lib周りの読み込み順序はかなり重要
 zplug "lib/completion", from:oh-my-zsh
 zplug "lib/functions", from:oh-my-zsh
@@ -33,7 +37,7 @@ zplug "lib/keybindings", from:oh-my-zsh
 zplug "lib/history", from:oh-my-zsh
 zplug "lib/misc", from:oh-my-zsh
 zplug "zsh-users/zsh-completions"
-zplug "zsh-users/zaw"
+# zplug "zsh-users/zaw"
 zplug "zsh-users/zsh-autosuggestions"
 # 読み込み順序を設定する
 # 例: "zsh-syntax-highlighting" は compinit の前に読み込まれる必要がある
@@ -48,10 +52,6 @@ source ~/.dotconfig/dotfiles/zsh.d/themes.zsh
 # OS別の設定
 case `uname` in
     "Darwin")
-        #For MacBook Air
-        zplug "plugins/brew", from:oh-my-zsh
-        zplug "plugins/brew-cask", from:oh-my-zsh
-        zplug "plugins/osx", from:oh-my-zsh
         alias update="brew -v update && brew -v upgrade"
         alias pbcopy="reattach-to-user-namespace pbcopy"
         ;;
@@ -90,7 +90,7 @@ esac
 bindkey -e # キーバインドをEmacs風にする
 # zsh customize
 setopt auto_cd
-function chpwd() { ls -F }
+function chpwd() { ls --color=auto }
 # historyの共有
 setopt share_history
 # ヒストリに追加されるコマンド行が古いものと同じなら古いものを削除
@@ -155,18 +155,6 @@ function extract() {
 }
 alias -s {gz,tgz,zip,lzh,bz2,tbz,Z,tar,arj,xz,rar,7z,cab,jar}=extract
 ################################################
-# rmtex
-################################################
-function rmtex() {
-    NAME=`basename $1 .tex`
-    rm $NAME.(aux|log|dvi)
-    if [ $? -ne 0 ]; then
-        echo "Failed to remove"
-    else
-        echo "Success!"
-    fi
-}
-################################################
 # copy to clipboard
 ################################################
 function c2b() {
@@ -177,23 +165,6 @@ function c2b() {
 if zplug check "zsh-users/zsh-history-substring-search"; then
     bindkey '^[[A' history-substring-search-up
     bindkey '^[[B' history-substring-search-down
-fi
-
-if zplug check "zsh-users/zaw"; then
-    autoload -Uz chpwd_recent_dirs cdr add-zsh-hook
-    add-zsh-hook chpwd chpwd_recent_dirs
-    zstyle ':chpwd:*' recent-dirs-max 10000 # cdrの履歴を保存する個数
-    zstyle ':chpwd:*' recent-dirs-default yes
-    zstyle ':completion:*' recent-dirs-insert both
-    zstyle ':filter-select:highlight' selected fg=black,bg=white,standout
-    zstyle ':filter-select' case-insensitive yes
-    bindkey '^@' zaw-cdr
-    bindkey '^R' zaw-history
-    bindkey '^X^F' zaw-git-files
-    bindkey '^X^B' zaw-git-branches
-    bindkey '^X^P' zaw-process
-    bindkey '^X^A' zaw-tmux
-    bindkey '^X^H' zaw-history
 fi
 
 source ${ZSHD_PATH}/run.zsh
