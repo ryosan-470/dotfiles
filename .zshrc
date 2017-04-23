@@ -1,7 +1,7 @@
 # When there is NOT ~/.zplug, do to install
 if [[ ! -d ~/.zplug ]]; then
     git clone https://github.com/zplug/zplug ~/.zplug
-    source ~/.zplug/init.zsh && zplug update --self
+    source ~/.zplug/init.zsh && zplug update
 fi
 source ~/.zplug/init.zsh
 
@@ -23,8 +23,6 @@ zplug "plugins/aws", from:oh-my-zsh, if:"which aws"
 zplug "plugins/heroku", from:oh-my-zsh, if:"which heroku"
 
 ## OSX
-zplug "plugins/brew", from:oh-my-zsh, if:"[[ $OSTYPE == **darwin** ]]"
-zplug "plugins/brew-cask", from:oh-my-zsh, if:"[[ $OSTYPE == **darwin** ]]"
 zplug "plugins/osx", from:oh-my-zsh, if:"[[ $OSTYPE == **darwin** ]]"
 
 ## Utilities
