@@ -1,0 +1,24 @@
+version: 2
+jobs:
+  build:
+    working_directory: /home/ubuntu/dotfiles
+    docker:
+      - image: jtwp470/dotfiles
+
+    steps:
+      - checkout
+      - run:
+          name: Check python version
+          command: python -V
+      - run:
+          name: Deploy
+          command: python install.py
+      - run:
+          name: Tests
+          command: python install.py test
+      - run:
+          name: Cleaning
+          command: python install.py clean
+      - run:
+          name: Run via cURL command
+          command: curl -L http://dot.jtwp470.net | python

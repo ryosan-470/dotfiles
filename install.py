@@ -103,6 +103,18 @@ def deploy():
             f.warn("{src} ==> {dst} has been already existed".format(src=src, dst=dst))
 
 
+def clean():
+    for dfs in DOT_HOME_FILES:
+        dst = os.path.join(HOME, dfs)
+
+        try:
+            os.remove(dst)
+        except:
+            f.warn("✘ {dst} cannot remove !!".format(dst=dst))
+
+    f.success("✓ Cleaned!")
+
+
 def initialize():
     init_directory = os.path.join(DOTFILES, "init")
     scripts = set(glob.glob(init_directory + "/*"))
@@ -132,21 +144,20 @@ def install():
     if os.path.exists(DOTFILES):
         f.success("✓ Skip to clone repository since it has been existed")
     else:
-        if downloading_dotfiles() is False:
+        ret = downloading_dotfiles()
+        if ret is False:
             f.fail("✗ Download failed. Please check your internet connection")
             sys.exit(1)
     f.success("✓ Finished to clone repository")
     f.info("==> Start to deploy")
-    if deploy() is False:
+    ret = deploy()
+    if ret is False:
         f.fail("✗ Deploying failed.")
         sys.exit(1)
 
     f.success("✓ Finished to deploy")
     f.info("==> initializing")
-    if initialize() is False:
-        f.fail("✗ Initializing failed")
-        sys.exit(1)
-
+    initialize()
     f.info("==> Start to test")
     test()
 
@@ -177,6 +188,9 @@ def main():
 
     parser_test = subparser.add_parser("test", help="test section using Travis-CI")
     parser_test.set_defaults(func=test)
+
+    parser_clean = subparser.add_parser("clean", help="Remove linking files")
+    parser_clean.set_defaults(func=clean)
 
     parser_all = subparser.add_parser("all", help="do download, deploy and init")
     parser_all.set_defaults(func=install)
