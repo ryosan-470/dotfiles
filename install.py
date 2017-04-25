@@ -162,44 +162,64 @@ def install():
     test()
 
 
-def main():
+def create_parser():
     description = """
     The setup script for me. Linux and Mac OSX supports.
-
     Copyright (C) 2015 - 2017 Ryosuke SATO (jtwp470)
     This software is released under the MIT License.
-
-    Please refer to http://jtwp470.mit-license.org to know this license.
     """
     parser = argparse.ArgumentParser(description=description)
-    subparser = parser.add_subparsers()
 
-    parser_download_repo = subparser.add_parser("download",
-                                                help="Clone repository from GitHub")
-    parser_download_repo.set_defaults(func=downloading_dotfiles)
+    subparsers = parser.add_subparsers()
+    download_cmd = subparsers.add_parser(
+        "download",
+        help="Clone repository from GitHub"
+    )
+    download_cmd.add_argument("branch", nargs='?', default="master")
 
-    parser_deploy = subparser.add_parser("deploy",
-                                         help="Deploy dotfiles to your home directory")
-    parser_deploy.set_defaults(func=deploy)
+    deploy_cmd = subparsers.add_parser(
+        "deploy",
+        help="Deploy dotfiles to your home directory"
+    )
+    deploy_cmd.set_defaults(func=deploy)
 
-    parser_initialize = subparser.add_parser("init",
-                                             help="To initialize: make file or install dependencies")
-    parser_initialize.set_defaults(func=initialize)
+    init_cmd = subparsers.add_parser(
+        "init",
+        help="To initialize: make file or install dependencies"
+    )
+    init_cmd.set_defaults(func=initialize)
 
-    parser_test = subparser.add_parser("test", help="test section using Travis-CI")
-    parser_test.set_defaults(func=test)
+    test_cmd = subparsers.add_parser(
+        "test",
+        help="test section using Travis-CI"
+    )
+    test_cmd.set_defaults(func=test)
 
-    parser_clean = subparser.add_parser("clean", help="Remove linking files")
-    parser_clean.set_defaults(func=clean)
+    clean_cmd = subparsers.add_parser(
+        "clean",
+        help="Remove linking files")
+    clean_cmd.set_defaults(func=clean)
 
-    parser_all = subparser.add_parser("all", help="do download, deploy and init")
-    parser_all.set_defaults(func=install)
-    args = parser.parse_args()
-    args.func()
+    all_cmd = subparsers.add_parser(
+        "all",
+        help="do download, deploy and init"
+    )
+    all_cmd.set_defaults(func=install)
+
+    return parser
+
+
+def main():
+    parser = create_parser()
+    args = parser.parse_args(sys.argv[1:])
+    vargs = vars(args)
+    if vargs.get('branch'):
+        downloading_dotfiles(vargs.get('branch'))
+    else:
+        args.func()
 
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
-        # オプションがないときはall扱いする
         sys.argv.append("all")
     main()
