@@ -9,16 +9,22 @@ jobs:
       - checkout
       - run:
           name: Check python version
-          command: python -V
+          command: python3 -V
       - run:
-          name: Deploy
-          command: python install.py
+          name: Clone repos from GitHub
+          command: python3 install.py download ${CIRCLE_BRANCH}
+      - run:
+          name: Deploy my code to your home directory
+          command: python3 install.py deploy
+      - run:
+          name: Initializing
+          command: python3 install.py init
       - run:
           name: Tests
-          command: python install.py test
+          command: python3 install.py test
       - run:
           name: Cleaning
-          command: python install.py clean
+          command: python3 install.py clean
       - run:
           name: Run via cURL command
-          command: curl -L http://dot.jtwp470.net | python
+          command: curl -L http://dot.jtwp470.net | python3
