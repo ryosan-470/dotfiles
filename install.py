@@ -17,7 +17,7 @@ DOTFILES = os.path.join(HOME, ".dotconfig/dotfiles")
 ALL_DOTFILES = set(x[len(DOTFILES+"/"):] for x in glob.glob(DOTFILES + "/.*"))
 # 除外するファイル名の設定
 EXCLUDE_DOTFILES = set([".git", ".git_commit_template.txt",
-                        ".gitignore", ".travis.yml", ".gitmodules"])
+                        ".gitignore", ".circleci", ".gitmodules"])
 # ホームディレクトリ上にシンボリックリンクを貼るファイルの名前
 DOT_HOME_FILES = ALL_DOTFILES - EXCLUDE_DOTFILES
 
