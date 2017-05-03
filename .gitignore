@@ -1,2 +1,2 @@
 .tmux.conf.osx
-vim.d/bundle/
+vim.d/bundle/.tmux/plugins

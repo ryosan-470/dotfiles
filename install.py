@@ -85,7 +85,7 @@ def downloading_dotfiles(branch="master"):
     # git clone --recursive ${REPO_URL} ${DOTFILES}
     # git  --recursive option is then do submodule init & submodule update
     f.info("Clone repository. branch is " + branch)
-    command = "git clone -b {branch} {repo} {dst} --recursive".format(
+    command = "git clone -b {branch} {repo} {dst}".format(
         branch=branch, repo=REPOS_URL, dst=DOTFILES)
     f.info(command)
     return True if run(command) else False
@@ -104,6 +104,8 @@ def deploy():
 
 
 def clean():
+    DOT_HOME_FILES.update([os.path.join(HOME, ".tmux/plugins/tpm")])
+
     for dfs in DOT_HOME_FILES:
         dst = os.path.join(HOME, dfs)
 
