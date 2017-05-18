@@ -15,6 +15,7 @@ zplug 'zplug/zplug', hook-build:'zplug --self-manage'  # zplug under zplug
 zplug "plugins/git", from:oh-my-zsh
 zplug "plugins/git-extras", from:oh-my-zsh
 zplug "plugins/pip", from:oh-my-zsh
+zplug "plugins/ssh-agent", from:oh-my-zsh
 zplug "plugins/docker", from:oh-my-zsh, if:"which docker"
 zplug "plugins/docker-compose", from:oh-my-zsh, if:"which docker-compose"
 zplug "plugins/vagrant", from:oh-my-zsh, if:"which vagrant"
@@ -125,6 +126,9 @@ autoload -Uz edit-command-line
 zle -N edit-command-line
 bindkey '^xe' edit-command-line
 
+# ssh-agent plugin https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/ssh-agent
+zstyle :omz:plugins:ssh-agent agent-forwarding on
+zstyle :omz:plugins:ssh-agent identities id_rsa id_ed25519
 ################################################
 # Functions
 ################################################
