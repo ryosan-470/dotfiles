@@ -276,6 +276,7 @@ zplug load --verbose
 ############################################################################
 ##    Alias
 ############################################################################
+alias b=bundle
 alias e='emacs -nw'
 alias ec='emacsclient -nw -a ""'
 alias ecw='emacsclient -c'
