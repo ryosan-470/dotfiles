@@ -35,6 +35,8 @@
 	hash = rev-parse HEAD
 	p = !git push origin `git rev-parse --abbrev-ref HEAD`
 	delete-merged-branch = !git branch --merged | grep -v \\* | grep -v master | xargs -I % git branch -d %
+	# blameしてそのコミットが含まれるPR番号を教えてくれます
+	showpr = !"f() { git log --merges --oneline --reverse --ancestry-path $1...master | grep 'Merge pull request #' | head -n 1; }; f"
 [commit]
 	template = ~/.dotconfig/dotfiles/.git_commit_template.txt
 [grep]
