@@ -55,7 +55,9 @@ values."
      elixir
      yaml
      ruby
+     (ruby :variables ruby-version-manager 'rbenv)
      shell-scripts
+     rust
      ;; sql
 
      ;; tools
@@ -79,9 +81,10 @@ values."
      version-control
      ;; emoji
      gtags
+     (gtags :variables gtags-enable-by-default)
      osx
-     git
-     ;; git-complete
+     imenu-list
+     github
      )
    ;; List of additional packages that will be installed without being
    ;; wrapped in a layer. If you need some configuration for these
