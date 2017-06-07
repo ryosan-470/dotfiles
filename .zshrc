@@ -310,6 +310,8 @@ alias el2elc="emacs -batch -f batch-byte-compile"
 # alias pip-update="pip list -o | awk '{ print $1 }' | xargs pip install -U"
 # alias pip3-update="pip3 list -o | awk '{ print $1 }' | xargs pip3 install -U"
 alias ru="ruby"
+alias chrome="/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome"
+alias chrome-canary="/Applications/Google\ Chrome\ Canary.app/Contents/MacOS/Google\ Chrome\ Canary"
 
 ################################################
 # if you press enter key, do ls or git status
