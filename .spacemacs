@@ -41,6 +41,10 @@ values."
      markdown
      python
      go
+     (go :variables
+         go-use-gometalinter t
+         go-tab-width 4
+         gofmt-command "goimports")
      asm
      c-c++
      emacs-lisp
@@ -444,6 +448,24 @@ you should place your code here."
   (setq YaTeX-kanji-code nil) ;; 4 == utf-8
   ;; FAQ: 2.14 Use Spacemacs as the $EDITOR for git commits?
   (global-git-commit-mode t)
+
+  ;; Golang
+  (add-to-list 'exec-path (expand-file-name "~/.go/bin"))
+  ;; skips 'vendor' directories and sets GO15VENDOREXPERIMENT=1
+  (setq flycheck-gometalinter-vendor t)
+  ;; only show errors
+  (setq flycheck-gometalinter-errors-only t)
+  ;; only run fast linters
+  (setq flycheck-gometalinter-fast t)
+  ;; use in tests files
+  (setq flycheck-gometalinter-test t)
+  ;; disable linters
+  (setq flycheck-gometalinter-disable-linters '("gotype" "gocyclo"))
+  ;; Only enable selected linters
+  (setq flycheck-gometalinter-disable-all t)
+  ;; (setq flycheck-gometalinter-enable-linters '("golint"))
+  ;; Set different deadline (default: 5s)
+  ;; (setq flycheck-gometalinter-deadline "10s")
   )
 
 ;; Do not write anything past this comment. This is where Emacs will
