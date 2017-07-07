@@ -37,6 +37,9 @@
 	delete-merged-branch = !git branch --merged | grep -v \\* | grep -v master | xargs -I % git branch -d %
 	# blameしてそのコミットが含まれるPR番号を教えてくれます
 	showpr = !"f() { git log --merges --oneline --reverse --ancestry-path $1...master | grep 'Merge pull request #' | head -n 1; }; f"
+	see = browse
+	pr = "!f() { hub browse -- `git log --merges --oneline --reverse --ancestry-path $1...master | grep 'Merge pull request #' | head -n 1 | cut -f5 -d' ' | sed -e 's%#%pull/%'`; }; f"
+	ag = "!git ls-files | xargs ag --pager=\"less -F -R\" --nogroup --color-match=0\\;31 --color-path=0\\;0 --no-numbers"
 [commit]
 	template = ~/.dotconfig/dotfiles/.git_commit_template.txt
 [grep]
