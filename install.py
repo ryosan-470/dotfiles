@@ -56,7 +56,7 @@ def run(os_command):
     """os_command is linux command, eg: git clone https://github.com/..."""
     try:
         subprocess.check_call(shlex.split(os_command))
-    except subprocess.CalledProcessError as e:
+    except subprocess.CalledProcessError:
         f.fail("✗ Execution command failure: %s" % os_command)
         return False
     return True
@@ -104,16 +104,24 @@ def deploy():
 
 
 def clean():
-    DOT_HOME_FILES.update([os.path.join(HOME, ".tmux/plugins/tpm")])
+    # DOT_HOME_FILES.update([os.path.join(HOME, ".tmux/plugins/tpm")])
+    failed = False
 
     for dfs in DOT_HOME_FILES:
         dst = os.path.join(HOME, dfs)
-
         try:
             os.remove(dst)
-        except:
-            f.warn("✘ {dst} cannot remove !!".format(dst=dst))
+        except OSError as e:
+            import errno
+            if e.errno == errno.ENOENT:
+                f.warn("✘ {dst} cannot remove because it has already removed".format(dst=dst))
+            else:
+                f.fail("✘ {dst} cannot remove !!".format(dst=dst))
+                failed = True
 
+    if failed:
+        f.fail("✘ Failed to execute clean!")
+        sys.exit(1)
     f.success("✓ Cleaned!")
 
 
@@ -130,10 +138,20 @@ def initialize():
 
 
 def test():
+    failed = False
     for x in DOT_HOME_FILES:
-        f.success("✓ %s" % os.path.join(HOME, x))
-        assert os.path.exists(os.path.join(HOME, x))
-    f.success("✓ All test passed")
+        target = os.path.join(HOME, x)
+        try:
+            assert os.path.exists(target)
+            f.success("✓ %s" % target)
+        except AssertionError:
+            f.warn("✘ %s" % target)
+            failed = True
+
+    if failed:
+        f.fail("✘ Some tests are failed")
+        sys.exit(1)
+    f.success("✔ All test passed")
 
 
 def install():

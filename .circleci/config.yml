@@ -27,4 +27,7 @@ jobs:
           command: python3 install.py clean
       - run:
           name: Run via cURL command
-          command: curl -L http://dot.jtwp470.net | python3
+          command: curl -L https://raw.githubusercontent.com/ryosan-470/dotfiles/${CIRCLE_BRANCH}/install.py | python3
+      - run:
+          name: Run tests
+          command: python3 install.py test
