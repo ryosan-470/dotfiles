@@ -259,6 +259,11 @@ DOT
     esac
 }
 
+function ipinfo() {
+    domain=$1
+    ip=$(resolveip -s ${domain})
+    curl https://ipinfo.io/${ip}
+}
 ################################################
 ## zplug 周りの最終確認
 ################################################
