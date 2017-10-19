@@ -24,7 +24,7 @@ zplug "plugins/aws", from:oh-my-zsh, if:"which aws"
 zplug "plugins/heroku", from:oh-my-zsh, if:"which heroku"
 
 ## OSX
-zplug "plugins/osx", from:oh-my-zsh, if:"[[ $OSTYPE == **darwin** ]]"
+zplug "plugins/osx", from:oh-my-zsh, if:"[[ `uname` == \"Darwin\" ]]"
 
 ## Utilities
 zplug "plugins/common-aliases", from:oh-my-zsh
