@@ -84,6 +84,11 @@ case `uname` in
             UPDATE_CMD="echo 'Not support your using distribution.'"
         fi
         alias update=${UPDATE_CMD}
+        alias dstat-full='dstat -Tclmdrn'
+        alias dstat-mem='dstat -Tclm'
+        alias dstat-cpu='dstat -Tclr'
+        alias dstat-net='dstat -Tclnd'
+        alias dstat-disk='dstat -Tcldr'
         ;;
 esac
 
