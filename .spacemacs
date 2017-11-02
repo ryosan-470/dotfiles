@@ -42,7 +42,8 @@ values."
      python
      (go :variables
          go-tab-width 4
-         gofmt-command "goimports")
+         gofmt-command "goimports"
+         go-use-gometalinter t)
      emacs-lisp
      html
      ;; java
