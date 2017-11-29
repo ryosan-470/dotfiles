@@ -220,6 +220,21 @@ function peco-cdr () {
 zle -N peco-cdr
 bindkey '^@' peco-cdr
 
+function peco-find-file() {
+    if git rev-parse 2> /dev/null; then
+        source_files=$(git ls-files)
+    else
+        source_files=$(find . -type f)
+    fi
+    selected_files=$(echo $source_files | peco --prompt "[find file]")
+
+    BUFFER="${BUFFER}${echo $selected_files | tr '\n' ' '}"
+    CURSOR=$#BUFFER
+    zle redisplay
+}
+zle -N peco-find-file
+bindkey '^f' peco-find-file
+
 bindkey '^F^F' forward-word
 bindkey '^B^B' backward-word
 
@@ -322,6 +337,7 @@ alias el2elc="emacs -batch -f batch-byte-compile"
 alias ru="ruby"
 alias chrome="/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome"
 alias chrome-canary="/Applications/Google\ Chrome\ Canary.app/Contents/MacOS/Google\ Chrome\ Canary"
+alias -g b='`git branch | peco | sed -e "s/^\*[ ]*//g"`' # Use git checkout b
 
 ################################################
 # if you press enter key, do ls or git status
