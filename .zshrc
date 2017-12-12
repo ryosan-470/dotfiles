@@ -340,7 +340,6 @@ alias gpp=g++
 alias ru="ruby"
 alias chrome="/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome"
 alias chrome-canary="/Applications/Google\ Chrome\ Canary.app/Contents/MacOS/Google\ Chrome\ Canary"
-alias -g b='`git branch | peco | sed -e "s/^\*[ ]*//g"`' # Use git checkout b
 
 ################################################
 # if you press enter key, do ls or git status

@@ -13,13 +13,16 @@
 [include]
 	path = ~/.gitconfig.local
 [alias]
+	a = add -p
+	ap = add -p
 	b = branch -a
-	co = checkout
+	branches = branch -a # ブランチの一覧
+	c = commit
+	cm = commit
+	co = !git checkout $(git branch | peco | awk '{print $NF}')
 	d = diff
 	dc = diff --cached
 	s = status -s
-	ap = add -p
-	branches = branch -a              # ブランチの一覧
 	stashes = stash list              # stash した一覧
 	unstage = reset -q HEAD --
 	discard = checkout --
