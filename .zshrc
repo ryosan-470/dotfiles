@@ -284,6 +284,16 @@ function ipinfo() {
     ip=$(resolveip -s ${domain})
     curl https://ipinfo.io/${ip}
 }
+
+function em() {
+    emacsclient -n -e "(if (> (length (frame-list)) 1) 't)" 2>/dev/null | grep t &> /dev/null
+
+    if [ "$?" -eq "1" ]; then
+        emacsclient -a '' -nqc "$@" &> /dev/null
+    else
+        emacsclient -nq "$@" &> /dev/null
+    fi
+}
 ################################################
 ## zplug 周りの最終確認
 ################################################
@@ -302,10 +312,6 @@ zplug load --verbose
 ##    Alias
 ############################################################################
 alias b=bundle
-alias e='emacs -nw'
-alias ec='emacsclient -nw -a ""'
-alias ecw='emacsclient -c'
-alias kill-emacs="emacsclient -e '(kill-emacs)'"
 alias v=vim
 alias g=git
 alias s='source ~/.zshrc'
@@ -331,9 +337,6 @@ alias ipy2=ipython2
 alias ipy3=ipython3
 alias fds='du -h -d 1'
 alias gpp=g++
-alias el2elc="emacs -batch -f batch-byte-compile"
-# alias pip-update="pip list -o | awk '{ print $1 }' | xargs pip install -U"
-# alias pip3-update="pip3 list -o | awk '{ print $1 }' | xargs pip3 install -U"
 alias ru="ruby"
 alias chrome="/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome"
 alias chrome-canary="/Applications/Google\ Chrome\ Canary.app/Contents/MacOS/Google\ Chrome\ Canary"

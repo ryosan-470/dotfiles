@@ -423,6 +423,9 @@ you should place your code here."
   (global-set-key (kbd "C-x t l")   'tabbar-backward-tab)
   (global-set-key (kbd "C-c <left>") 'tabbar-backward-tab)
 
+  (eval-leader-key/set-key
+   "q q" 'spacemacs/frame-killer)
+
   ;; FAQ: 2.14 Use Spacemacs as the $EDITOR for git commits?
   (global-git-commit-mode t)
 
