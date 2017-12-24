@@ -22,6 +22,7 @@ zplug "plugins/vagrant", from:oh-my-zsh, if:"which vagrant"
 zplug "plugins/nmap", from:oh-my-zsh, if:"which nmap"
 zplug "plugins/aws", from:oh-my-zsh, if:"which aws"
 zplug "plugins/heroku", from:oh-my-zsh, if:"which heroku"
+zplug "plugins/kubectl", from:oh-my-zsh, if:"which kubectl"
 
 ## OSX
 zplug "plugins/osx", from:oh-my-zsh, if:"[[ `uname` == \"Darwin\" ]]"
