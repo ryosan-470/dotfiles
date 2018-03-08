@@ -191,6 +191,14 @@ if which gpg-agent > /dev/null; then
     export GPG_AGENT_INFO
     export GPG_TTY=`tty`
 fi
+
+# load terraform autocomplete
+if which terraform > /dev/null; then
+    autoload -U +X bashcompinit && bashcompinit
+
+    complete -o nospace -C $(which terraform) terraform
+fi
+
 ################################################
 # peco
 ################################################
