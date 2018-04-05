@@ -23,6 +23,7 @@ zplug "plugins/nmap", from:oh-my-zsh, if:"which nmap"
 zplug "plugins/aws", from:oh-my-zsh, if:"which aws"
 zplug "plugins/heroku", from:oh-my-zsh, if:"which heroku"
 zplug "plugins/kubectl", from:oh-my-zsh, if:"which kubectl"
+zplug "plugins/helm", from:oh-my-zsh, if:"which helm"
 
 ## OSX
 zplug "plugins/osx", from:oh-my-zsh, if:"[[ `uname` == \"Darwin\" ]]"
