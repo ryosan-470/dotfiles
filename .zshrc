@@ -23,6 +23,7 @@ zplug "plugins/nmap", from:oh-my-zsh, if:"which nmap"
 zplug "plugins/aws", from:oh-my-zsh, if:"which aws"
 zplug "plugins/heroku", from:oh-my-zsh, if:"which heroku"
 zplug "plugins/kubectl", from:oh-my-zsh, if:"which kubectl"
+zplug "plugins/kube-ps1", from:oh-my-zsh, if:"which kubectl"
 zplug "plugins/helm", from:oh-my-zsh, if:"which helm"
 
 ## OSX
@@ -47,6 +48,8 @@ zplug "zsh-users/zsh-syntax-highlighting", defer:2
 # substring-search はsyntax highlightingより後に呼び出す
 zplug "zsh-users/zsh-history-substring-search", defer:2
 zplug "b4b4r07/enhancd", use:init.sh  # ターミナルの移動をいい感じにしてくれる
+# 事前に以下を読み込んでおく
+[[ `zplug list | grep kube-ps1` ]] && source $ZPLUG_REPOS/robbyrussell/oh-my-zsh/plugins/kube-ps1/kube-ps1.zsh
 # テーマファイルとして読み込む
 zplug "ryosan-470/zsh-theme", as:theme
 
