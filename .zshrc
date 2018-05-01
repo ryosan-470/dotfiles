@@ -248,6 +248,17 @@ function peco-find-file() {
 zle -N peco-find-file
 bindkey '^f' peco-find-file
 
+function peco-src () {
+    local selected_dir=$(ghq list -p | peco --query "$LBUFFER")
+    if [ -n "$selected_dir" ]; then
+        BUFFER="cd ${selected_dir}"
+        zle accept-line
+    fi
+    zle clear-screen
+}
+zle -N peco-src
+bindkey '^]' peco-src
+
 bindkey '^F^F' forward-word
 bindkey '^B^B' backward-word
 
