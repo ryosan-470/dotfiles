@@ -1,5 +1,5 @@
 # Dotfiles test environment
-FROM ubuntu:16.04
+FROM ubuntu:18.04
 MAINTAINER Ryosuke SATO <rskjtwp@gmail.com>
 
 LABEL Description="This image is used to test my dotfiles installation and running"
