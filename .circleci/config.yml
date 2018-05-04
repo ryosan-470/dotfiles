@@ -1,6 +1,6 @@
 version: 2
 jobs:
-  build:
+  test:
     working_directory: /home/ubuntu/dotfiles
     docker:
       - image: jtwp470/dotfiles
@@ -31,3 +31,37 @@ jobs:
       - run:
           name: Run tests
           command: python3 install.py test
+
+  build_and_push:
+    docker:
+      - image: docker:18.04.0-ce-git
+    environment:
+      - TAG: jtwp470/dotfiles
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run:
+          name: Login Docker Hub
+          command: |
+            echo $DOCKERHUB_PASSWORD | docker login -u $DOCKERHUB_USER --password-stdin
+      - run:
+          name: Build Docker image
+          command: |
+            docker pull ${TAG}
+            docker build --cache-from ${TAG} -t ${TAG} .
+      - deploy:
+          name: Push to Docker Hub
+          command: |
+            docker push ${TAG}
+
+workflows:
+  version: 2
+  test:
+    jobs:
+      - test
+  build-and-push:
+    jobs:
+      - test
+      - build_and_push:
+          requires:
+            - test
