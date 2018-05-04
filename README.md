@@ -1,5 +1,6 @@
 # dotfiles
 [![CircleCI](https://img.shields.io/circleci/project/github/ryosan-470/dotfiles.svg?style=flat-square)](https://circleci.com/gh/ryosan-470/dotfiles/)
+[![Docker Pulls](https://img.shields.io/docker/pulls/jtwp470/dotfiles.svg?style=flat-square)](https://hub.docker.com/r/jtwp470/dotfiles/)
 [![License](http://img.shields.io/:license-mit-blue.svg?style=flat-square)](./LICENSE)
 ![platform-osx](https://img.shields.io/badge/platform-osx-blue.svg?style=flat-square)
 ![platform-linux](https://img.shields.io/badge/platform-Linux-blue.svg?style=flat-square)
