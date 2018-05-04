@@ -65,3 +65,7 @@ workflows:
       - build_and_push:
           requires:
             - test
+          filters:
+            branches:
+              only:
+                - master
