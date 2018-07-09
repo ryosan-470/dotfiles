@@ -50,9 +50,9 @@ values."
            ruby-version-manager 'rbenv
            ruby-enable-enh-ruby-mode t
            ruby-test-runner 'rspec
+           ruby-enable-ruby-on-rails-support t
            ruby-insert-encoding-magic-comment nil
-           ruby-enable-ruby-on-rails-support t)
-     ruby-on-rails
+           )
      shell-scripts
      ;; tools
      docker
@@ -456,6 +456,8 @@ you should place your code here."
   ;; Ruby
   (eval-after-load 'company
     (push 'company-robe company-backends))
+  ;; マジックコメントを挿入しない
+  (setq ruby-insert-encoding-magic-comment nil)
 
   ;; Launch company mode when using terraform-mode
   (add-hook 'terraform-mode-hook
