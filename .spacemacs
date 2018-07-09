@@ -45,9 +45,6 @@ values."
          gofmt-command "goimports"
          go-use-gometalinter t)
      emacs-lisp
-     html
-     ;; java
-     javascript
      yaml
      (ruby :variables
            ruby-version-manager 'rbenv
