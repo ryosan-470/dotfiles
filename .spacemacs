@@ -453,7 +453,7 @@ you should place your code here."
 
   ;; Ruby
   (eval-after-load 'company
-    (push 'company-robe company-backends))
+    '(push 'company-robe company-backends))
   ;; マジックコメントを挿入しない
   (setq ruby-insert-encoding-magic-comment nil)
 
