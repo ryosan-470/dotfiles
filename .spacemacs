@@ -441,8 +441,6 @@ you should place your code here."
   ;; Only enable selected linters
   (setq flycheck-gometalinter-disable-all t)
   (setq flycheck-gometalinter-enable-linters '("golint"))
-  ;; GOPATH
-  (add-to-list 'exec-path (expand-file-name "~/code/bin"))
 
   (add-to-list 'tramp-default-proxies-alist
                '(nil "\\`root\\'" "/ssh:%h:"))
