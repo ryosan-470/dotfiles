@@ -57,7 +57,6 @@ values."
      ;; tools
      docker
      vagrant
-     ivy
      (auto-completion :variables
                       auto-completion-enable-help-tooltip t
                       auto-completion-enable-sort-by-usage t)
