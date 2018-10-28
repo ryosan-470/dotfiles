@@ -40,10 +40,6 @@ values."
      ;; See https://github.com/syl20bnr/spacemacs/tree/master/layers/%2Blang
      markdown
      python
-     (go :variables
-         go-tab-width 4
-         gofmt-command "goimports"
-         go-use-gometalinter t)
      emacs-lisp
      yaml
      (ruby :variables
@@ -51,6 +47,11 @@ values."
            ruby-test-runner 'rspec
            ruby-enable-ruby-on-rails-support t)
      shell-scripts
+     (go :variables
+         gofmt-command "goimports"
+         go-tab-width 4
+         go-use-gometalinter t
+         )
      ;; tools
      docker
      vagrant
@@ -323,6 +324,7 @@ executes.
 before packages are loaded. If you are unsure, you should try in setting them in
 `dotspacemacs/user-config' first."
   (setq exec-path-from-shell-arguments '("-l"))
+  ;; (setq exec-path-from-shell-debug t)
   )
 
 (defun dotspacemacs/user-config ()
@@ -424,28 +426,6 @@ you should place your code here."
 
   ;; モード有効時と保存時にシンタックスチェックを実施
   (setq flycheck-check-syntax-automatically '(mode-enabled save))
-  ;; Golang
-  (setq flycheck-gometalinter-vendor t)
-  ;; only show errors
-  (setq flycheck-gometalinter-errors-only t)
-  ;; only run fast linters
-  (setq flycheck-gometalinter-fast t)
-  ;; use in tests files
-  (setq flycheck-gometalinter-test t)
-  ;; disable linters
-  (setq flycheck-gometalinter-disable-linters '("gotype" "gocyclo"))
-  ;; Only enable selected linters
-  (setq flycheck-gometalinter-disable-all t)
-  (setq flycheck-gometalinter-enable-linters '("golint"))
-  ;; GOPATH
-  (add-to-list 'exec-path (expand-file-name "~/code/bin"))
-
-  (add-to-list 'tramp-default-proxies-alist
-               '(nil "\\`root\\'" "/ssh:%h:"))
-  (add-to-list 'tramp-default-proxies-alist
-               '("localhost" nil nil))
-  (add-to-list 'tramp-default-proxies-alist
-               '((regexp-quote (system-name)) nil nil))
 
   ;; Launch company mode when using terraform-mode
   (add-hook 'terraform-mode-hook
