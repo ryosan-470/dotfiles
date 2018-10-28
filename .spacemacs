@@ -47,12 +47,9 @@ values."
      emacs-lisp
      yaml
      (ruby :variables
-           ruby-version-manager 'rbenv
            ruby-enable-enh-ruby-mode t
            ruby-test-runner 'rspec
-           ruby-enable-ruby-on-rails-support t
-           ruby-insert-encoding-magic-comment nil
-           )
+           ruby-enable-ruby-on-rails-support t)
      shell-scripts
      ;; tools
      docker
@@ -450,18 +447,21 @@ you should place your code here."
   (add-to-list 'tramp-default-proxies-alist
                '((regexp-quote (system-name)) nil nil))
 
-  ;; Ruby
-  (eval-after-load 'company
-    '(push 'company-robe company-backends))
-  ;; マジックコメントを挿入しない
-  (setq ruby-insert-encoding-magic-comment nil)
-
   ;; Launch company mode when using terraform-mode
   (add-hook 'terraform-mode-hook
             '(lambda ()
                (company-init-backend)
                (company-terraform-init)
                ))
+
+  ;; Ruby
+  ;; マジックコメントを挿入しないように
+  ;; define our own super awesome hook that will remove the before-save-hook
+  (defun remove-enh-magic-comment ()
+    (remove-hook 'before-save-hook 'enh-ruby-mode-set-encoding t))
+
+  ;; add the hook to call our super awesome function.
+  (add-hook 'enh-ruby-mode-hook 'remove-enh-magic-comment)
   )
 
 ;; Do not write anything past this comment. This is where Emacs will
