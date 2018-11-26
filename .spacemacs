@@ -48,9 +48,9 @@ values."
            ruby-enable-ruby-on-rails-support t)
      shell-scripts
      (go :variables
-         gofmt-command "goimports"
          go-tab-width 4
-         go-use-gometalinter t
+         go-use-golangci-lint t
+         gofmt-command "goimports"
          )
      ;; tools
      docker
@@ -306,6 +306,7 @@ values."
    ;; (default nil)
    dotspacemacs-whitespace-cleanup nil
 
+   dotspacemacs-mode-line-theme 'spacemacs
    ;;; JavaScript indent
    js2-basic-offset 2
    js-indent-level 2
@@ -442,6 +443,9 @@ you should place your code here."
 
   ;; add the hook to call our super awesome function.
   (add-hook 'enh-ruby-mode-hook 'remove-enh-magic-comment)
+
+  ;; Golang
+  (setq go-format-before-save t)
   )
 
 ;; Do not write anything past this comment. This is where Emacs will
@@ -461,3 +465,24 @@ you should place your code here."
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  )
+(defun dotspacemacs/emacs-custom-settings ()
+  "Emacs custom settings.
+This is an auto-generated function, do not modify its content directly, use
+Emacs customize menu instead.
+This function is called at the very end of Spacemacs initialization."
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(package-selected-packages
+   (quote
+    (toml-mode racer lsp-rust flycheck-rust counsel-gtags cargo rust-mode winum imenu-list protobuf-mode flycheck-gometalinter company-terraform hcl-mode jinja2-mode company-ansible ansible-doc ansible projectile-rails inflections feature-mode company-quickhelp enh-ruby-mode unfill fuzzy flycheck-credo ob-elixir flycheck-mix alchemist elixir-mode gnuplot-mode csv-mode terraform-mode visual-regexp quickrun helm-company helm-c-yasnippet flyspell-correct-ivy company-web web-completion-data company-tern dash-functional tern company-statistics company-shell company-go company-emoji company-emacs-eclim company-c-headers company-anaconda company auto-yasnippet ac-ispell auto-complete yaml-mode x86-lookup web-mode web-beautify vagrant-tramp vagrant tagedit sql-indent smeargle slim-mode scss-mode sass-mode rvm ruby-tools ruby-test-mode rubocop rspec-mode robe reveal-in-osx-finder rbenv rake pug-mode phpunit phpcbf php-extras php-auto-yasnippets pbcopy osx-trash osx-dictionary orgit org nginx-mode nasm-mode mwim mmm-mode minitest markdown-toc markdown-mode magit-gitflow livid-mode skewer-mode simple-httpd less-css-mode launchctl js2-refactor multiple-cursors js2-mode js-doc insert-shebang helm-themes helm-swoop helm-pydoc helm-projectile helm-mode-manager helm-gtags helm-gitignore helm-flx helm-descbinds helm-css-scss helm-ag haml-mode go-guru go-eldoc go-mode gitignore-mode gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link git-gutter-fringe+ git-gutter-fringe fringe-helper git-gutter+ git-gutter gh-md ggtags flyspell-correct-helm flyspell-correct flycheck-pos-tip pos-tip flycheck fish-mode evil-magit magit git-commit with-editor emoji-cheat-sheet-plus emmet-mode eclim yasnippet drupal-mode php-mode dockerfile-mode docker json-mode tablist magit-popup docker-tramp json-snatcher json-reformat disaster diff-hl coffee-mode cmake-mode clang-format chruby bundler inf-ruby auto-dictionary ace-jump-helm-line yatex evil-unimpaired yapfify pyvenv pytest pyenv-mode py-isort pip-requirements live-py-mode hy-mode cython-mode anaconda-mode pythonic ws-butler window-numbering which-key wgrep volatile-highlights vi-tilde-fringe uuidgen use-package toc-org spaceline powerline smex restart-emacs request rainbow-delimiters popwin persp-mode pcre2el paradox spinner org-plus-contrib org-bullets open-junk-file neotree move-text macrostep lorem-ipsum linum-relative link-hint ivy-hydra info+ indent-guide ido-vertical-mode hydra hungry-delete hl-todo highlight-parentheses highlight-numbers parent-mode highlight-indentation hide-comnt help-fns+ helm-make helm helm-core google-translate golden-ratio flx-ido flx fill-column-indicator fancy-battery eyebrowse expand-region exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-tutor evil-surround evil-search-highlight-persist evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-lisp-state smartparens evil-indent-plus evil-iedit-state iedit evil-exchange evil-escape evil-ediff evil-args evil-anzu anzu evil goto-chg undo-tree eval-sexp-fu highlight elisp-slime-nav dumb-jump popup f s diminish define-word counsel-projectile projectile pkg-info epl counsel swiper ivy column-enforce-mode clean-aindent-mode bind-map bind-key auto-highlight-symbol auto-compile packed dash async aggressive-indent adaptive-wrap ace-window ace-link avy quelpa package-build spacemacs-theme)))
+ '(tramp-syntax (quote default) nil (tramp)))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
+)
