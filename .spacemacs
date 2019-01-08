@@ -42,16 +42,18 @@ values."
      python
      emacs-lisp
      yaml
+     lsp
      (ruby :variables
+           ruby-backend 'lsp
            ruby-enable-enh-ruby-mode t
            ruby-test-runner 'rspec
            ruby-enable-ruby-on-rails-support t)
      shell-scripts
      (go :variables
+         go-backend 'lsp
          go-tab-width 4
          go-use-golangci-lint t
-         gofmt-command "goimports"
-         )
+         gofmt-command "goimports")
      ;; tools
      docker
      vagrant
