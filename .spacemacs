@@ -69,7 +69,6 @@ values."
      terraform
      ansible
      git
-     lsp
      )
    ;; List of additional packages that will be installed without being
    ;; wrapped in a layer. If you need some configuration for these
@@ -450,6 +449,9 @@ you should place your code here."
 
   ;; Golang
   (setq go-format-before-save t)
+
+  ;; lsp
+  (setq lsp-message-project-root-warning t)
   )
 
 ;; Do not write anything past this comment. This is where Emacs will
