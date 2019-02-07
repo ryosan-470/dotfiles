@@ -49,10 +49,12 @@ jobs:
           command: |
             docker pull ${TAG}
             docker build --cache-from ${TAG} -t ${TAG} .
+            docker tag ${TAG} ${TAG}:${CIRCLE_SHA1}
       - deploy:
           name: Push to Docker Hub
           command: |
             docker push ${TAG}
+            docker push ${TAG}:${CIRCLE_SHA1}
 
 workflows:
   version: 2
