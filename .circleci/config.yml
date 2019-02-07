@@ -3,7 +3,7 @@ jobs:
   test:
     working_directory: /home/ubuntu/dotfiles
     docker:
-      - image: jtwp470/dotfiles
+      - image: ryosan470/dotfiles
 
     steps:
       - checkout
@@ -34,9 +34,9 @@ jobs:
 
   build_and_push:
     docker:
-      - image: docker:18.04.0-ce-git
+      - image: docker:18.09.1-git
     environment:
-      - TAG: jtwp470/dotfiles
+      - TAG: ryosan470/dotfiles
     steps:
       - checkout
       - setup_remote_docker

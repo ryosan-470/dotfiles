@@ -1,6 +1,6 @@
 # dotfiles
 [![CircleCI](https://img.shields.io/circleci/project/github/ryosan-470/dotfiles.svg?style=flat-square)](https://circleci.com/gh/ryosan-470/dotfiles/)
-[![Docker Pulls](https://img.shields.io/docker/pulls/jtwp470/dotfiles.svg?style=flat-square)](https://hub.docker.com/r/jtwp470/dotfiles/)
+[![Docker Pulls](https://img.shields.io/docker/pulls/ryosan470/dotfiles.svg?style=flat-square)](https://hub.docker.com/r/ryosan470/dotfiles/)
 [![License](http://img.shields.io/:license-mit-blue.svg?style=flat-square)](./LICENSE)
 ![platform-osx](https://img.shields.io/badge/platform-osx-blue.svg?style=flat-square)
 ![platform-linux](https://img.shields.io/badge/platform-Linux-blue.svg?style=flat-square)
@@ -13,12 +13,6 @@ I decide to use [spacemacs](http://spacemacs.org). I don't support my [dotemacs]
 ## How to setup
 
 The easiest way to install the dotfiles is open to up a terminal, type the installation command below:
-
-```bash
-$ curl -L http://dot.jtwp470.net | python
-```
-
-else:
 
 ```bash
 $ curl -L https://raw.githubusercontent.com/ryosan-470/dotfiles/master/install.py | python
@@ -48,23 +42,23 @@ Try my conf to use Docker container.
 1. Install [docker](https://docs.docker.com/engine/installation/)
 2. Clone this repository and build container like this:
    ```bash
-   git clone https://github.com/jtwp470/dotfiles
+   git clone https://github.com/ryosan-470/dotfiles
    cd dotfiles
    ```
 
-3. Pull or build container. ([Docker hub repo](https://hub.docker.com/r/jtwp470/dotfiles/))
+3. Pull or build container. ([Docker hub repo](https://hub.docker.com/r/ryosan470/dotfiles/))
    Pull container like this: (**recommended**)
    ```bash
-   docker pull jtwp470/dotfiles
+   docker pull ryosan470/dotfiles
    ```
    or you want to build container, like this:
    ```bash
-   docker build -t jtwp470/dotfiles .
+   docker build -t ryosan470/dotfiles .
    ```
 
 4. Run container and try.
    ```bash
-   docker run -ti -v $(pwd):/root/.dotconfig/dotfiles jtwp470/dotfiles:latest /bin/bash
+   docker run -ti -v $(pwd):/root/.dotconfig/dotfiles ryosan470/dotfiles:latest /bin/bash
    # In container
    cd /root/.dotconfig/dotfiles  # Move to dotfiles directory
    # You DON'T get repository from GitHub
