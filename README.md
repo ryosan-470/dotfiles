@@ -58,14 +58,7 @@ Try my conf to use Docker container.
 
 4. Run container and try.
    ```bash
-   docker run -ti -v $(pwd):/root/.dotconfig/dotfiles ryosan470/dotfiles:latest /bin/bash
-   # In container
-   cd /root/.dotconfig/dotfiles  # Move to dotfiles directory
-   # You DON'T get repository from GitHub
-   python install.py deploy
-   python install.py init
-   python install.py test
-   # Run test
+   docker run --rm -it ryosan470/dotfiles
    ```
 
 ## Requirements
