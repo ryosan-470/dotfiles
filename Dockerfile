@@ -14,11 +14,23 @@ RUN apt update && \
   python3 \
   language-pack-en-base \
   language-pack-en \
+  gcc \
+  make \
+  ncurses-dev \
+  libgnutls-dev \
   && rm -rf /var/lib/apt/lists/*
 RUN locale-gen en_US.UTF-8
 ENV LANG en_US.UTF-8
 ENV LANGUAGE en_US:en
 ENV LC_ALL en_US.UTF-8
+ENV EMACS_VERSION 26.1
+RUN curl -o /tmp/emacs.tar.gz https://ftp.gnu.org/pub/gnu/emacs/emacs-${EMACS_VERSION}.tar.gz && \
+  tar xvf /tmp/emacs.tar.gz -C /tmp && \
+  cd /tmp/emacs-${EMACS_VERSION} && \
+  ./configure && \
+  make && \
+  make install && \
+  rm -rf /tmp/emacs-${EMACS_VERSION} /tmp/emacs.tar.gz
 
 # Add normal user
 RUN useradd -ms /bin/zsh ubuntu
@@ -26,4 +38,6 @@ USER ubuntu
 WORKDIR /home/ubuntu
 ADD . .dotconfig/dotfiles
 RUN python3 .dotconfig/dotfiles/install.py
+ENV SPACEMACS_BRANCH develop
+RUN git clone --branch ${SPACEMACS_BRANCH} https://github.com/syl20bnr/spacemacs ~/.emacs.d
 CMD ["/bin/zsh"]
