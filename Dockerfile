@@ -28,8 +28,8 @@ ENV LC_ALL en_US.UTF-8
 RUN useradd -ms /bin/zsh ubuntu
 USER ubuntu
 WORKDIR /home/ubuntu
-ADD . ~/.dotconfig/dotfiles
-RUN python3 ~/.dotconfig/dotfiles/install.py
+ADD . .dotconfig/dotfiles
+RUN python3 .dotconfig/dotfiles/install.py
 ENV SPACEMACS_BRANCH develop
 RUN git clone --branch ${SPACEMACS_BRANCH} https://github.com/syl20bnr/spacemacs ~/.emacs.d
 RUN emacs -batch -l ~/.emacs.d/init.el
