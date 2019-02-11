@@ -17,7 +17,7 @@ RUN apt update && \
   gcc \
   make \
   ncurses-dev \
-  libgnutls-dev \
+  pkg-config  \
   && rm -rf /var/lib/apt/lists/*
 RUN locale-gen en_US.UTF-8
 ENV LANG en_US.UTF-8
