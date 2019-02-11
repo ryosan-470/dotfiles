@@ -27,7 +27,7 @@ ENV EMACS_VERSION 26.1
 RUN curl -o /tmp/emacs.tar.gz https://ftp.gnu.org/pub/gnu/emacs/emacs-${EMACS_VERSION}.tar.gz && \
   tar xvf /tmp/emacs.tar.gz -C /tmp && \
   cd /tmp/emacs-${EMACS_VERSION} && \
-  ./configure && \
+  ./configure --with-x-toolkit=no --with-gif=no --with-gnutls=no && \
   make && \
   make install && \
   rm -rf /tmp/emacs-${EMACS_VERSION} /tmp/emacs.tar.gz
