@@ -55,7 +55,7 @@ values."
          go-use-golangci-lint t
          gofmt-command "goimports")
      (c-c++ :variables
-            c-c++-backend 'lsp-ccls
+            c-c++-backend 'lsp-cquery
             c-c++-default-mode-for-headers 'c++-mode)
      ;; tools
      docker
