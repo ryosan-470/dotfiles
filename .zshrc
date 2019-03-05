@@ -218,6 +218,7 @@ fi
 
 [[ `type hub &> /dev/null` ]] && eval "$(hub alias -s)"
 [[ `type helm &> /dev/null` ]] && source <(helm completion zsh)
+[[ `type direnv &>/dev/null` ]] && eval "$(direnv hook zsh)"
 ################################################
 # peco
 ################################################
