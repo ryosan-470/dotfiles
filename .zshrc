@@ -215,9 +215,17 @@ if which terraform > /dev/null; then
     complete -o nospace -C $(which terraform) terraform
 fi
 
-[[ `type hub &> /dev/null` ]] && eval "$(hub alias -s)"
-[[ `type helm &> /dev/null` ]] && source <(helm completion zsh)
-[[ `type direnv &>/dev/null` ]] && eval "$(direnv hook zsh)"
+if which hub > /dev/null; then
+    eval "$(hub alias -s)"
+fi
+
+if which hub > /dev/null; then
+    source <(helm completion zsh)
+fi
+
+if which direnv > /dev/null; then
+    eval "$(direnv hook zsh)"
+fi
 ################################################
 # peco
 ################################################
