@@ -80,16 +80,23 @@ workflows:
   test:
     jobs:
       - test
-      - build_image
+      - build_image:
+          context: DockerHub
   build-and-push:
     jobs:
-      - test
-      - build_image
-      - build_and_push:
-          requires:
-            - test
-            - build_image
+      - test:
           filters:
             branches:
               only:
                 - master
+      - build_image:
+          context: DockerHub
+          filters:
+            branches:
+              only:
+                - master
+      - build_and_push:
+          context: DockerHub
+          requires:
+            - test
+            - build_image
