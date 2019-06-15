@@ -1,0 +1,7 @@
+#!/bin/bash
+MAX_RETRY=10
+
+for i in `seq 1 $MAX_RETRY`; do
+    "$@" && break
+done
+

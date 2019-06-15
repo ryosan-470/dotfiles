@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+src=$1
+dst=$2
+
+if [ $# -ne 2 ]; then
+    echo "Usage tomp3 <mp4 or mkv ...> <mp3>"
+    exit 1
+fi
+
+ffmpeg -i ${src} -acodec libmp3lame ${dst}
+exit 0
