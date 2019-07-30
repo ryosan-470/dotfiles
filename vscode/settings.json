@@ -1,0 +1,13 @@
+{
+    "editor.fontSize": 16,
+    "editor.fontFamily": "'Source Code Pro'",
+    "files.trimTrailingWhitespace": true,
+    "editor.formatOnSave": true,
+    "workbench.iconTheme": null,
+    "window.zoomLevel": 0,
+    "search.exclude": {
+        "**/_build": true,
+        "**/.elixir_ls": true
+    },
+    "workbench.editor.enablePreview": false
+}
