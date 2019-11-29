@@ -6,3 +6,4 @@ GRTAGS
 GTAGS
 # VSCodeがつくるもの
 .elixir_ls
+.vscode
