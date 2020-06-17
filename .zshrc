@@ -34,12 +34,6 @@ zplug "plugins/pip", from:oh-my-zsh
 zplug "plugins/ssh-agent", from:oh-my-zsh
 zplug "plugins/docker", from:oh-my-zsh, if:"which docker"
 zplug "plugins/docker-compose", from:oh-my-zsh, if:"which docker-compose"
-zplug "plugins/vagrant", from:oh-my-zsh, if:"which vagrant"
-zplug "plugins/nmap", from:oh-my-zsh, if:"which nmap"
-zplug "plugins/aws", from:oh-my-zsh, if:"which aws"
-zplug "plugins/heroku", from:oh-my-zsh, if:"which heroku"
-zplug "plugins/kubectl", from:oh-my-zsh, if:"which kubectl"
-zplug "plugins/helm", from:oh-my-zsh, if:"which helm"
 
 ## OSX
 zplug "plugins/osx", from:oh-my-zsh, if:"[[ `uname` == \"Darwin\" ]]"
@@ -54,7 +48,6 @@ zplug "lib/keybindings", from:oh-my-zsh
 zplug "lib/history", from:oh-my-zsh
 zplug "lib/misc", from:oh-my-zsh
 zplug "zsh-users/zsh-completions"
-# zplug "zsh-users/zaw"
 zplug "zsh-users/zsh-autosuggestions"
 # 読み込み順序を設定する
 # 例: "zsh-syntax-highlighting" は compinit の前に読み込まれる必要がある
@@ -208,19 +201,8 @@ if which gpg-agent > /dev/null; then
     export GPG_TTY=`tty`
 fi
 
-# load terraform autocomplete
-if which terraform > /dev/null; then
-    autoload -U +X bashcompinit && bashcompinit
-
-    complete -o nospace -C $(which terraform) terraform
-fi
-
 if which hub > /dev/null; then
     eval "$(hub alias -s)"
-fi
-
-if which hub > /dev/null; then
-    source <(helm completion zsh)
 fi
 
 if which direnv > /dev/null; then
