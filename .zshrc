@@ -340,21 +340,10 @@ zplug load --verbose
 ############################################################################
 ##    Alias
 ############################################################################
-alias b=bundle
-alias v=vim
 alias g=git
 alias s='source ~/.zshrc'
 alias t=tmux
-alias ta="tmux attach -t 0"
-alias td="tmux detach"
-alias tl="tmux ls"
-alias gpl='git pull origin master'
-alias gps='git push origin master'
-alias gf='git fetch origin master'
 alias gss='git status -s'
-alias gc='git commit'
-alias gcm='git commit -m'
-alias gcv='git commit -v'
 alias j=java
 alias jc=javac
 alias ll='ls -lh'
@@ -366,10 +355,6 @@ alias ipy2=ipython2
 alias ipy3=ipython3
 alias fds='du -h -d 1'
 alias gpp=g++
-alias ru="ruby"
-alias chrome="/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome"
-alias chrome-canary="/Applications/Google\ Chrome\ Canary.app/Contents/MacOS/Google\ Chrome\ Canary"
-
 ################################################
 # if you press enter key, do ls or git status
 ################################################
