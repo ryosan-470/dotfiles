@@ -31,3 +31,5 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y zsh
       - name: setup
         run: curl https://raw.githubusercontent.com/${GITHUB_REPOSITORY}/${GITHUB_SHA}/install.py | python
+      - name: tmux load config
+        run: tmux source-file ~/.tmux.conf
