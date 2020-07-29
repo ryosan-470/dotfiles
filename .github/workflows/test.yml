@@ -1,0 +1,31 @@
+name: test
+on: push
+
+jobs:
+  unit-test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.x, 2.x]
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 1
+      - uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: display python version
+        run: python -c "import sys; print(sys.version)"
+      - name: execute test
+        run: |
+          python install.py download
+          python install.py deploy
+          python install.py init
+          python install.py test
+          python install.py clean
+
+  e2e:
+    runs-on: ubuntu-latest
+    steps:
+      - name: setup
+        run: curl https://raw.githubusercontent.com/${GITHUB_REPOSITORY}/${GITHUB_SHA}/install.py | python
