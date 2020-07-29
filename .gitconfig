@@ -1,6 +1,12 @@
 [core]
 	editor = "emacsclient -nw -a ''" --alternate-editor "vim" --alternate-editor "nano"
 	excludesfile = ~/.gitignore_global
+[user]
+	name = ryosan-470
+	email = rskjtwp@gmail.com
+	signingkey = 60C13C7737C6E4D0707828B19E53E96EAD309F72
+[commit]
+	gpgsign = true
 [color]
 	ui = auto
 	status  = auto
