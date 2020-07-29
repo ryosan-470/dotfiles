@@ -27,5 +27,7 @@ jobs:
   e2e:
     runs-on: ubuntu-latest
     steps:
+      - name: prepare test
+        run: sudo apt-get update && sudo apt-get install -y zsh
       - name: setup
         run: curl https://raw.githubusercontent.com/${GITHUB_REPOSITORY}/${GITHUB_SHA}/install.py | python
