@@ -9,8 +9,8 @@
 
 The easiest way to install the dotfiles is open to up a terminal, type the installation command below:
 
-```bash
-$ curl -L https://raw.githubusercontent.com/ryosan-470/dotfiles/master/install.py | python
+```console
+curl -L https://raw.githubusercontent.com/ryosan-470/dotfiles/master/install.py | python
 ```
 
 ## Update the configuration
@@ -24,6 +24,16 @@ There are common dot commands used in various situations:
 update         Update your dotfiles from GitHub (e.g git fetch origin master)
 help           Print this message
 ```
+
+## Homebrew のセットアップについて
+
+macOS では、パッケージの管理に Homebrew を使用しています。
+新しい機器を導入する際などは以下のコマンドでセットアップすることができます。
+
+```console
+brew bundle
+```
+
 
 ## GitConfig
 コミット時の名前やメールアドレスなどは各環境に依存するため, dotfilesでの管理をとりやめました.
