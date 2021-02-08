@@ -1,5 +1,5 @@
 [core]
-	editor = "emacsclient -nw -a ''" --alternate-editor "vim" --alternate-editor "nano"
+	editor = "nano"
 	excludesfile = ~/.gitignore_global
 [user]
 	name = ryosan-470
