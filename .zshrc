@@ -31,7 +31,6 @@ zplug 'zplug/zplug', hook-build:'zplug --self-manage'  # zplug under zplug
 zplug "plugins/git", from:oh-my-zsh
 zplug "plugins/git-extras", from:oh-my-zsh
 zplug "plugins/pip", from:oh-my-zsh
-zplug "plugins/ssh-agent", from:oh-my-zsh
 zplug "plugins/docker", from:oh-my-zsh, if:"which docker"
 zplug "plugins/docker-compose", from:oh-my-zsh, if:"which docker-compose"
 
