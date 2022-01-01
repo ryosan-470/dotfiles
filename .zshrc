@@ -297,15 +297,6 @@ function ipinfo() {
     curl https://ipinfo.io/${ip}
 }
 
-function em() {
-    emacsclient -n -e "(if (> (length (frame-list)) 1) 't)" 2>/dev/null | grep t &> /dev/null
-
-    if [ "$?" -eq "1" ]; then
-        emacsclient -a '' -nqc "$@" &> /dev/null
-    else
-        emacsclient -nq "$@" &> /dev/null
-    fi
-}
 ################################################
 ## zplug 周りの最終確認
 ################################################
