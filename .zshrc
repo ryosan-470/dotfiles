@@ -33,9 +33,7 @@ zplug "plugins/git-extras", from:oh-my-zsh
 zplug "plugins/pip", from:oh-my-zsh
 zplug "plugins/docker", from:oh-my-zsh, if:"which docker"
 zplug "plugins/docker-compose", from:oh-my-zsh, if:"which docker-compose"
-
-## OSX
-zplug "plugins/osx", from:oh-my-zsh, if:"[[ `uname` == \"Darwin\" ]]"
+zplug "plugins/macos", from:oh-my-zsh, if:"[[ `uname` == \"Darwin\" ]]"
 
 ## Utilities
 zplug "plugins/common-aliases", from:oh-my-zsh
