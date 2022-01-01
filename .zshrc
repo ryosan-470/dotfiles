@@ -138,20 +138,6 @@ autoload -Uz edit-command-line
 zle -N edit-command-line
 bindkey '^xe' edit-command-line
 
-# ssh-agent plugin https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/ssh-agent
-zstyle :omz:plugins:ssh-agent agent-forwarding on
-zstyle :omz:plugins:ssh-agent identities id_rsa id_ed25519
-################################################
-# Functions
-################################################
-################################################
-# emacs-restart C-r e
-################################################
-function emacs-restart(){
-    emacsclient -e '(kill-emacs)' && emacsclient -nw -a ""
-}
-zle -N emacs-restart
-bindkey '^re' emacs-restart
 ################################################
 # hoge.tar.gz を ./hoge.tar.gz で展開
 ################################################
