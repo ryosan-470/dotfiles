@@ -73,7 +73,6 @@ case `uname` in
         alias open='gnome-open'
         alias pbcopy='xsel --clipboard --input'
         alias pbpaste='xsel --clipboard --output'
-        alias ls='ls --color=auto'
         local UPDATE_CMD=""
         if [ -e /etc/lsb-release ]; then
             # Ubuntu
@@ -329,28 +328,7 @@ alias ipy2=ipython2
 alias ipy3=ipython3
 alias fds='du -h -d 1'
 alias gpp=g++
-################################################
-# if you press enter key, do ls or git status
-################################################
-# ls --color が適用されるために後ろで読み込む
-function do_enter() {
-    if [ -n "$BUFFER" ]; then
-        zle accept-line
-        return 0
-    fi
-    echo
-    ls --color=auto
-    # ls_abbrev
-    if [ "$(git rev-parse --is-inside-work-tree 2> /dev/null)" = 'true' ]; then
-        echo
-        echo -e "\e[0;33m--- git status ---\e[0m"
-        git status -sb
-    fi
-    zle reset-prompt
-    return 0
-}
-zle -N do_enter
-bindkey '^m' do_enter
+alias ls='ls --color=auto'
 
 # OS固有の設定を書くファイル(ignoreされている) zplug load後に必要
 # これは最後に読み込むことにする (local.zsh側の方が上書きできる仕様)
