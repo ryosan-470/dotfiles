@@ -28,6 +28,9 @@ setopt inc_append_history
 
 zplug 'zplug/zplug', hook-build:'zplug --self-manage'  # zplug under zplug
 ## Tools
+zplug "plugins/asdf", from:oh-my-zsh, if:"which asdf"
+zplug "plugins/aws", from:oh-my-zsh, if:"which aws"
+zplug "plugins/brew", from:oh-my-zsh, if:"which brew"
 zplug "plugins/git", from:oh-my-zsh
 zplug "plugins/git-extras", from:oh-my-zsh
 zplug "plugins/pip", from:oh-my-zsh
