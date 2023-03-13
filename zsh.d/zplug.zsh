@@ -9,14 +9,10 @@ source ~/.zplug/init.zsh
 zplug 'zplug/zplug', hook-build:'zplug --self-manage'  # zplug under zplug
 ## Tools
 zplug "plugins/asdf", from:oh-my-zsh, if:"which asdf"
-zplug "plugins/aws", from:oh-my-zsh, if:"which aws"
 zplug "plugins/brew", from:oh-my-zsh, if:"which brew"
 zplug "plugins/git", from:oh-my-zsh
 zplug "plugins/git-extras", from:oh-my-zsh
 zplug "plugins/pip", from:oh-my-zsh
-zplug "plugins/docker", from:oh-my-zsh, if:"which docker"
-zplug "plugins/docker-compose", from:oh-my-zsh, if:"which docker-compose"
-zplug "plugins/macos", from:oh-my-zsh, if:"[[ `uname` == \"Darwin\" ]]"
 
 ## Utilities
 zplug "plugins/common-aliases", from:oh-my-zsh
