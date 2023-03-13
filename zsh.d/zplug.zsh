@@ -20,12 +20,7 @@ zplug "plugins/macos", from:oh-my-zsh, if:"[[ `uname` == \"Darwin\" ]]"
 
 ## Utilities
 zplug "plugins/common-aliases", from:oh-my-zsh
-
-# lib周りの読み込み順序はかなり重要
-zplug "lib/completion", from:oh-my-zsh
-zplug "lib/functions", from:oh-my-zsh
 zplug "lib/keybindings", from:oh-my-zsh
-zplug "lib/history", from:oh-my-zsh
 zplug "zsh-users/zsh-completions"
 zplug "zsh-users/zsh-autosuggestions"
 # 読み込み順序を設定する
