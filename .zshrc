@@ -5,11 +5,6 @@ source ${ZSHD_PATH}/os.zsh
 source ${ZSHD_PATH}/command.zsh
 source ${ZSHD_PATH}/config.zsh
 
-export GREP_OPTIONS='--color=auto --binary-files=without-match'
-alias grep="grep $GREP_OPTIONS"
-unset GREP_OPTIONS
-
-
 ############################################################################
 ## Alias
 ############################################################################
