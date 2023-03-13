@@ -1,6 +1,6 @@
 ZSHD_PATH=$HOME/.dotconfig/dotfiles/zsh.d
 
-source ${ZSHD_PATH}/zplug_conf.zsh
+source ${ZSHD_PATH}/zplug.zsh
 
 autoload colors && colors
 
