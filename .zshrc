@@ -5,17 +5,6 @@ source ${ZSHD_PATH}/os.zsh
 source ${ZSHD_PATH}/command.zsh
 source ${ZSHD_PATH}/config.zsh
 
-################################################
-## tmux自動起動
-################################################
-if [ "$TMUX" = "" ]; then
-    tmux attach;
-
-    # detachしてない場合
-    if [ $? ]; then
-        tmux;
-    fi
-fi
 export GREP_OPTIONS='--color=auto --binary-files=without-match'
 alias grep="grep $GREP_OPTIONS"
 unset GREP_OPTIONS
