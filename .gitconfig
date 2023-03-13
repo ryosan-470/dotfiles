@@ -53,3 +53,5 @@
 	compactionHeuristic = true
 [ghq]
 	root = ~/code/src
+[pull]
+	rebase = false
