@@ -29,7 +29,6 @@ zplug "zsh-users/zsh-autosuggestions"
 zplug "zsh-users/zsh-syntax-highlighting", defer:2
 # substring-search はsyntax highlightingより後に呼び出す
 zplug "zsh-users/zsh-history-substring-search", defer:2
-zplug "b4b4r07/enhancd", use:init.sh  # ターミナルの移動をいい感じにしてくれる
 # テーマファイルとして読み込む
 zplug "zimfw/asciiship", as:theme
 
