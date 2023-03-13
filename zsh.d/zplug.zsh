@@ -26,7 +26,6 @@ zplug "lib/completion", from:oh-my-zsh
 zplug "lib/functions", from:oh-my-zsh
 zplug "lib/keybindings", from:oh-my-zsh
 zplug "lib/history", from:oh-my-zsh
-zplug "lib/misc", from:oh-my-zsh
 zplug "zsh-users/zsh-completions"
 zplug "zsh-users/zsh-autosuggestions"
 # 読み込み順序を設定する
