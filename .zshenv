@@ -9,6 +9,7 @@ export LC_ALL=en_US.UTF-8
 export GOPATH=$HOME/code
 export GOBIN=$GOPATH/bin
 export PATH="$GOBIN:$PATH"
+export ZIM_CONFIG_FILE=$HOME/.dotconfig/dotfiles/zimrc
 ################################################################################
 ## Qiita: tmuxのウィンドウ名をsshでつないでいるときは接続先ホストにする
 ################################################################################
