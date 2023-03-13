@@ -57,14 +57,7 @@ zplug "zsh-users/zsh-syntax-highlighting", defer:2
 zplug "zsh-users/zsh-history-substring-search", defer:2
 zplug "b4b4r07/enhancd", use:init.sh  # ターミナルの移動をいい感じにしてくれる
 # テーマファイルとして読み込む
-zplug "ryosan-470/zsh-theme", as:theme
-
-## THEME CONFIG
-POWERLINE_HIDE_USER_NAME="true"
-POWERLINE_SHORT_HOST_NAME="true"
-POWERLINE_DISABLE_RPROMPT="true"
-POWERLINE_PATH="short"
-POWERLINE_DETECT_SSH="true"
+zplug "zimfw/asciiship", as:theme
 
 # OS別の設定
 case `uname` in
