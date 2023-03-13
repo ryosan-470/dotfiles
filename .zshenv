@@ -1,5 +1,7 @@
 # environment settings
 typeset -U path PATH
+export BUILDKIT_PROGRESS=plain
+export EDITOR=nano
 export PAGER=less
 export LANG=en_US.UTF-8
 export LC_ALL=en_US.UTF-8
