@@ -1,6 +1,6 @@
 ZSHD_PATH=$HOME/.dotconfig/dotfiles/zsh.d
 
-source ${ZSHD_PATH}/zplug.zsh
+source ${ZSHD_PATH}/zim.zsh
 source ${ZSHD_PATH}/os.zsh
 source ${ZSHD_PATH}/command.zsh
 source ${ZSHD_PATH}/config.zsh
