@@ -1,49 +1,9 @@
 ZSHD_PATH=$HOME/.dotconfig/dotfiles/zsh.d
 
 source ${ZSHD_PATH}/zplug.zsh
+source ${ZSHD_PATH}/os.zsh
 
 autoload colors && colors
-
-# OS別の設定
-case `uname` in
-    "Darwin")
-        alias update="brew -v update && brew -v upgrade"
-        ;;
-    "Linux")
-        #For Linux General
-        alias open='gnome-open'
-        alias pbcopy='xsel --clipboard --input'
-        alias pbpaste='xsel --clipboard --output'
-        local UPDATE_CMD=""
-        if [ -e /etc/lsb-release ]; then
-            # Ubuntu
-            UPDATE_CMD="sudo apt-get update && sudo apt-get upgrade"
-        elif [ -e /etc/arch-release ]; then
-            # ArchLinux
-            UPDATE_CMD="sudo pacman -Syu"
-        elif [ -e /etc/redhat-release ]; then
-            # CentOS
-            UPDATE_CMD="sudo yum update";
-        elif cat /etc/os-release | grep Raspbian >/dev/null 2>&1 ; then
-            # Raspbian
-            UPDATE_CMD="sudo apt-get update && sudo apt-get upgrade"
-        else
-            UPDATE_CMD="echo 'Not support your using distribution.'"
-        fi
-        alias update=${UPDATE_CMD}
-        alias dstat-full='dstat -Tclmdrn'
-        alias dstat-mem='dstat -Tclm'
-        alias dstat-cpu='dstat -Tclr'
-        alias dstat-net='dstat -Tclnd'
-        alias dstat-disk='dstat -Tcldr'
-        ;;
-esac
-
-case `uname -m` in
-    "x86" | "x86_64")
-        zplug "peco/peco", as:command, from:gh-r, frozen:1
-        ;;
-esac
 
 bindkey -e # キーバインドをEmacs風にする
 # zsh customize
