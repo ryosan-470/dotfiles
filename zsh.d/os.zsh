@@ -11,7 +11,7 @@ case `uname` in
         local UPDATE_CMD=""
         if [ -e /etc/lsb-release ]; then
             # Ubuntu
-            UPDATE_CMD="sudo apt-get update && sudo apt-get upgrade"
+            UPDATE_CMD="sudo apt update && sudo apt upgrade"
         elif [ -e /etc/arch-release ]; then
             # ArchLinux
             UPDATE_CMD="sudo pacman -Syu"
