@@ -1,7 +1,7 @@
 # OS ごとの設定
 case `uname` in
     "Darwin")
-        alias update="brew -v update && brew -v upgrade"
+        alias update="brew update -v && brew upgrade -v"
         ;;
     "Linux")
         #For Linux General
