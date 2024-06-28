@@ -6,5 +6,3 @@ if (($+commands[brew])); then
     fpath=($homebrew_zsh_completion_path $fpath)
   fi
 fi
-
-autoload -Uz compinit && compinit
