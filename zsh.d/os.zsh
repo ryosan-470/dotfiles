@@ -1,7 +1,10 @@
 # OS ごとの設定
 case `uname` in
     "Darwin")
-        alias update="brew update -v && brew upgrade -v"
+        if [ -e /opt/homebrew/bin/brew ]; then
+            eval $(/opt/homebrew/bin/brew shellenv)
+            alias update="brew update -v && brew upgrade -v"
+        fi
         ;;
     "Linux")
         #For Linux General
