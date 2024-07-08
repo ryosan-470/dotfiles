@@ -3,10 +3,9 @@ on: push
 
 jobs:
   unit-test:
-    runs-on: ubuntu-latest
     strategy:
-      matrix:
-        python-version: [3.x, 2.x]
+      os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v2
         with:
