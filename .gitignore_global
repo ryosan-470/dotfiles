@@ -7,3 +7,9 @@ GTAGS
 # VSCodeがつくるもの
 .elixir_ls
 .vscode
+# Go 関連
+go.work
+go.work.sum
+# asdf や環境固定関連
+.tool-versions
+
