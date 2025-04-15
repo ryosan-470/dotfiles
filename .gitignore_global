@@ -21,3 +21,7 @@ vendor/
 
 # dotenv
 .envrc
+
+# GitHub Copilot
+.github/copilot-instructions.md
+.github/prompts/*
