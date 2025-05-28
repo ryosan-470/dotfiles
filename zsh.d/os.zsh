@@ -1,8 +1,8 @@
 # OS ごとの設定
 case `uname` in
     "Darwin")
-        if [ -e /opt/homebrew/bin/brew ]; then
-            eval $(/opt/homebrew/bin/brew shellenv)
+        if (($+commands[brew])); then
+            # eval "$(brew --prefix)/bin/brew shellenv"
             alias update="brew update -v && brew upgrade -v"
         fi
         ;;
