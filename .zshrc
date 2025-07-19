@@ -1,5 +1,6 @@
 ZSHD_PATH=$HOME/.dotconfig/dotfiles/zsh.d
 
+# Zimの初期化前にfpathを設定し、補完システムを初期化
 source ${ZSHD_PATH}/completion.zsh
 source ${ZSHD_PATH}/zim.zsh
 source ${ZSHD_PATH}/os.zsh
