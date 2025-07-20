@@ -1,6 +1,5 @@
 # dotfiles
 [![test](https://github.com/ryosan-470/dotfiles/workflows/test/badge.svg)](https://github.com/ryosan-470/dotfiles/actions?query=workflow%3Atest)
-[![Docker Pulls](https://img.shields.io/docker/pulls/ryosan470/dotfiles.svg?style=flat-square)](https://hub.docker.com/r/ryosan470/dotfiles/)
 [![License](http://img.shields.io/:license-mit-blue.svg?style=flat-square)](./LICENSE)
 ![platform-osx](https://img.shields.io/badge/platform-osx-blue.svg?style=flat-square)
 ![platform-linux](https://img.shields.io/badge/platform-Linux-blue.svg?style=flat-square)
