@@ -42,3 +42,26 @@ For example, you can set your own aliases, functions, and environment variables.
 # Set your own aliases
 alias ll='ls -la'
 ```
+
+## Development
+
+### Running Tests
+
+This project uses [uv](https://docs.astral.sh/uv/) for Python dependency management and testing.
+
+```bash
+# Install uv (if not already installed)
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# Install dependencies
+uv sync --dev
+
+# Run tests
+uv run pytest
+
+# Run tests with coverage
+uv run pytest --cov=install --cov-report=term-missing
+
+# Run specific test
+uv run pytest tests/test_install.py::TestWhichFunction -v
+```

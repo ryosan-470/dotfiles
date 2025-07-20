@@ -1,2 +1,22 @@
 .tmux.conf.osx
 vim.d/bundle/.tmux/plugins
+
+# Python and uv
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.venv/
+venv/
+ENV/
+env/
+.uv/
+uv.lock
+.pytest_cache/
+.coverage
+.coverage.*
+coverage.xml
+*.cover
+*.log
+.hypothesis/
