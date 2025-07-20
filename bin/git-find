@@ -1,5 +1,0 @@
-#!/bin/bash
-DST_PATH=$(git grep -n $1 | grep -v "[0-9]:\s*//" | peco | awk -F ":" '{print "-c "$2" "$1}');
-if [ ${#DST_PATH} -ne 0 ]; then
-    less $DST_PATH;
-fi
