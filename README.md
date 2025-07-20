@@ -25,20 +25,20 @@ update         Update your dotfiles from GitHub (e.g git fetch origin master)
 help           Print this message
 ```
 
-## Homebrew のセットアップについて
+## Dependencies
 
-macOS では、パッケージの管理に Homebrew を使用しています。
-新しい機器を導入する際などは以下のコマンドでセットアップすることができます。
+- zsh
+  - [zimfw](https://github.com/zimfw/zimfw)
+- tmux
+  - [tmux plugin manager](https://github.com/tmux-plugins/tpm)
 
-```console
-brew bundle
+## Customization
+
+You can customize the dotfiles by editing the files in the `~/.local.zsh`.
+For example, you can set your own aliases, functions, and environment variables.
+
+```bash
+# ~/.local.zsh
+# Set your own aliases
+alias ll='ls -la'
 ```
-
-
-## GitConfig
-コミット時の名前やメールアドレスなどは各環境に依存するため, dotfilesでの管理をとりやめました.
-各環境で利用する際は, `~/.gitconfig.local` に追記する形で利用してください.
-
-## Reference
-
-* [The B4B4R07's dotfiles](https://github.com/b4b4r07/dotfiles)
