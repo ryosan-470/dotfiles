@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 import glob
 import os
 import shlex
@@ -7,7 +6,6 @@ import subprocess
 import sys
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import List
 
 
 # ====================
@@ -33,7 +31,7 @@ class FileSystemInterface(ABC):
         pass
 
     @abstractmethod
-    def list_files(self, pattern: str) -> List[str]:
+    def list_files(self, pattern: str) -> list[str]:
         pass
 
     @abstractmethod
@@ -91,7 +89,7 @@ class FileSystem(FileSystemInterface):
     def makedirs(self, path: str, exist_ok: bool = False) -> None:
         os.makedirs(path, exist_ok=exist_ok)
 
-    def list_files(self, pattern: str) -> List[str]:
+    def list_files(self, pattern: str) -> list[str]:
         return glob.glob(pattern)
 
     def is_symlink(self, path: str) -> bool:
@@ -154,7 +152,7 @@ class DotfilesConfig:
     dotfiles_dir: str
     repo_url: str = "https://github.com/ryosan-470/dotfiles.git"
     exclude_patterns: set = None
-    required_commands: List[str] = None
+    required_commands: list[str] = None
 
     def __post_init__(self):
         if self.exclude_patterns is None:

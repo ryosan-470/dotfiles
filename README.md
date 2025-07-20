@@ -64,3 +64,21 @@ uv run pytest --cov=install --cov-report=term-missing
 # Run specific test
 uv run pytest tests/test_install.py::TestWhichFunction -v
 ```
+
+### Code Quality
+
+This project uses [Ruff](https://docs.astral.sh/ruff/) for linting and formatting.
+
+```bash
+# Run linter
+uv run ruff check .
+
+# Auto-fix linting issues
+uv run ruff check --fix .
+
+# Format code
+uv run ruff format .
+
+# Check formatting without making changes
+uv run ruff format --check .
+```

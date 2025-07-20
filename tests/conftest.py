@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 import os
 import sys
 import tempfile
@@ -64,10 +63,7 @@ def mock_git_clone():
             # If it's a git clone command, create the directory
             if "git" in args and "clone" in args:
                 # Extract the destination from the command
-                if "-b" in args:
-                    dst_index = args.index("-b") + 3
-                else:
-                    dst_index = -1
+                dst_index = args.index("-b") + 3 if "-b" in args else -1
                 dst = args[dst_index]
                 os.makedirs(dst, exist_ok=True)
             return None
