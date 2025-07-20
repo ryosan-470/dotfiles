@@ -1,5 +1,19 @@
 {
   "cSpell.words": [
+    "capsys",
+    "dotconfig",
+    "gitmodules",
+    "pytest",
+    "vimrc",
     "zimfw"
-  ]
+  ],
+
+  "[python]": {
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+      "source.fixAll": "explicit",
+      "source.organizeImports.ruff": "explicit"
+    },
+    "editor.defaultFormatter": "charliermarsh.ruff"
+  }
 }

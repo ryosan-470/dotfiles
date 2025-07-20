@@ -1,6 +1,5 @@
 # dotfiles
 [![test](https://github.com/ryosan-470/dotfiles/workflows/test/badge.svg)](https://github.com/ryosan-470/dotfiles/actions?query=workflow%3Atest)
-[![Docker Pulls](https://img.shields.io/docker/pulls/ryosan470/dotfiles.svg?style=flat-square)](https://hub.docker.com/r/ryosan470/dotfiles/)
 [![License](http://img.shields.io/:license-mit-blue.svg?style=flat-square)](./LICENSE)
 ![platform-osx](https://img.shields.io/badge/platform-osx-blue.svg?style=flat-square)
 ![platform-linux](https://img.shields.io/badge/platform-Linux-blue.svg?style=flat-square)
@@ -41,4 +40,45 @@ For example, you can set your own aliases, functions, and environment variables.
 # ~/.local.zsh
 # Set your own aliases
 alias ll='ls -la'
+```
+
+## Development
+
+### Running Tests
+
+This project uses [uv](https://docs.astral.sh/uv/) for Python dependency management and testing.
+
+```bash
+# Install uv (if not already installed)
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# Install dependencies
+uv sync --dev
+
+# Run tests
+uv run pytest
+
+# Run tests with coverage
+uv run pytest --cov=install --cov-report=term-missing
+
+# Run specific test
+uv run pytest tests/test_install.py::TestWhichFunction -v
+```
+
+### Code Quality
+
+This project uses [Ruff](https://docs.astral.sh/ruff/) for linting and formatting.
+
+```bash
+# Run linter
+uv run ruff check .
+
+# Auto-fix linting issues
+uv run ruff check --fix .
+
+# Format code
+uv run ruff format .
+
+# Check formatting without making changes
+uv run ruff format --check .
 ```
