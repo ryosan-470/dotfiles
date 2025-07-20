@@ -22,3 +22,25 @@ if (($+commands[op])); then
   }
   compdef _op op
 fi
+
+# Docker CLI の補完を有効にする
+# 遅延ローディング
+if (($+commands[docker])); then
+  function _docker() {
+    unfunction "$0"
+    eval "$(docker completion zsh)"
+    $0 "$@"
+  }
+  compdef _docker docker
+fi
+
+# GitHub CLI の補完を有効にする
+# 遅延ローディング
+if (($+commands[gh])); then
+  function _gh() {
+    unfunction "$0"
+    eval "$(gh completion -s zsh)"
+    $0 "$@"
+  }
+  compdef _gh gh
+fi
