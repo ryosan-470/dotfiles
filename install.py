@@ -22,9 +22,9 @@ EXCLUDE_DOTFILES = set([".git", ".git_commit_template.txt",
 DOT_HOME_FILES = ALL_DOTFILES - EXCLUDE_DOTFILES
 
 
-class FormatedColor:
+class FormattedColor:
     SUCCESS = "\033[92m"  # Green
-    WARNING = "\033[93m"  # Yello
+    WARNING = "\033[93m"  # Yellow
     DANGER = "\033[91m"   # Red
     PRIMARY = "\033[94m"  # Blue
     BOLD = "\033[1m"
@@ -49,7 +49,7 @@ class FormatedColor:
         self.pprint(self.BOLD, msg)
 
 
-f = FormatedColor()
+f = FormattedColor()
 
 
 def run(os_command):
@@ -183,12 +183,7 @@ def install():
 
 
 def create_parser():
-    description = """
-    The setup script for me. Linux and Mac OSX supports.
-    Copyright (C) 2015 - 2017 Ryosuke SATO (jtwp470)
-    This software is released under the MIT License.
-    """
-    parser = argparse.ArgumentParser(description=description)
+    parser = argparse.ArgumentParser()
 
     subparsers = parser.add_subparsers()
     download_cmd = subparsers.add_parser(
