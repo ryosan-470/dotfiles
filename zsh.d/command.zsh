@@ -112,11 +112,12 @@ alias -s {c,cc,cpp,java}=run
 ## tmux自動起動
 ################################################
 if [ "$TMUX" = "" ]; then
-    tmux attach;
-
-    # detachしてない場合
-    if [ $? ]; then
-        tmux;
+    if (($+commands[tmux])); then
+        tmux attach;
+        # detachしてない場合
+        if [ $? ]; then
+            tmux;
+        fi
     fi
 fi
 
