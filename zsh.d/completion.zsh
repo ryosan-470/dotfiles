@@ -44,3 +44,25 @@ if (($+commands[gh])); then
   }
   compdef _gh gh
 fi
+
+# uv コマンドの補完を有効にする
+# 遅延ローディング
+if (($+commands[uv])); then
+  function _uv() {
+    unfunction "$0"
+    eval "$(uv generate-shell-completion zsh)"
+    $0 "$@"
+  }
+  compdef _uv uv
+fi
+
+# uvx コマンドの補完を有効にする
+# 遅延ローディング
+if (($+commands[uvx])); then
+  function _uvx() {
+    unfunction "$0"
+    eval "$(uvx generate-shell-completion zsh)"
+    $0 "$@"
+  }
+  compdef _uvx uvx
+fi
