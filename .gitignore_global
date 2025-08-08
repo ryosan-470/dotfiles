@@ -25,3 +25,6 @@ vendor/
 # GitHub Copilot
 .github/copilot-instructions.md
 .github/prompts/*
+
+# npm
+.npmrc
