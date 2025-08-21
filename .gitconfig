@@ -21,6 +21,8 @@
 [alias]
 	b = branch -a
 	branches = branch -a # ブランチの一覧
+	# ブランチ切り替え
+	sw = !git switch `git branch | peco`
 	c = commit
 	stashes = stash list              # stash した一覧
 	unstage = reset -q HEAD --
