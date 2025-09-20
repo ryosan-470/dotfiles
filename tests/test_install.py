@@ -74,7 +74,7 @@ class TestDotfilesInstaller:
 
     def test_check_requirements_all_present(self, installer, mock_dependencies):
         """Test check_requirements when all commands are present"""
-        config, fs, runner, output = mock_dependencies
+        _, _, runner, output = mock_dependencies
         runner.which.return_value = True
 
         result = installer.check_requirements()
@@ -84,7 +84,7 @@ class TestDotfilesInstaller:
 
     def test_check_requirements_missing_commands(self, installer, mock_dependencies):
         """Test check_requirements when commands are missing"""
-        config, fs, runner, output = mock_dependencies
+        _, _, runner, output = mock_dependencies
 
         def which_side_effect(cmd):
             return cmd not in ["tmux", "vim"]
@@ -100,7 +100,7 @@ class TestDotfilesInstaller:
 
     def test_download_repository_not_exists(self, installer, mock_dependencies):
         """Test downloading when repository doesn't exist"""
-        config, fs, runner, output = mock_dependencies
+        _, fs, runner, output = mock_dependencies
         fs.exists.return_value = False
         runner.run.return_value = True
 
@@ -113,7 +113,7 @@ class TestDotfilesInstaller:
 
     def test_download_repository_exists(self, installer, mock_dependencies):
         """Test downloading when repository already exists"""
-        config, fs, runner, output = mock_dependencies
+        _, fs, runner, output = mock_dependencies
         fs.exists.return_value = True
 
         result = installer.download()
@@ -126,7 +126,7 @@ class TestDotfilesInstaller:
 
     def test_deploy_success(self, installer, mock_dependencies, mocker):
         """Test successful deployment"""
-        config, fs, runner, output = mock_dependencies
+        config, fs, _, output = mock_dependencies
         mocker.patch.object(config, "get_dotfiles", return_value={".zshrc", ".vimrc"})
         fs.exists.return_value = False
 
@@ -138,7 +138,7 @@ class TestDotfilesInstaller:
 
     def test_deploy_file_exists(self, installer, mock_dependencies, mocker):
         """Test deployment when files already exist"""
-        config, fs, runner, output = mock_dependencies
+        config, fs, _, output = mock_dependencies
         mocker.patch.object(config, "get_dotfiles", return_value={".zshrc"})
         fs.exists.return_value = True
 
@@ -150,7 +150,7 @@ class TestDotfilesInstaller:
 
     def test_clean_success(self, installer, mock_dependencies, mocker):
         """Test successful clean operation"""
-        config, fs, runner, output = mock_dependencies
+        config, fs, _, output = mock_dependencies
         mocker.patch.object(config, "get_dotfiles", return_value={".zshrc", ".vimrc"})
         fs.exists.return_value = True
 
@@ -162,7 +162,7 @@ class TestDotfilesInstaller:
 
     def test_initialize_no_init_dir(self, installer, mock_dependencies):
         """Test initialize when init directory doesn't exist"""
-        config, fs, runner, output = mock_dependencies
+        _, fs, runner, output = mock_dependencies
         fs.exists.return_value = False
 
         result = installer.initialize()
@@ -173,7 +173,7 @@ class TestDotfilesInstaller:
 
     def test_initialize_with_scripts(self, installer, mock_dependencies):
         """Test initialize with scripts"""
-        config, fs, runner, output = mock_dependencies
+        _, fs, runner, _ = mock_dependencies
         fs.exists.return_value = True
         fs.list_files.return_value = [
             "/init/init_zsh.sh",
@@ -191,7 +191,7 @@ class TestDotfilesInstaller:
 
     def test_verify_all_exist(self, installer, mock_dependencies, mocker):
         """Test verify when all files exist"""
-        config, fs, runner, output = mock_dependencies
+        config, fs, _, output = mock_dependencies
         mocker.patch.object(config, "get_dotfiles", return_value={".zshrc", ".vimrc"})
         fs.exists.return_value = True
 
@@ -202,7 +202,7 @@ class TestDotfilesInstaller:
 
     def test_verify_some_missing(self, installer, mock_dependencies, mocker):
         """Test verify when some files are missing"""
-        config, fs, runner, output = mock_dependencies
+        config, fs, _, output = mock_dependencies
         mocker.patch.object(config, "get_dotfiles", return_value={".zshrc", ".vimrc"})
 
         def exists_side_effect(path):
@@ -217,7 +217,7 @@ class TestDotfilesInstaller:
 
     def test_install_full_success(self, installer, mock_dependencies):
         """Test full installation success"""
-        config, fs, runner, output = mock_dependencies
+        _, _, _, _ = mock_dependencies
 
         # Mock all methods to return success
         installer.check_requirements = Mock(return_value=True)
