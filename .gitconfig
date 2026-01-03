@@ -60,3 +60,6 @@
 	rebase = false
 [fetch]
 	prune = true
+[credential]
+	helper = /usr/local/share/gcm-core/git-credential-manager
+
