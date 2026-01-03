@@ -58,3 +58,5 @@
 	root = ~/code/src
 [pull]
 	rebase = false
+[fetch]
+	prune = true
