@@ -28,3 +28,10 @@ vendor/
 
 # npm
 .npmrc
+
+# Claude Code
+.claude/
+CLAUDE.md
+
+# MCP
+.serena/
