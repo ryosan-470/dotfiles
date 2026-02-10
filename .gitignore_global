@@ -22,16 +22,8 @@ vendor/
 # dotenv
 .envrc
 
-# GitHub Copilot
-.github/copilot-instructions.md
-.github/prompts/*
-
 # npm
 .npmrc
-
-# Claude Code
-.claude/
-CLAUDE.md
 
 # MCP
 .serena/

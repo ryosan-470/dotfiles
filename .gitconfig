@@ -1,6 +1,7 @@
 [core]
 	editor = "nano"
 	excludesfile = ~/.gitignore_global
+	excludesfile = ~/.gitignore.local
 [user]
 	name = ryosan-470
 	email = rskjtwp@gmail.com
