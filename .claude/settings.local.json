@@ -8,7 +8,8 @@
       "Bash(mv:*)",
       "Bash(python:*)",
       "Bash(uv run:*)",
-      "Bash(uv sync:*)"
+      "Bash(uv sync:*)",
+      "Bash(command -v:*)"
     ],
     "deny": []
   }
