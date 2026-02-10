@@ -180,7 +180,7 @@ class TestDotfilesInstaller:
 
     def test_deploy_creates_parent_dir(self, installer, mock_dependencies, mocker):
         """Test deployment creates parent directory for subdirectory files"""
-        config, fs, _, output = mock_dependencies
+        config, fs, _, _output = mock_dependencies
         mocker.patch.object(
             config,
             "get_dotfiles",
