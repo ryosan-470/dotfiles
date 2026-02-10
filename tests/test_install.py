@@ -3,6 +3,7 @@
 Unit tests for refactored install.py
 """
 
+import os
 from unittest.mock import Mock
 
 import pytest
@@ -42,13 +43,31 @@ class TestDotfilesConfig:
                 "/home/test/.dotconfig/dotfiles/.gitignore",
             ],
         )
+        mocker.patch("os.path.exists", return_value=False)
+
+        dotfiles = config.get_dotfiles()
+        dst_names = [os.path.basename(dst) for _, dst in dotfiles]
+
+        assert ".zshrc" in dst_names
+        assert ".vimrc" in dst_names
+        assert ".git" not in dst_names  # Should be excluded
+        assert ".gitignore" not in dst_names  # Should be excluded
+
+    def test_get_dotfiles_includes_claude_settings(self, mocker):
+        """Test that claude/settings.json is included when it exists"""
+        config = install.DotfilesConfig(
+            home_dir="/home/test", dotfiles_dir="/home/test/.dotconfig/dotfiles"
+        )
+
+        mocker.patch("glob.glob", return_value=[])
+        mocker.patch("os.path.exists", return_value=True)
 
         dotfiles = config.get_dotfiles()
 
-        assert ".zshrc" in dotfiles
-        assert ".vimrc" in dotfiles
-        assert ".git" not in dotfiles  # Should be excluded
-        assert ".gitignore" not in dotfiles  # Should be excluded
+        assert (
+            "/home/test/.dotconfig/dotfiles/claude/settings.json",
+            "/home/test/.claude/settings.json",
+        ) in dotfiles
 
 
 class TestDotfilesInstaller:
@@ -127,7 +146,14 @@ class TestDotfilesInstaller:
     def test_deploy_success(self, installer, mock_dependencies, mocker):
         """Test successful deployment"""
         config, fs, _, output = mock_dependencies
-        mocker.patch.object(config, "get_dotfiles", return_value={".zshrc", ".vimrc"})
+        mocker.patch.object(
+            config,
+            "get_dotfiles",
+            return_value=[
+                ("/dotfiles/.zshrc", "/home/test/.zshrc"),
+                ("/dotfiles/.vimrc", "/home/test/.vimrc"),
+            ],
+        )
         fs.exists.return_value = False
 
         result = installer.deploy()
@@ -139,7 +165,11 @@ class TestDotfilesInstaller:
     def test_deploy_file_exists(self, installer, mock_dependencies, mocker):
         """Test deployment when files already exist"""
         config, fs, _, output = mock_dependencies
-        mocker.patch.object(config, "get_dotfiles", return_value={".zshrc"})
+        mocker.patch.object(
+            config,
+            "get_dotfiles",
+            return_value=[("/dotfiles/.zshrc", "/home/test/.zshrc")],
+        )
         fs.exists.return_value = True
 
         result = installer.deploy()
@@ -148,10 +178,35 @@ class TestDotfilesInstaller:
         fs.create_symlink.assert_not_called()
         output.warn.assert_called()
 
+    def test_deploy_creates_parent_dir(self, installer, mock_dependencies, mocker):
+        """Test deployment creates parent directory for subdirectory files"""
+        config, fs, _, output = mock_dependencies
+        mocker.patch.object(
+            config,
+            "get_dotfiles",
+            return_value=[
+                ("/dotfiles/claude/settings.json", "/home/test/.claude/settings.json"),
+            ],
+        )
+        fs.exists.return_value = False
+
+        result = installer.deploy()
+
+        assert result is True
+        fs.makedirs.assert_called_with("/home/test/.claude", exist_ok=True)
+        fs.create_symlink.assert_called_once()
+
     def test_clean_success(self, installer, mock_dependencies, mocker):
         """Test successful clean operation"""
         config, fs, _, output = mock_dependencies
-        mocker.patch.object(config, "get_dotfiles", return_value={".zshrc", ".vimrc"})
+        mocker.patch.object(
+            config,
+            "get_dotfiles",
+            return_value=[
+                ("/dotfiles/.zshrc", "/home/test/.zshrc"),
+                ("/dotfiles/.vimrc", "/home/test/.vimrc"),
+            ],
+        )
         fs.exists.return_value = True
 
         result = installer.clean()
@@ -192,7 +247,14 @@ class TestDotfilesInstaller:
     def test_verify_all_exist(self, installer, mock_dependencies, mocker):
         """Test verify when all files exist"""
         config, fs, _, output = mock_dependencies
-        mocker.patch.object(config, "get_dotfiles", return_value={".zshrc", ".vimrc"})
+        mocker.patch.object(
+            config,
+            "get_dotfiles",
+            return_value=[
+                ("/dotfiles/.zshrc", "/home/test/.zshrc"),
+                ("/dotfiles/.vimrc", "/home/test/.vimrc"),
+            ],
+        )
         fs.exists.return_value = True
 
         result = installer.verify()
@@ -203,7 +265,14 @@ class TestDotfilesInstaller:
     def test_verify_some_missing(self, installer, mock_dependencies, mocker):
         """Test verify when some files are missing"""
         config, fs, _, output = mock_dependencies
-        mocker.patch.object(config, "get_dotfiles", return_value={".zshrc", ".vimrc"})
+        mocker.patch.object(
+            config,
+            "get_dotfiles",
+            return_value=[
+                ("/dotfiles/.zshrc", "/home/test/.zshrc"),
+                ("/dotfiles/.vimrc", "/home/test/.vimrc"),
+            ],
+        )
 
         def exists_side_effect(path):
             return ".zshrc" in path
