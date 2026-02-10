@@ -45,6 +45,10 @@ This is a personal dotfiles repository for managing shell configurations, primar
 - Uses TPM (Tmux Plugin Manager) for tmux plugins
 - Initialization scripts in `init/` directory handle setup
 
+**Claude Code Configuration** (`claude/`):
+- `claude/settings.json` - Claude Code global settings template, symlinked to `~/.claude/settings.json`
+- Note: `.claude/settings.local.json` is a separate project-level Claude Code config (permissions for this repo)
+
 **Customization System**:
 - `~/.local.zsh` - User-specific zsh customizations
 - `~/.gitconfig.local` - User-specific git configuration

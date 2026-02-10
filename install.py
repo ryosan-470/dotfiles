@@ -175,11 +175,31 @@ class DotfilesConfig:
             home_dir=home, dotfiles_dir=os.path.join(home, ".dotconfig/dotfiles")
         )
 
-    def get_dotfiles(self) -> set:
-        """Get list of dotfiles to be linked"""
+    def get_dotfiles(self) -> list[tuple[str, str]]:
+        """Get list of (src, dst) pairs for all files to be linked"""
         pattern = os.path.join(self.dotfiles_dir, ".*")
-        all_files = set(os.path.basename(f) for f in glob.glob(pattern))
-        return all_files - self.exclude_patterns
+        basenames = set(os.path.basename(f) for f in glob.glob(pattern))
+        basenames -= self.exclude_patterns
+
+        links = [
+            (
+                os.path.join(self.dotfiles_dir, name),
+                os.path.join(self.home_dir, name),
+            )
+            for name in basenames
+        ]
+
+        # Extra links (subdirectory files)
+        claude_settings = os.path.join(self.dotfiles_dir, "claude", "settings.json")
+        if os.path.exists(claude_settings):
+            links.append(
+                (
+                    claude_settings,
+                    os.path.join(self.home_dir, ".claude", "settings.json"),
+                )
+            )
+
+        return links
 
 
 # ====================
@@ -234,13 +254,13 @@ class DotfilesInstaller:
     def deploy(self) -> bool:
         """Create symlinks for dotfiles"""
         success = True
-        dotfiles = self.config.get_dotfiles()
 
-        for dotfile in dotfiles:
-            src = os.path.join(self.config.dotfiles_dir, dotfile)
-            dst = os.path.join(self.config.home_dir, dotfile)
-
+        for src, dst in self.config.get_dotfiles():
             try:
+                dst_dir = os.path.dirname(dst)
+                if dst_dir != self.config.home_dir:
+                    self.fs.makedirs(dst_dir, exist_ok=True)
+
                 if self.fs.exists(dst):
                     self.output.warn(f"{src} ==> {dst} has been already existed")
                 else:
@@ -255,11 +275,8 @@ class DotfilesInstaller:
     def clean(self) -> bool:
         """Remove symlinks"""
         success = True
-        dotfiles = self.config.get_dotfiles()
 
-        for dotfile in dotfiles:
-            dst = os.path.join(self.config.home_dir, dotfile)
-
+        for _, dst in self.config.get_dotfiles():
             try:
                 if self.fs.exists(dst):
                     self.fs.remove(dst)
@@ -304,15 +321,13 @@ class DotfilesInstaller:
 
     def verify(self) -> bool:
         """Verify installation"""
-        dotfiles = self.config.get_dotfiles()
         failed = False
 
-        for dotfile in dotfiles:
-            target = os.path.join(self.config.home_dir, dotfile)
-            if self.fs.exists(target):
-                self.output.success(f"✓ {target}")
+        for _, dst in self.config.get_dotfiles():
+            if self.fs.exists(dst):
+                self.output.success(f"✓ {dst}")
             else:
-                self.output.warn(f"✘ {target}")
+                self.output.warn(f"✘ {dst}")
                 failed = True
 
         if failed:

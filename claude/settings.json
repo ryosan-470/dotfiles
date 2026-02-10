@@ -1,0 +1,27 @@
+{
+  "language": "日本語",
+  "hooks": {
+    "Notification": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "if [ \"$(uname)\" = 'Darwin' ]; then osascript -e 'display notification \"Claude Code が入力を待っています\" with title \"Claude Code\"'; fi"
+          }
+        ]
+      }
+    ],
+    "PermissionRequest": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "if [ \"$(uname)\" = 'Darwin' ]; then osascript -e 'display notification \"Claude Code が許可を求めています\" with title \"Claude Code\"'; fi",
+            "async": true
+          }
+        ]
+      }
+    ]
+  }
+}

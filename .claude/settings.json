@@ -1,0 +1,30 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(find:*)",
+      "Bash(mkdir:*)",
+      "Bash(uv run pytest:*)",
+      "Bash(python:*)",
+      "Bash(uv run:*)",
+      "Bash(uv sync:*)",
+      "Bash(command -v:*)",
+      "Bash(gh pr checks:*)",
+      "Bash(gh run view:*)"
+    ],
+    "deny": []
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/python-post-edit.sh",
+            "timeout": 60
+          }
+        ]
+      }
+    ]
+  }
+}
