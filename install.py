@@ -199,6 +199,15 @@ class DotfilesConfig:
                 )
             )
 
+        claude_md = os.path.join(self.dotfiles_dir, "claude", "CLAUDE.md")
+        if os.path.exists(claude_md):
+            links.append(
+                (
+                    claude_md,
+                    os.path.join(self.home_dir, ".claude", "CLAUDE.md"),
+                )
+            )
+
         return links
 
 
