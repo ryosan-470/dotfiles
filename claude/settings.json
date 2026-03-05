@@ -3,20 +3,44 @@
     "allow": [
       "Bash(find:*)",
       "Bash(mkdir:*)",
+      "Bash(gh issue list:*)",
+      "Bash(gh issue status:*)",
       "Bash(gh issue view:*)",
       "Bash(gh pr checks:*)",
+      "Bash(gh pr diff:*)",
+      "Bash(gh pr list:*)",
+      "Bash(gh pr status:*)",
+      "Bash(gh pr view:*)",
+      "Bash(gh release list:*)",
+      "Bash(gh release view:*)",
       "Bash(gh repo list:*)",
-      "Bash(gh run view:*)"
+      "Bash(gh repo view:*)",
+      "Bash(gh run list:*)",
+      "Bash(gh run view:*)",
+      "Bash(gh search:*)",
+      "Bash(gh workflow list:*)",
+      "Bash(gh workflow view:*)"
     ],
     "deny": [
+      "Bash(gh api:*)",
+      "Bash(gh auth:*)",
+      "Bash(gh gpg-key:*)",
       "Bash(gh issue close:*)",
       "Bash(gh issue delete:*)",
       "Bash(gh pr close:*)",
       "Bash(gh pr delete:*)",
       "Bash(gh pr merge:*)",
-      "Bash(gh repo create:*)",
+      "Bash(gh release delete:*)",
       "Bash(gh repo archive:*)",
-      "Bash(gh repo delete:*)"
+      "Bash(gh repo create:*)",
+      "Bash(gh repo delete:*)",
+      "Bash(gh repo edit:*)",
+      "Bash(gh repo fork:*)",
+      "Bash(gh repo rename:*)",
+      "Bash(gh secret:*)",
+      "Bash(gh ssh-key:*)",
+      "Bash(gh variable:*)",
+      "Bash(gh workflow disable:*)"
     ]
   },
   "hooks": {
