@@ -19,9 +19,18 @@
       "Bash(gh run view:*)",
       "Bash(gh search:*)",
       "Bash(gh workflow list:*)",
-      "Bash(gh workflow view:*)"
+      "Bash(gh workflow view:*)",
+      "Bash(git branch:*)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)",
+      "Bash(git remote:*)",
+      "Bash(git show:*)",
+      "Bash(git stash list:*)",
+      "Bash(git status:*)",
+      "Bash(git tag:*)"
     ],
     "deny": [
+      "Bash(brew:*)",
       "Bash(gh api:*)",
       "Bash(gh auth:*)",
       "Bash(gh gpg-key:*)",
@@ -40,7 +49,16 @@
       "Bash(gh secret:*)",
       "Bash(gh ssh-key:*)",
       "Bash(gh variable:*)",
-      "Bash(gh workflow disable:*)"
+      "Bash(gh workflow disable:*)",
+      "Bash(git checkout -- .:*)",
+      "Bash(git clean -fd:*)",
+      "Bash(git push --force:*)",
+      "Bash(git push -f:*)",
+      "Bash(git push origin --force:*)",
+      "Bash(git push origin -f:*)",
+      "Bash(git reset --hard:*)",
+      "Bash(shutdown:*)",
+      "Bash(sudo:*)"
     ]
   },
   "hooks": {
