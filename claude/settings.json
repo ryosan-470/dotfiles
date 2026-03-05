@@ -1,11 +1,13 @@
 {
   "permissions": {
     "allow": [
+      "Glob",
+      "Grep",
       "Read",
-      "WebFetch",
+      "WebFetch(domain:github.com)",
       "WebSearch",
-      "Bash(find:*)",
       "Bash(mkdir:*)",
+      "Bash(ls:*)",
       "Bash(gh issue list:*)",
       "Bash(gh issue status:*)",
       "Bash(gh issue view:*)",
@@ -32,9 +34,23 @@
       "Bash(git status:*)",
       "Bash(git tag:*)"
     ],
+    "ask": [
+      "Bash(gh issue comment:*)",
+      "Bash(gh pr create:*)",
+      "Bash(gh pr edit:*)",
+      "Bash(gh pr comment:*)",
+      "Bash(gh pr review:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(rm:*)",
+      "Bash(mv:*)"
+    ],
     "deny": [
       "Bash(brew:*)",
-      "Bash(gh api:*)",
+      "Bash(curl:*)",
+      "Bash(find:*)",
+      "Bash(grep:*)",
+      "Bash(wget:*)",
       "Bash(gh auth:*)",
       "Bash(gh gpg-key:*)",
       "Bash(gh issue close:*)",
@@ -53,6 +69,7 @@
       "Bash(gh ssh-key:*)",
       "Bash(gh variable:*)",
       "Bash(gh workflow disable:*)",
+      "Bash(rm -rf:*)",
       "Bash(git checkout -- .:*)",
       "Bash(git clean -fd:*)",
       "Bash(git push --force:*)",

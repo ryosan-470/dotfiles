@@ -55,7 +55,8 @@ This is a personal dotfiles repository for managing shell configurations, primar
 `claude/settings.json` の `permissions` でコマンドの許可/不許可を管理している。方針は以下の通り：
 
 **Claude Code ツール**:
-- **Allow(自動許可)**: `Read`, `WebFetch`, `WebSearch`(すべて読み取り専用で副作用なし)
+- **Allow(自動許可)**: `Glob`, `Grep`, `Read`, `WebFetch`, `WebSearch`(すべて読み取り専用で副作用なし)
+- **Deny(常に拒否)**: `Bash(find:*)`, `Bash(grep:*)` (専用ツール `Glob`/`Grep` を使うため)
 
 **gh CLI**:
 - **Allow(自動許可)**: 閲覧・参照系コマンド(`view`, `list`, `status`, `diff`, `checks`, `search` など)
