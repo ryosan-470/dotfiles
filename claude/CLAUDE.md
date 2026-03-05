@@ -7,6 +7,9 @@
 
 `settings.json` の `permissions` でコマンドの許可/不許可を管理している。方針は以下の通り：
 
+### Claude Code ツール
+- **Allow（自動許可）**: `Read`, `WebFetch`, `WebSearch`（すべて読み取り専用で副作用なし）
+
 ### gh CLI
 - **Allow（自動許可）**: 閲覧・参照系コマンド（`view`, `list`, `status`, `diff`, `checks`, `search` など）
 - **Deny（常に拒否）**: 破壊的・不可逆な操作（`delete`, `close`, `merge`, `archive`, `rename` など）、認証・鍵の操作（`auth`, `ssh-key`, `gpg-key`）、リポジトリ設定の変更（`secret`, `variable`）、`gh api`（任意のAPI呼び出しで他の制御をバイパスできるため）

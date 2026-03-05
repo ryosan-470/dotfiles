@@ -1,6 +1,9 @@
 {
   "permissions": {
     "allow": [
+      "Read",
+      "WebFetch",
+      "WebSearch",
       "Bash(find:*)",
       "Bash(mkdir:*)",
       "Bash(gh issue list:*)",
