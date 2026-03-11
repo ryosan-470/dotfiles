@@ -9,7 +9,7 @@
 The easiest way to install the dotfiles is open to up a terminal, type the installation command below:
 
 ```console
-curl -L https://raw.githubusercontent.com/ryosan-470/dotfiles/master/install.py | python
+curl -L https://dot.ryosan470.com | python
 ```
 
 ## Update the configuration
