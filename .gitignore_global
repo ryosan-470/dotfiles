@@ -27,3 +27,8 @@ vendor/
 
 # MCP
 .serena/
+
+# Claude Code
+**/.claude/settings.*.json
+CLAUDE.local.json
+
