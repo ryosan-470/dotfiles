@@ -57,21 +57,22 @@ This is a personal dotfiles repository for managing shell configurations, primar
 **Claude Code ツール**:
 - **Allow(自動許可)**: `Glob`, `Grep`, `Read`, `WebSearch`(読み取り専用で副作用なし)
 - **Allow(自動許可)**: `WebFetch` はドメイン指定で許可: `github.com`, `raw.githubusercontent.com`, `docs.anthropic.com`, `developer.mozilla.org`, `pkg.go.dev`
-- **Deny(常に拒否)**: `Bash(find:*)` (専用ツール `Glob` を使うため)、`Bash(curl:*)`, `Bash(wget:*)` (任意のネットワークリクエスト防止)
+- **Deny(常に拒否)**: `Bash(find *)` (専用ツール `Glob` を使うため)、`Bash(curl *)`, `Bash(wget *)` (任意のネットワークリクエスト防止)
+- **Deny(常に拒否)**: `Read(**/.env*)`, `Read(~/.aws/credentials)`, `Read(~/.aws/config)`, `Read(~/.ssh/**)`(機密ファイルの保護)
 - Note: `grep` は deny から除外済み。単体検索は専用ツール `Grep` を使い、パイプでの利用(`command | grep`)は都度確認で許可する方針
 
 **gh CLI**:
 - **Allow(自動許可)**: 閲覧・参照系コマンド(`view`, `list`, `status`, `diff`, `checks`, `search` など)
-- **Ask(都度確認)**: `issue comment`, `pr create/edit/comment/review`
-- **Deny(常に拒否)**: 破壊的・不可逆な操作(`delete`, `close`, `merge`, `archive`, `rename` など)、認証・鍵の操作(`auth`, `ssh-key`, `gpg-key`)、リポジトリ設定の変更(`secret`, `variable`)、`gh api`(任意のAPI呼び出しで他の制御をバイパスできるため)
+- **Ask(都度確認)**: `gh api`, `issue comment`, `pr create/edit/comment/review`
+- **Deny(常に拒否)**: 破壊的・不可逆な操作(`delete`, `close`, `merge`, `archive`, `rename` など)、認証・鍵の操作(`auth`, `ssh-key`, `gpg-key`)、リポジトリ設定の変更(`secret`, `variable`)、ワークフロー変更(`workflow enable/disable`)
 
 **git**:
 - **Allow(自動許可)**: 閲覧・参照系(`log`, `diff`, `show`, `status`, `branch`, `remote`, `tag`, `stash list`)
 - **Ask(都度確認)**: `commit`, `push`
-- **Deny(常に拒否)**: 破壊的・復元困難な操作(`push --force/-f`, `reset --hard`, `clean -fd`, `checkout -- .`, `rm -rf`)
+- **Deny(常に拒否)**: 破壊的・復元困難な操作(`push --force/-f`, `reset --hard`, `clean -fd`, `checkout -- .`, `restore`, `rm -rf`)
 
 **brew**:
-- **Deny(全操作拒否)**: `brew:*` で全コマンドをブロック
+- **Deny(全操作拒否)**: 全コマンドをブロック
 
 **システム**:
 - **Deny(常に拒否)**: `sudo`, `shutdown`(特権昇格・システム停止の防止)
@@ -79,6 +80,8 @@ This is a personal dotfiles repository for managing shell configurations, primar
 **ファイル操作**:
 - **Ask(都度確認)**: `rm`, `mv`(誤削除・誤移動の防止)
 - **Deny(常に拒否)**: `rm -rf`(再帰的削除は絶対禁止)
+
+**構文**: 全ルールで非推奨の `:*` サフィックスを廃止し、スペース + `*` 構文に統一
 
 **Customization System**:
 - `~/.local.zsh` - User-specific zsh customizations
