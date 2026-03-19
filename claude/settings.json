@@ -53,7 +53,6 @@
       "Bash(brew:*)",
       "Bash(curl:*)",
       "Bash(find:*)",
-      "Bash(grep:*)",
       "Bash(wget:*)",
       "Bash(gh auth:*)",
       "Bash(gh gpg-key:*)",

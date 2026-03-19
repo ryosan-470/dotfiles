@@ -57,7 +57,8 @@ This is a personal dotfiles repository for managing shell configurations, primar
 **Claude Code ツール**:
 - **Allow(自動許可)**: `Glob`, `Grep`, `Read`, `WebSearch`(読み取り専用で副作用なし)
 - **Allow(自動許可)**: `WebFetch` はドメイン指定で許可: `github.com`, `raw.githubusercontent.com`, `docs.anthropic.com`, `developer.mozilla.org`, `pkg.go.dev`
-- **Deny(常に拒否)**: `Bash(find:*)`, `Bash(grep:*)` (専用ツール `Glob`/`Grep` を使うため)、`Bash(curl:*)`, `Bash(wget:*)` (任意のネットワークリクエスト防止)
+- **Deny(常に拒否)**: `Bash(find:*)` (専用ツール `Glob` を使うため)、`Bash(curl:*)`, `Bash(wget:*)` (任意のネットワークリクエスト防止)
+- Note: `grep` は deny から除外済み。単体検索は専用ツール `Grep` を使い、パイプでの利用(`command | grep`)は都度確認で許可する方針
 
 **gh CLI**:
 - **Allow(自動許可)**: 閲覧・参照系コマンド(`view`, `list`, `status`, `diff`, `checks`, `search` など)
