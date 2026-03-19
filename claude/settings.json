@@ -85,6 +85,7 @@
       "Bash(sudo:*)"
     ]
   },
+  "model": "opusplan",
   "hooks": {
     "Notification": [
       {
@@ -108,6 +109,16 @@
         ]
       }
     ]
+  },
+  "enabledPlugins": {
+    "code-review@claude-plugins-official": true,
+    "commit-commands@claude-plugins-official": true,
+    "claude-md-management@claude-plugins-official": true,
+    "pr-review-toolkit@claude-plugins-official": true,
+    "gopls-lsp@claude-plugins-official": true,
+    "code-simplifier@claude-plugins-official": true,
+    "claude-code-setup@claude-plugins-official": true,
+    "atlassian@claude-plugins-official": true
   },
   "language": "日本語",
   "effortLevel": "high"
