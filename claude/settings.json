@@ -124,7 +124,8 @@
     "gopls-lsp@claude-plugins-official": true,
     "code-simplifier@claude-plugins-official": true,
     "claude-code-setup@claude-plugins-official": true,
-    "atlassian@claude-plugins-official": true
+    "atlassian@claude-plugins-official": true,
+    "discord@claude-plugins-official": true
   },
   "language": "日本語",
   "effortLevel": "high"
