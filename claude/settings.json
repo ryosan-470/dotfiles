@@ -91,7 +91,6 @@
       "Bash(sudo *)"
     ]
   },
-  "model": "opusplan",
   "hooks": {
     "Notification": [
       {
@@ -127,6 +126,4 @@
     "atlassian@claude-plugins-official": true,
     "discord@claude-plugins-official": true
   },
-  "language": "日本語",
-  "effortLevel": "high"
-}
+  "language": "日本語"}
