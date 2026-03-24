@@ -38,18 +38,6 @@
       "Bash(git status *)",
       "Bash(git tag *)"
     ],
-    "ask": [
-      "Bash(gh api *)",
-      "Bash(gh issue comment *)",
-      "Bash(gh pr create *)",
-      "Bash(gh pr edit *)",
-      "Bash(gh pr comment *)",
-      "Bash(gh pr review *)",
-      "Bash(git commit *)",
-      "Bash(git push *)",
-      "Bash(rm *)",
-      "Bash(mv *)"
-    ],
     "deny": [
       "Read(**/.env*)",
       "Read(~/.aws/credentials)",
@@ -89,6 +77,18 @@
       "Bash(git restore *)",
       "Bash(shutdown *)",
       "Bash(sudo *)"
+    ],
+    "ask": [
+      "Bash(gh api *)",
+      "Bash(gh issue comment *)",
+      "Bash(gh pr create *)",
+      "Bash(gh pr edit *)",
+      "Bash(gh pr comment *)",
+      "Bash(gh pr review *)",
+      "Bash(git commit *)",
+      "Bash(git push *)",
+      "Bash(rm *)",
+      "Bash(mv *)"
     ]
   },
   "hooks": {
