@@ -12,7 +12,6 @@ venv/
 ENV/
 env/
 .uv/
-uv.lock
 .pytest_cache/
 .coverage
 .coverage.*
