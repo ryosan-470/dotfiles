@@ -15,7 +15,7 @@
 	interactive = auto
 	grep = auto
 [push]
-	default = tracking
+	default = simple
 [include]
 	path = ~/.gitconfig.local
 [alias]
