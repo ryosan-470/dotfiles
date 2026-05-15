@@ -70,12 +70,6 @@
       "Bash(rm -rf *)",
       "Bash(git checkout -- . *)",
       "Bash(git clean -fd *)",
-      "Bash(git push --force *)",
-      "Bash(git push -f *)",
-      "Bash(git push origin --force *)",
-      "Bash(git push origin -f *)",
-      "Bash(git reset --hard *)",
-      "Bash(git restore *)",
       "Bash(shutdown *)",
       "Bash(sudo *)"
     ],
@@ -87,6 +81,12 @@
       "Bash(gh pr comment *)",
       "Bash(gh pr review *)",
       "Bash(git commit *)",
+      "Bash(git push --force *)",
+      "Bash(git push -f *)",
+      "Bash(git push origin --force *)",
+      "Bash(git push origin -f *)",
+      "Bash(git reset --hard *)",
+      "Bash(git restore *)",
       "Bash(git push *)",
       "Bash(rm *)",
       "Bash(mv *)"
@@ -125,15 +125,12 @@
     "gopls-lsp@claude-plugins-official": true,
     "code-simplifier@claude-plugins-official": true,
     "claude-code-setup@claude-plugins-official": true,
-    "atlassian@claude-plugins-official": true,
-    "discord@claude-plugins-official": true,
     "context7@claude-plugins-official": true,
-    "superpowers@claude-plugins-official": true,
     "typescript-lsp@claude-plugins-official": true,
     "skill-creator@claude-plugins-official": true,
-    "hookify@claude-plugins-official": true,
-    "learning-output-style@claude-plugins-official": true
+    "hookify@claude-plugins-official": true
   },
   "language": "日本語",
-  "skipAutoPermissionPrompt": true
+  "theme": "dark-ansi",
+  "teammateMode": "tmux"
 }
