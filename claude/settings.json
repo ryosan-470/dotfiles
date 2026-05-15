@@ -107,11 +107,16 @@
     ],
     "PermissionRequest": [
       {
+        "matcher": "",
         "hooks": [
           {
             "type": "command",
             "command": "if [ \"$(uname)\" = 'Darwin' ]; then osascript -e 'display notification \"Claude Code が許可を求めています\" with title \"Claude Code\"'; fi",
             "async": true
+          },
+          {
+            "type": "command",
+            "command": "if [ which ccgate >/dev/null 2>&1 ]; then ccgate claude; fi"
           }
         ]
       }
