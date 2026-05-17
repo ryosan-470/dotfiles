@@ -19,6 +19,7 @@
       "Bash(gh pr checks *)",
       "Bash(gh pr diff *)",
       "Bash(gh pr list *)",
+      "Bash(gh pr merge *)",
       "Bash(gh pr status *)",
       "Bash(gh pr view *)",
       "Bash(gh release list *)",
@@ -54,7 +55,6 @@
       "Bash(gh issue delete *)",
       "Bash(gh pr close *)",
       "Bash(gh pr delete *)",
-      "Bash(gh pr merge *)",
       "Bash(gh release delete *)",
       "Bash(gh repo archive *)",
       "Bash(gh repo create *)",
@@ -135,7 +135,25 @@
     "skill-creator@claude-plugins-official": true,
     "hookify@claude-plugins-official": true
   },
+  "extraKnownMarketplaces": {
+    "agent-toolkit-for-aws": {
+      "source": {
+        "source": "github",
+        "repo": "aws/agent-toolkit-for-aws"
+      }
+    },
+    "ryosan-470-plugins": {
+      "source": {
+        "source": "github",
+        "repo": "ryosan-470/claude-plugins"
+      }
+    }
+  },
   "language": "日本語",
+  "teammateMode": "tmux",
   "theme": "dark-ansi",
-  "teammateMode": "tmux"
+  "verbose": true,
+  "remoteControlAtStartup": true,
+  "agentPushNotifEnabled": true,
+  "skipAutoPermissionPrompt": true
 }

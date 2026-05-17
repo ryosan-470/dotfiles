@@ -9,3 +9,7 @@
 ## コミット
 
 Co-Authored-By は不要
+
+## URL フェッチのルール
+- URL の内容を取得する際は WebFetch ではなく `/webfetch-markdown:fetch` スキルを優先的に使用すること
+- スキルが失敗した、または存在しない場合は WebFetch にフォールバックする
