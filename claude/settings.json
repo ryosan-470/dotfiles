@@ -116,7 +116,7 @@
           },
           {
             "type": "command",
-            "command": "if [ which ccgate >/dev/null 2>&1 ]; then ccgate claude; fi"
+            "command": "if command -v ccgate >/dev/null 2>&1; then ccgate claude; fi"
           }
         ]
       }
