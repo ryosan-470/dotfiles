@@ -149,11 +149,18 @@
       }
     }
   },
+  "env": {
+    "CLAUDE_CODE_SIMPLE_SYSTEM_PROMPT": "1"
+  },
+  "includeCoAuthoredBy": false,
+  "includeGitInstructions": false,
+  "showClearContextOnPlanAccept": true,
   "language": "日本語",
   "teammateMode": "tmux",
   "theme": "dark-ansi",
   "verbose": true,
-  "remoteControlAtStartup": true,
   "agentPushNotifEnabled": true,
-  "skipAutoPermissionPrompt": true
+  "skipAutoPermissionPrompt": true,
+  "effortLevel": "high",
+  "model": "opusplan"
 }
