@@ -162,4 +162,8 @@
   "skipAutoPermissionPrompt": true,
   "effortLevel": "high",
   "model": "opusplan"
+  "statusLine": {
+    "type": "command",
+    "command": "sh ~/.dotconfig/dotfiles/claude/statusline-command.sh"
+  },
 }
