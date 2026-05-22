@@ -1,5 +1,10 @@
 {
   "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "env": {
+    "CLAUDE_CODE_SIMPLE_SYSTEM_PROMPT": "1"
+  },
+  "includeCoAuthoredBy": false,
+  "includeGitInstructions": false,
   "permissions": {
     "allow": [
       "Glob",
@@ -145,19 +150,15 @@
       "source": {
         "source": "github",
         "repo": "ryosan-470/claude-plugins"
-      }
+      },
+      "autoUpdate": true
     }
   },
-  "env": {
-    "CLAUDE_CODE_SIMPLE_SYSTEM_PROMPT": "1"
-  },
-  "includeCoAuthoredBy": false,
-  "includeGitInstructions": false,
-  "showClearContextOnPlanAccept": true,
   "language": "日本語",
   "teammateMode": "tmux",
   "theme": "dark-ansi",
   "verbose": true,
+  "teammateMode": "tmux",
   "agentPushNotifEnabled": true,
   "skipAutoPermissionPrompt": true,
   "effortLevel": "high",
