@@ -32,3 +32,4 @@ vendor/
 **/.claude/settings.*.json
 CLAUDE.local.json
 
+.nx/
