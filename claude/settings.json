@@ -158,9 +158,9 @@
   "agentPushNotifEnabled": true,
   "skipAutoPermissionPrompt": true,
   "effortLevel": "high",
-  "model": "opusplan",
   "statusLine": {
     "type": "command",
-    "command": "bash /Users/ryosan470/.claude/statusline.sh"
-  }
+    "command": "bash ~/.dotconfig/dotfiles/claude/statusline.sh"
+  },
+  "model": "haiku"
 }
