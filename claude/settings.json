@@ -50,7 +50,6 @@
       "Read(~/.aws/config)",
       "Read(~/.ssh/**)",
       "Bash(brew *)",
-      "Bash(curl *)",
       "Bash(wget *)",
       "Bash(gh auth *)",
       "Bash(gh gpg-key *)",
@@ -77,10 +76,13 @@
       "Bash(sudo *)"
     ],
     "ask": [
+      "Bash(curl *)",
       "Bash(gh api *)",
       "Bash(gh issue comment *)",
+      "Bash(gh issue close *)",
       "Bash(gh issue edit *)",
       "Bash(gh pr create *)",
+      "Bash(gh pr close *)",
       "Bash(gh pr edit *)",
       "Bash(gh pr comment *)",
       "Bash(gh pr merge *)",
