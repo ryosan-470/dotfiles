@@ -164,5 +164,5 @@
     "type": "command",
     "command": "bash ~/.dotconfig/dotfiles/claude/statusline.sh"
   },
-  "model": "haiku"
+  "model": "sonnet"
 }
