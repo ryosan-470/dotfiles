@@ -1,0 +1,28 @@
+# クイックターミナルの位置を上部（または中央）にし、サイズを縦横100%にする
+quick-terminal-position = "top"
+quick-terminal-size = "100%,100%"
+
+# （お好みで）背景の透過とすりガラス効果も合わせるとiTerm2風になります
+background-opacity = 0.65
+background-blur-radius = 2
+
+# ホットキー
+# keybind = global:ctrl+shift+T=toggle_quick_terminal
+keybind = global:ctrl+shift+T=toggle_visibility
+
+
+# リガチャー（合字）を有効にする（フォントが対応している場合）
+font-thicken = true
+
+# 太字や斜体を個別に指定したい場合（指定しなければfont-familyから自動で選ばれます）
+font-style = "Regular"
+font-style-bold = "Bold"
+font-style-italic = "Italic"
+
+# 1. フォントの種類（Macにインストールされているフォント名）
+font-family = "JetBrains Mono"
+
+# 2. フォントサイズ
+font-size = 16
+
+theme = Moonfly

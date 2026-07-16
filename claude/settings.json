@@ -103,26 +103,10 @@
     "defaultMode": "auto"
   },
   "hooks": {
-    "Notification": [
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "if [ \"$(uname)\" = 'Darwin' ]; then osascript -e 'display notification \"Claude Code が入力を待っています\" with title \"Claude Code\"'; fi"
-          }
-        ]
-      }
-    ],
     "PermissionRequest": [
       {
         "matcher": "",
         "hooks": [
-          {
-            "type": "command",
-            "command": "if [ \"$(uname)\" = 'Darwin' ]; then osascript -e 'display notification \"Claude Code が許可を求めています\" with title \"Claude Code\"'; fi",
-            "async": true
-          },
           {
             "type": "command",
             "command": "if command -v ccgate >/dev/null 2>&1; then ccgate claude; fi"
