@@ -9,15 +9,7 @@
   "includeGitInstructions": false,
   "permissions": {
     "allow": [
-      "Glob",
-      "Grep",
       "Read",
-      "WebFetch(domain:github.com)",
-      "WebFetch(domain:raw.githubusercontent.com)",
-      "WebFetch(domain:docs.anthropic.com)",
-      "WebFetch(domain:developer.mozilla.org)",
-      "WebFetch(domain:pkg.go.dev)",
-      "WebSearch",
       "Bash(mkdir *)",
       "Bash(ls *)",
       "Bash(gh issue list *)",
@@ -129,12 +121,11 @@
   "enabledPlugins": {
     "code-review@claude-plugins-official": true,
     "commit-commands@claude-plugins-official": true,
-    "claude-md-management@claude-plugins-official": true,
     "pr-review-toolkit@claude-plugins-official": true,
     "code-simplifier@claude-plugins-official": true,
     "context7@claude-plugins-official": true,
-    "skill-creator@claude-plugins-official": true,
-    "hookify@claude-plugins-official": true
+    "jira-create-ticket@auth-group-claude-plugins": true,
+    "ai-pr@auth-group-claude-plugins": true
   },
   "extraKnownMarketplaces": {
     "agent-toolkit-for-aws": {
