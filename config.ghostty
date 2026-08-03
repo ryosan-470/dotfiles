@@ -7,9 +7,7 @@ background-opacity = 0.65
 background-blur-radius = 2
 
 # ホットキー
-# keybind = global:ctrl+shift+T=toggle_quick_terminal
 keybind = global:ctrl+shift+T=toggle_visibility
-
 
 # リガチャー（合字）を有効にする（フォントが対応している場合）
 font-thicken = true
@@ -26,3 +24,5 @@ font-family = "JetBrains Mono"
 font-size = 16
 
 theme = Moonfly
+
+mouse-scroll-multiplier = precision:0.5,discrete:1
