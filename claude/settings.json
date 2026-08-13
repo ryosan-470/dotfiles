@@ -39,7 +39,13 @@
       "Bash(git tag *)"
     ],
     "deny": [
-      "Read(**/.env*)",
+      "Read(**/.env)",
+      "Read(**/.env.local)",
+      "Read(**/.env.*.local)",
+      "Read(**/.env.development)",
+      "Read(**/.env.production)",
+      "Read(**/.env.test)",
+      "Read(**/.envrc)",
       "Read(~/.aws/credentials)",
       "Read(~/.aws/config)",
       "Read(~/.ssh/**)",
@@ -118,6 +124,10 @@
       }
     ]
   },
+  "statusLine": {
+    "type": "command",
+    "command": "bash ~/.dotconfig/dotfiles/claude/statusline.sh"
+  },
   "enabledPlugins": {
     "code-review@claude-plugins-official": true,
     "commit-commands@claude-plugins-official": true,
@@ -125,7 +135,8 @@
     "code-simplifier@claude-plugins-official": true,
     "context7@claude-plugins-official": true,
     "jira-create-ticket@auth-group-claude-plugins": true,
-    "ai-pr@auth-group-claude-plugins": true
+    "ai-pr@auth-group-claude-plugins": true,
+    "cclens@cclens": true
   },
   "extraKnownMarketplaces": {
     "agent-toolkit-for-aws": {
@@ -140,17 +151,17 @@
         "repo": "ryosan-470/claude-plugins"
       },
       "autoUpdate": true
+    },
+    "cclens": {
+      "source": {
+        "source": "github",
+        "repo": "lambdalisue/cclens"
+      }
     }
   },
   "language": "日本語",
   "teammateMode": "tmux",
   "theme": "dark-ansi",
   "agentPushNotifEnabled": true,
-  "skipAutoPermissionPrompt": true,
-  "effortLevel": "high",
-  "statusLine": {
-    "type": "command",
-    "command": "bash ~/.dotconfig/dotfiles/claude/statusline.sh"
-  },
-  "model": "sonnet"
+  "skipAutoPermissionPrompt": true
 }
