@@ -119,6 +119,11 @@
           {
             "type": "command",
             "command": "rtk hook claude"
+          },
+          {
+            "type": "command",
+            "command": "bash ~/.dotconfig/dotfiles/claude/find-guard.sh",
+            "timeout": 5
           }
         ]
       }
@@ -163,5 +168,7 @@
   "teammateMode": "tmux",
   "theme": "dark-ansi",
   "agentPushNotifEnabled": true,
-  "skipAutoPermissionPrompt": true
+  "skipAutoPermissionPrompt": true,
+  "effortLevel": "medium",
+  "model": "sonnet[1m]"
 }
