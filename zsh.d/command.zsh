@@ -111,13 +111,9 @@ alias -s {c,cc,cpp,java}=run
 ################################################
 ## tmux自動起動
 ################################################
-if [ "$TMUX" = "" ]; then
+if [ "$TMUX" = "" ] && [ "$TERM_PROGRAM" != "Orca" ]; then
     if (($+commands[tmux])); then
-        tmux attach;
-        # detachしてない場合
-        if [ $? ]; then
-            tmux;
-        fi
+        tmux attach || tmux;
     fi
 fi
 
