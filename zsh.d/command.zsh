@@ -67,6 +67,16 @@ function ipinfo() {
     curl https://ipinfo.io/${ip}
 }
 
+# aws sso login のときだけ dualstack エンドポイントを使う
+# (testcontainers など他ツールへの影響を避けるため環境変数はグローバルに export しない)
+function aws() {
+    if [[ " $* " == *" sso "* && " $* " == *" login "* ]]; then
+        AWS_USE_DUALSTACK_ENDPOINT=true command aws "$@"
+    else
+        command aws "$@"
+    fi
+}
+
 # run.zsh
 # Usage: run test.cpp
 # Compile the source and running
