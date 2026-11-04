@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!-- launchd は ~ や $HOME を展開しないため、__HOME__ をインストール時に置換する (手順は README.md) -->
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.ryosan470.cleanup-caches</string>
+    <key>ProgramArguments</key>
+    <array>
+        <string>/bin/bash</string>
+        <string>__HOME__/.dotconfig/dotfiles/launchd/cleanup-caches.sh</string>
+    </array>
+    <!-- 毎月 1 日 12:00。スリープ中だった場合は復帰後に実行される -->
+    <key>StartCalendarInterval</key>
+    <dict>
+        <key>Day</key>
+        <integer>1</integer>
+        <key>Hour</key>
+        <integer>12</integer>
+        <key>Minute</key>
+        <integer>0</integer>
+    </dict>
+    <key>StandardOutPath</key>
+    <string>__HOME__/Library/Logs/cleanup-caches.log</string>
+    <key>StandardErrorPath</key>
+    <string>__HOME__/Library/Logs/cleanup-caches.log</string>
+    <key>LowPriorityIO</key>
+    <true/>
+    <key>Nice</key>
+    <integer>10</integer>
+</dict>
+</plist>
