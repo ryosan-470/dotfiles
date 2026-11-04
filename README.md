@@ -42,6 +42,26 @@ For example, you can set your own aliases, functions, and environment variables.
 alias ll='ls -la'
 ```
 
+## Periodic cache cleanup (macOS)
+
+`launchd/cleanup-caches.sh` cleans up regenerable development caches (go build cache, uv, Homebrew, pnpm, npm, mise, dangling docker images/build cache).
+It runs on the 1st of every month at 12:00 via launchd. Logs are written to `~/Library/Logs/cleanup-caches.log`.
+
+```bash
+# Install / update the LaunchAgent
+sed "s|__HOME__|$HOME|g" ~/.dotconfig/dotfiles/launchd/com.ryosan470.cleanup-caches.plist \
+  > ~/Library/LaunchAgents/com.ryosan470.cleanup-caches.plist
+launchctl bootout gui/$(id -u)/com.ryosan470.cleanup-caches 2>/dev/null
+launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/com.ryosan470.cleanup-caches.plist
+
+# Run it now
+launchctl kickstart gui/$(id -u)/com.ryosan470.cleanup-caches
+
+# Uninstall
+launchctl bootout gui/$(id -u)/com.ryosan470.cleanup-caches
+rm ~/Library/LaunchAgents/com.ryosan470.cleanup-caches.plist
+```
+
 ## Development
 
 ### Running Tests
