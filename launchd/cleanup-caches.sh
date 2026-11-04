@@ -32,7 +32,8 @@ run brew cleanup -s --prune=all
 run pnpm store prune
 run npm cache clean --force
 # mise prune はキャッシュではなく、どの config からも参照されていないツールのバージョンを削除する (再インストールにネットワークが必要)
-run mise prune -y
+# --quiet: 非 TTY でも進捗バーが行ごとにログへ出力されるのを抑える (エラーは出る)
+run mise prune -y --quiet
 if command -v docker >/dev/null 2>&1 && docker info >/dev/null 2>&1; then
     run docker image prune -f
     run docker builder prune -f
