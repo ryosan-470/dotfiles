@@ -120,11 +120,12 @@ calculate_memory() {
     if type vm_stat > /dev/null 2>&1; then
         local vm_stat
         vm_stat=$(vm_stat) || return 1
-        local pages_free=$(echo "$vm_stat" | awk '/Pages free/ {print $3}' | tr -d '.')
-        local pages_active=$(echo "$vm_stat" | awk '/Pages active/ {print $3}' | tr -d '.')
-        local pages_inactive=$(echo "$vm_stat" | awk '/Pages inactive/ {print $3}' | tr -d '.')
-        local pages_speculative=$(echo "$vm_stat" | awk '/Pages speculative/ {print $3}' | tr -d '.')
-        local pages_wired=$(echo "$vm_stat" | awk '/Pages wired down/ {print $4}' | tr -d '.')
+        local pages_free pages_active pages_inactive pages_speculative pages_wired
+        pages_free=$(echo "$vm_stat" | awk '/Pages free/ {print $3}' | tr -d '.')
+        pages_active=$(echo "$vm_stat" | awk '/Pages active/ {print $3}' | tr -d '.')
+        pages_inactive=$(echo "$vm_stat" | awk '/Pages inactive/ {print $3}' | tr -d '.')
+        pages_speculative=$(echo "$vm_stat" | awk '/Pages speculative/ {print $3}' | tr -d '.')
+        pages_wired=$(echo "$vm_stat" | awk '/Pages wired down/ {print $4}' | tr -d '.')
 
         local free_mem=$((($pages_free + $pages_speculative) * 4096 / 1024))
         local used_mem=$((($pages_active + $pages_inactive + $pages_wired) * 4096 / 1024))
@@ -136,7 +137,7 @@ calculate_memory() {
                 echo "Page size: 4096bytes"
                 echo "pages_free: $pages_free pages"
                 echo "pages_active: $pages_active pages"
-                echo "pages_inactive: $pages_Inactive pages"
+                echo "pages_inactive: $pages_inactive pages"
                 echo "pages_speculative: $pages_speculative pages"
                 echo "pages_wired: $pages_wired pages"
                 echo
@@ -181,13 +182,14 @@ set_up_format() {
     local format=$2
 
     local -a list
-    list=($(echo "$format" | GREP_OPTIONS= grep -o "#[^#${sigil}]*${sigil}"))
+    # shellcheck disable=SC2207
+    list=($(echo "$format" | GREP_OPTIONS="" grep -o "#[^#${sigil}]*${sigil}"))
 
     if [ -n "$DEBUG" ]; then
         {
             echo "sigil=$sigil"
             echo "format=$format"
-            echo "list=${list[@]}"
+            echo "list=${list[*]}"
         } 1>&2
     fi
 
@@ -201,7 +203,7 @@ set_up_format() {
         fi
 
         # Check scale.
-        if [ $(echo "$scale" | sed 's/.*\.//') -ge $MAX_SCALE ]; then
+        if [ "$(echo "$scale" | sed 's/.*\.//')" -ge $MAX_SCALE ]; then
             echo "Error: Illegal scale: $item" 1>&2
             echo "Specify the value less than ${MAX_SCALE}." 1>&2
             exit 1
