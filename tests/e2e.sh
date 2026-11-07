@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# E2E テスト: chezmoi apply 後に、配置された設定が実際にツールから読み込めるかを検証する (#85)
+# E2E テスト: chezmoi apply 後に、配置された設定が実際にツールから読み込めるかを検証する
 #
 # 使い方: tests/e2e.sh <テスト名>...   (引数なしで全テスト)
 #   前提: `chezmoi init --apply` 済みの $HOME で実行する (CI の test.yml を参照)。
