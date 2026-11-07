@@ -36,6 +36,8 @@ jobs:
           test ! -e "$HOME/.claude/settings.base.json"
           jq empty "$HOME/.claude/settings.json"
           chezmoi verify
+      - name: Test modify_settings.json.tmpl merge logic
+        run: tests/modify_settings.sh
       - name: Install zsh
         if: runner.os == 'Linux'
         run: sudo apt-get update && sudo apt-get install -y zsh
