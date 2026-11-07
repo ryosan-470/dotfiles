@@ -113,3 +113,31 @@ jobs:
           pipx run check-jsonschema==0.33.3 \
             --schemafile https://json.schemastore.org/claude-code-settings.json \
             home/dot_claude/settings.base.json .claude/settings.json
+
+  e2e:
+    needs: apply
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v7.0.1
+        with:
+          fetch-depth: 1
+      - name: Install chezmoi
+        run: |
+          sh -c "$(curl -fsLS get.chezmoi.io)" -- -b "$HOME/.local/bin" -t v2.74.0
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+      - name: Install zsh / tmux (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends zsh tmux
+      - name: Install tmux (macOS)
+        if: runner.os == 'macOS'
+        run: command -v tmux >/dev/null || brew install tmux
+      - name: chezmoi init --apply
+        run: chezmoi init --apply --no-tty --promptDefaults --source "$GITHUB_WORKSPACE"
+      - name: E2E テスト (配置後にツールを実際に起動して検証)
+        run: tests/e2e.sh
