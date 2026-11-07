@@ -2,7 +2,7 @@
 case `uname` in
     "Darwin")
         if (($+commands[brew])); then
-            alias update="brew update -v && brew upgrade -v"
+            alias update="brew update -v && brew upgrade -vy"
         fi
         ;;
     "Linux")
