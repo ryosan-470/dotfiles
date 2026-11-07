@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# Claude Statusline v8 — managed by Claude Statusline VS Code extension
-# Do not edit manually; it will be overwritten on next activation.
+# Claude Statusline v8
+# dotfiles (chezmoi) で管理。編集は home/dot_claude/executable_statusline.sh に対して行う。
 payload=$(cat)
 
 reset='\033[0m'; bold='\033[1m'; dim='\033[2m'

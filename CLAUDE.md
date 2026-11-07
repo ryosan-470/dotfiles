@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Repository Overview
 
-This is a personal dotfiles repository for managing shell configurations, primarily for zsh, tmux, vim, and Claude Code on macOS and Linux systems. It is managed by [chezmoi](https://www.chezmoi.io/): files under `home/` (see `.chezmoiroot`) are copied to the home directory by `chezmoi apply`. The ghq clone (`~/code/src/github.com/ryosan-470/dotfiles`) itself is the chezmoi source directory.
+This is a personal dotfiles repository for managing shell configurations, primarily for zsh, tmux, and Claude Code on macOS and Linux systems. It is managed by [chezmoi](https://www.chezmoi.io/): files under `home/` (see `.chezmoiroot`) are copied to the home directory by `chezmoi apply`. The ghq clone (`~/code/src/github.com/ryosan-470/dotfiles`) itself is the chezmoi source directory.
 
 ## Common Commands
 
@@ -112,8 +112,8 @@ This is a personal dotfiles repository for managing shell configurations, primar
 
 ## Dependencies
 
-Required commands: chezmoi, tmux, zsh, vim, git, jq
-Optional: peco, ghq, resolveip
+Required commands: chezmoi, tmux, zsh, git, jq
+Optional: peco, ghq, resolveip, rtk (`~/.claude/CLAUDE.md` の `@RTK.md` と `rtk hook claude` hook の前提。`RTK.md` は rtk が生成する `~/.claude/RTK.md` で chezmoi 管理外。`rtk init -g` で用意する)
 
 ## Claude Interactions
 

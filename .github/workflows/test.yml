@@ -21,8 +21,8 @@ jobs:
       - name: Verify deployed files
         run: |
           set -eu
-          for f in .zshrc .zshenv .gitconfig .tmux.conf .vimrc \
-                   .config/zsh/command.zsh .config/zsh/zimrc .config/vim/dein.toml \
+          for f in .zshrc .zshenv .gitconfig .tmux.conf \
+                   .config/zsh/command.zsh .config/zsh/zimrc \
                    .config/git/commit_template.txt \
                    .claude/CLAUDE.md .claude/settings.json .claude/statusline.sh .claude/hooks/find-guard.sh \
                    .tmux/plugins/tpm/tpm; do

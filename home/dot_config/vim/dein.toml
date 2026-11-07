@@ -1,5 +1,0 @@
-[[plugins]]
-repo = 'Shougo/dein.vim'
-repo = 'vim-scripts/nginx.vim' # Nginx用
-repo = 'cespare/vim-toml'
-repo = 'vim-airline/vim-airline'

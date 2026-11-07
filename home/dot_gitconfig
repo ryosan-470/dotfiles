@@ -7,6 +7,7 @@
 	signingkey = 60C13C7737C6E4D0707828B19E53E96EAD309F72
 [commit]
 	gpgsign = true
+	template = ~/.config/git/commit_template.txt
 [color]
 	ui = auto
 	status  = auto
@@ -37,11 +38,9 @@
 	hash = rev-parse HEAD
 	p = !git push origin `git rev-parse --abbrev-ref HEAD`
 	pf = !git push origin `git rev-parse --abbrev-ref HEAD` --force-with-lease
-	delete-merged-branch = !git branch --merged | grep -v \\* | grep -v master | xargs -I % git branch -d %
+	delete-merged-branch = !git branch --merged | grep -vE '^[*+]|^[[:space:]]*(main|master|develop|trunk|release)$' | xargs -I % git branch -d %
 	# blameしてそのコミットが含まれるPR番号を教えてくれます
 	ag = "!git ls-files | xargs ag --pager=\"less -F -R\" --nogroup --color-match=0\\;31 --color-path=0\\;0 --no-numbers"
-[commit]
-	template = ~/.config/git/commit_template.txt
 [grep]
 	lineNumber = true
 [pager]

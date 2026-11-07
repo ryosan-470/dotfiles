@@ -142,6 +142,7 @@ claude/settings.json    # ~/.claude/settings.json にマージされる
 - 「常に許可」で増えた権限はローカルにだけ残る。全マシンで使いたいものは `settings.base.json` にも追記する
 - **`settings.base.json` から削除した権限や hook は、既存マシンからは消えない**。消したい場合は各マシンの `~/.claude/settings.json` からも手で削除する
 - マージには `jq` が必要 (macOS は標準で入っている)。無い場合は既存のファイルをそのまま残す
+- `~/.claude/CLAUDE.md` が参照する `@RTK.md` は chezmoi 管理外。rtk (`rtk init -g`) が生成する `~/.claude/RTK.md` で、無くても `@` 参照が無視されるだけで害はない。hook (`rtk hook claude`) も rtk 本体が前提
 
 ## 新しいマシンのセットアップ
 
