@@ -43,3 +43,13 @@ shopt -s globstar
 [[ -f ~/.local.bash ]] && . ~/.local.bash
 
 [[ "$TERM_PROGRAM" == "vscode" ]] && . "$(code --locate-shell-integration-path bash)"
+{{- if stat (joinPath .chezmoi.homeDir ".dory" "bin") }}
+{{- /* dory が起動時に追記するブロックと同一内容にしておく (違うと dory が再追記して chezmoi と差分になる) */}}
+# >>> dory cli >>>
+DORY_CLI_BIN="{{ .chezmoi.homeDir }}/.dory/bin"
+case ":$PATH:" in
+  *":$DORY_CLI_BIN:"*) ;;
+  *) export PATH="$DORY_CLI_BIN:$PATH" ;;
+esac
+# <<< dory cli <<<
+{{- end }}

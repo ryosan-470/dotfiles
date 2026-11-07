@@ -16,8 +16,6 @@
 	grep = auto
 [push]
 	default = simple
-[include]
-	path = ~/.gitconfig.local
 [alias]
 	b = branch -a
 	branches = branch -a # ブランチの一覧
@@ -43,7 +41,7 @@
 	# blameしてそのコミットが含まれるPR番号を教えてくれます
 	ag = "!git ls-files | xargs ag --pager=\"less -F -R\" --nogroup --color-match=0\\;31 --color-path=0\\;0 --no-numbers"
 [commit]
-	template = ~/.dotconfig/dotfiles/.git_commit_template.txt
+	template = ~/.config/git/commit_template.txt
 [grep]
 	lineNumber = true
 [pager]
@@ -62,4 +60,11 @@
 	prune = true
 [credential]
 	helper = /usr/local/share/gcm-core/git-credential-manager
+
+# 仕事用レイヤー → マシン固有の設定の順に読み込む (後勝ち。ファイルが無ければ無視される)
+# 仕事用 gitconfig 側で includeIf "gitdir:~/code/src/github.com/<社のorg>/" を使うと
+# 社用 PC 上でも私用リポジトリは私用の email/署名のままにできる
+[include]
+	path = ~/.config/work/gitconfig
+	path = ~/.gitconfig.local
 

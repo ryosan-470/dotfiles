@@ -1,0 +1,8 @@
+# modify_settings.json のマージ元。直接は配置しない
+.claude/settings.base.json
+
+{{ if ne .chezmoi.os "darwin" }}
+# macOS 専用
+Library
+.local/bin/cleanup-caches.sh
+{{ end }}

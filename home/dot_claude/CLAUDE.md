@@ -18,3 +18,4 @@
 
 @RTK.md
 @CLAUDE.local.md
+@~/.config/work/claude/CLAUDE.md

@@ -1,0 +1,15 @@
+{{ if eq .chezmoi.os "darwin" -}}
+#!/bin/bash
+# LaunchAgent の plist が変わったときだけ再ロードする (chezmoi apply の後に実行)
+# plist hash: {{ include "private_Library/private_LaunchAgents/com.ryosan470.cleanup-caches.plist.tmpl" | sha256sum }}
+set -eu
+
+# CI (GitHub Actions) には GUI セッションが無く bootstrap できないのでスキップ
+[ -n "${CI:-}" ] && exit 0
+
+label=com.ryosan470.cleanup-caches
+domain="gui/$(id -u)"
+launchctl bootout "$domain/$label" 2>/dev/null || true
+launchctl bootstrap "$domain" "$HOME/Library/LaunchAgents/$label.plist"
+echo "loaded $label"
+{{ end -}}

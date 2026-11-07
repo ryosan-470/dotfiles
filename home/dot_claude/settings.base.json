@@ -122,7 +122,7 @@
           },
           {
             "type": "command",
-            "command": "bash ~/.dotconfig/dotfiles/claude/find-guard.sh",
+            "command": "bash ~/.claude/hooks/find-guard.sh",
             "timeout": 5
           }
         ]
@@ -131,7 +131,7 @@
   },
   "statusLine": {
     "type": "command",
-    "command": "bash ~/.dotconfig/dotfiles/claude/statusline.sh"
+    "command": "bash ~/.claude/statusline.sh"
   },
   "enabledPlugins": {
     "code-review@claude-plugins-official": true,

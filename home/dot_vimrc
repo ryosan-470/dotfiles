@@ -12,7 +12,7 @@ if &runtimepath !~# '/dein.vim'
   execute 'set runtimepath^=' . fnamemodify(s:dein_repo_dir, ':p')
 endif
 " 設定のファイルを保存しているディレクトリ
-let g:rc_dir = expand("~/.dotconfig/dotfiles/vim.d")
+let g:rc_dir = expand("~/.config/vim")
 " 設定開始
 " if dein#load_state(s:dein_dir)
   call dein#begin(s:dein_dir)

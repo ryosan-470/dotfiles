@@ -49,14 +49,14 @@ function dot() {
 The dot command is a controller my dotfiles based on CLI
 There are common dot commands used in various situations:
 
-update         Update your dotfiles from GitHub (e.g git fetch origin master)
+update         Update your dotfiles from GitHub and apply them (chezmoi update)
+diff           Show changes chezmoi would apply (chezmoi diff)
 help           Print this message
 DOT
 )
     case $1 in
-        update) cd ~/.dotconfig/dotfiles > /dev/null;
-                git pull origin master;
-                cd $ret > /dev/null;;
+        update) chezmoi update;;
+        diff) chezmoi diff;;
         *) echo $help_message;;
     esac
 }

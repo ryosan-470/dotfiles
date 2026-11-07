@@ -1,0 +1,28 @@
+ZSHD_PATH=$HOME/.config/zsh
+
+# Zimの初期化前にfpathを設定し、補完システムを初期化
+source ${ZSHD_PATH}/completion.zsh
+source ${ZSHD_PATH}/zim.zsh
+source ${ZSHD_PATH}/os.zsh
+source ${ZSHD_PATH}/command.zsh
+source ${ZSHD_PATH}/config.zsh
+source ${ZSHD_PATH}/alias.zsh
+
+# 仕事用レイヤー (chezmoi の workRepo から ~/.config/work に clone される。無ければ何もしない)
+for f in ~/.config/work/zsh/*.zsh(N); do
+    source $f
+done
+unset f
+
+# マシン固有の設定 (リポジトリ管理外)。最後に読み込むので上書きできる
+[[ -f ~/.local.zsh ]] && source ~/.local.zsh
+{{- if stat (joinPath .chezmoi.homeDir ".dory" "bin") }}
+{{- /* dory が起動時に追記するブロックと同一内容にしておく (違うと dory が再追記して chezmoi と差分になる) */}}
+# >>> dory cli >>>
+DORY_CLI_BIN="{{ .chezmoi.homeDir }}/.dory/bin"
+case ":$PATH:" in
+  *":$DORY_CLI_BIN:"*) ;;
+  *) export PATH="$DORY_CLI_BIN:$PATH" ;;
+esac
+# <<< dory cli <<<
+{{- end }}

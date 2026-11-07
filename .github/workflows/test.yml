@@ -2,56 +2,38 @@ name: test
 on: push
 
 jobs:
-  lint:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v7
-        with:
-          fetch-depth: 1
-      - name: Install uv
-        uses: astral-sh/setup-uv@v7
-        with:
-          enable-cache: true
-          cache-dependency-glob: "pyproject.toml"
-      - name: Set up Python 3.10
-        run: uv python install 3.10
-      - name: Install dependencies
-        run: uv sync --dev
-      - name: display python version
-        run: uv run python -c "import sys; print(sys.version)"
-      - name: run ruff linter
-        run: uv run ruff check .
-      - name: run ruff formatter check
-        run: uv run ruff format --check .
-
-  unit-test:
+  apply:
     strategy:
+      fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-latest]
-        python-version: ["3.10", "3.11", "3.12", "3.13", "3.14"]
     runs-on: ${{ matrix.os }}
-    needs: lint
     steps:
       - uses: actions/checkout@v7
         with:
           fetch-depth: 1
-      - name: Install uv
-        uses: astral-sh/setup-uv@v7
-        with:
-          enable-cache: true
-          cache-dependency-glob: "pyproject.toml"
-      - name: Set up Python ${{ matrix.python-version }}
-        run: uv python install ${{ matrix.python-version }}
-      - name: Install dependencies
-        run: uv sync --dev
-      - name: display python version
-        run: uv run python -c "import sys; print(sys.version)"
-      - name: run unit tests with pytest
-        run: uv run pytest tests/ -v --cov=install --cov-report=term-missing
-      - name: execute integration test
+      - name: Install chezmoi
         run: |
-          uv run python install.py download
-          uv run python install.py deploy
-          uv run python install.py init
-          uv run python install.py test
-          uv run python install.py clean
+          sh -c "$(curl -fsLS get.chezmoi.io)" -- -b "$HOME/.local/bin"
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+      - name: "chezmoi init --apply (私用マシン相当: workRepo は空)"
+        run: chezmoi init --apply --no-tty --promptDefaults --source "$GITHUB_WORKSPACE"
+      - name: Verify deployed files
+        run: |
+          set -eu
+          for f in .zshrc .zshenv .gitconfig .tmux.conf .vimrc \
+                   .config/zsh/command.zsh .config/zsh/zimrc .config/vim/dein.toml \
+                   .config/git/commit_template.txt \
+                   .claude/CLAUDE.md .claude/settings.json .claude/statusline.sh .claude/hooks/find-guard.sh \
+                   .tmux/plugins/tpm/tpm; do
+            test -e "$HOME/$f" || { echo "missing: $f"; exit 1; }
+          done
+          test ! -e "$HOME/.claude/settings.base.json"
+          jq empty "$HOME/.claude/settings.json"
+          chezmoi verify
+      - name: Syntax check zsh files
+        if: runner.os == 'macOS'
+        run: |
+          for f in "$HOME"/.zshrc "$HOME"/.zshenv "$HOME"/.config/zsh/*.zsh; do
+            zsh -n "$f"
+          done

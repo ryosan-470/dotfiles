@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<!-- launchd は ~ や $HOME を展開しないため、__HOME__ をインストール時に置換する (手順は README.md) -->
+<!-- launchd は ~ や $HOME を展開しないため、chezmoi のテンプレートで絶対パスに展開する -->
 <plist version="1.0">
 <dict>
     <key>Label</key>
@@ -8,7 +8,7 @@
     <key>ProgramArguments</key>
     <array>
         <string>/bin/bash</string>
-        <string>__HOME__/.dotconfig/dotfiles/launchd/cleanup-caches.sh</string>
+        <string>{{ .chezmoi.homeDir }}/.local/bin/cleanup-caches.sh</string>
     </array>
     <!-- 毎月 1 日 12:00。スリープ中だった場合は復帰後に実行される -->
     <key>StartCalendarInterval</key>
@@ -21,9 +21,9 @@
         <integer>0</integer>
     </dict>
     <key>StandardOutPath</key>
-    <string>__HOME__/Library/Logs/cleanup-caches.log</string>
+    <string>{{ .chezmoi.homeDir }}/Library/Logs/cleanup-caches.log</string>
     <key>StandardErrorPath</key>
-    <string>__HOME__/Library/Logs/cleanup-caches.log</string>
+    <string>{{ .chezmoi.homeDir }}/Library/Logs/cleanup-caches.log</string>
     <key>LowPriorityIO</key>
     <true/>
     <key>Nice</key>

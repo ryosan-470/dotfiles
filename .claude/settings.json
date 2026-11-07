@@ -1,30 +1,19 @@
 {
   "permissions": {
     "allow": [
-      "Bash(find:*)",
-      "Bash(mkdir:*)",
-      "Bash(uv run pytest:*)",
-      "Bash(python:*)",
-      "Bash(uv run:*)",
-      "Bash(uv sync:*)",
-      "Bash(command -v:*)",
-      "Bash(gh pr checks:*)",
-      "Bash(gh run view:*)"
+      "Bash(find *)",
+      "Bash(mkdir *)",
+      "Bash(command -v *)",
+      "Bash(gh pr checks *)",
+      "Bash(gh run view *)",
+      "Bash(chezmoi diff *)",
+      "Bash(chezmoi status *)",
+      "Bash(chezmoi verify *)",
+      "Bash(chezmoi doctor *)",
+      "Bash(chezmoi managed *)",
+      "Bash(chezmoi cat *)",
+      "Bash(chezmoi execute-template *)"
     ],
     "deny": []
-  },
-  "hooks": {
-    "PostToolUse": [
-      {
-        "matcher": "Edit|Write",
-        "hooks": [
-          {
-            "type": "command",
-            "command": ".claude/hooks/python-post-edit.sh",
-            "timeout": 60
-          }
-        ]
-      }
-    ]
   }
 }
