@@ -1,5 +1,4 @@
 .tmux.conf.osx
-vim.d/bundle/.tmux/plugins
 
 # Python and uv
 __pycache__/
