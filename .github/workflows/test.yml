@@ -1,5 +1,10 @@
 name: test
-on: push
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
 
 jobs:
   apply:
@@ -9,12 +14,12 @@ jobs:
         os: [ubuntu-latest, macos-latest]
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 1
       - name: Install chezmoi
         run: |
-          sh -c "$(curl -fsLS get.chezmoi.io)" -- -b "$HOME/.local/bin"
+          sh -c "$(curl -fsLS get.chezmoi.io)" -- -b "$HOME/.local/bin" -t v2.74.0
           echo "$HOME/.local/bin" >> "$GITHUB_PATH"
       - name: "chezmoi init --apply (私用マシン相当: workRepo は空)"
         run: chezmoi init --apply --no-tty --promptDefaults --source "$GITHUB_WORKSPACE"
