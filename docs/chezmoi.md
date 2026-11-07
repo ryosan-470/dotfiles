@@ -122,12 +122,6 @@ claude/settings.json    # ~/.claude/settings.json にマージされる
     path = ~/.config/work/gitconfig-org
 ```
 
-### コミット署名 (`dot_gitconfig.tmpl`)
-
-`commit.gpgsign = true` は、署名鍵の秘密鍵がそのマシンの gpg にある場合だけ出力される。
-鍵が無い新規マシンでもコミットが失敗しない。鍵を import した後は `chezmoi apply` を再実行すると署名が有効になる。
-署名鍵の UID には私用・社用のアドレスを含めているため、鍵は私用/社用で分けずに 1 本を共用する。
-
 ## Claude Code の settings.json
 
 `~/.claude/settings.json` は Claude Code (「常に許可」) や Orca (hooks の注入) が自分で書き換えるため、
