@@ -1,0 +1,13 @@
+[".tmux/plugins/tpm"]
+    type = "git-repo"
+    url = "https://github.com/tmux-plugins/tpm.git"
+    refreshPeriod = "168h"
+
+{{ if .workRepo -}}
+# 仕事用レイヤー: 勤務先ごとの private リポジトリ (シークレットはコミットしない)
+# 公開リポジトリには URL を含めず、chezmoi init 時の入力値 (ローカルの chezmoi.toml) からのみ参照する
+[".config/work"]
+    type = "git-repo"
+    url = {{ .workRepo | quote }}
+    refreshPeriod = "24h"
+{{- end }}

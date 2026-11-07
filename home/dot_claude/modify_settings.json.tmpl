@@ -1,0 +1,41 @@
+#!/bin/bash
+# ~/.claude/settings.json を生成する chezmoi modify スクリプト
+#
+# Claude Code は「常に許可」などで settings.json を自分で書き換える (シンボリックリンクも実ファイルに置き換わる)。
+# そのため単純なコピー/リンクではなく、以下の 3 層をマージして出力する:
+#   1. 現在のファイル (stdin)          ... Claude Code がローカルで追加した設定
+#   2. settings.base.json (リポジトリ) ... 共通設定。同じキーは 1 を上書きする
+#   3. ~/.config/work/claude/settings.json (あれば) ... 仕事用設定。同じキーは 2 を上書きする
+# permissions の allow/ask/deny/additionalDirectories は 3 層の和集合、
+# hooks はイベントごとに 2 と 3 を連結する (ローカルの hooks はリポジトリ側で置き換える)。
+set -euo pipefail
+
+base={{ joinPath .chezmoi.sourceDir "dot_claude" "settings.base.json" | quote }}
+work="$HOME/.config/work/claude/settings.json"
+
+current=$(cat)
+[ -n "$current" ] || current='{}'
+[ -f "$work" ] || work=/dev/null
+
+if ! command -v jq >/dev/null 2>&1; then
+    cat "$base"
+    exit 0
+fi
+
+jq -n \
+    --argjson cur "$current" \
+    --slurpfile base "$base" \
+    --slurpfile work "$work" '
+def dedupe: reduce .[] as $x ([]; if any(.[]; . == $x) then . else . + [$x] end);
+
+$base[0] as $b
+| ($work[0] // {}) as $w
+| ($cur * $b * $w)
+| reduce ("allow", "ask", "deny", "additionalDirectories") as $k (.;
+    ([$cur, $b, $w] | map(.permissions[$k] // []) | add | dedupe) as $v
+    | if ($v | length) > 0 then .permissions[$k] = $v else . end)
+| if ($b.hooks // $w.hooks) != null then
+    .hooks = (($b.hooks // {}) as $bh | ($w.hooks // {}) as $wh
+      | reduce (($bh + $wh) | keys[]) as $e ({}; .[$e] = (($bh[$e] // []) + ($wh[$e] // []))))
+  else . end
+'

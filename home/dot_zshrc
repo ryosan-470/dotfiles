@@ -1,0 +1,18 @@
+ZSHD_PATH=$HOME/.config/zsh
+
+# Zimの初期化前にfpathを設定し、補完システムを初期化
+source ${ZSHD_PATH}/completion.zsh
+source ${ZSHD_PATH}/zim.zsh
+source ${ZSHD_PATH}/os.zsh
+source ${ZSHD_PATH}/command.zsh
+source ${ZSHD_PATH}/config.zsh
+source ${ZSHD_PATH}/alias.zsh
+
+# 仕事用レイヤー (chezmoi の workRepo から ~/.config/work に clone される。無ければ何もしない)
+for f in ~/.config/work/zsh/*.zsh(N); do
+    source $f
+done
+unset f
+
+# マシン固有の設定 (リポジトリ管理外)。最後に読み込むので上書きできる
+[[ -f ~/.local.zsh ]] && source ~/.local.zsh

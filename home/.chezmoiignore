@@ -1,0 +1,2 @@
+# modify_settings.json のマージ元。直接は配置しない
+.claude/settings.base.json

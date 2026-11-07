@@ -4,34 +4,39 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Repository Overview
 
-This is a personal dotfiles repository for managing shell configurations, primarily for zsh, tmux, vim, and Karabiner on macOS and Linux systems. The repository follows a symlink-based deployment strategy where configuration files are linked from `~/.dotconfig/dotfiles` to the home directory.
+This is a personal dotfiles repository for managing shell configurations, primarily for zsh, tmux, vim, and Claude Code on macOS and Linux systems. It is managed by [chezmoi](https://www.chezmoi.io/): files under `home/` (see `.chezmoiroot`) are copied to the home directory by `chezmoi apply`. The ghq clone (`~/code/src/github.com/ryosan-470/dotfiles`) itself is the chezmoi source directory.
 
 ## Common Commands
 
 ### Installation and Setup
-- `curl -L https://raw.githubusercontent.com/ryosan-470/dotfiles/master/install.py | python` - Initial installation
-- `python install.py all` - Download, deploy and initialize dotfiles
-- `python install.py deploy` - Create symlinks to home directory
-- `python install.py init` - Run initialization scripts
-- `python install.py test` - Test that all symlinks exist
-- `python install.py clean` - Remove all symlinks
+- `sh -c "$(curl -fsLS get.chezmoi.io)" -- init --apply --source ~/code/src/github.com/ryosan-470/dotfiles ryosan-470` - Initial installation
+- `chezmoi diff` - Show what `apply` would change
+- `chezmoi apply` - Apply the repository to the home directory
+- `chezmoi update` - git pull + apply
 
 ### Daily Usage
-- `dot` - Show help for dotfiles management
-- `dot update` - Update dotfiles from GitHub (git pull origin master)
+- `dot update` / `dot diff` - Wrappers for `chezmoi update` / `chezmoi diff`
 - `s` - Reload zsh configuration (source ~/.zshrc)
+
+### Editing rules
+- Edit files under `home/` in this repository, then run `chezmoi apply`. Do not edit the deployed files in `~` directly.
+- chezmoi naming: `dot_` = leading `.`, `executable_` = +x, `modify_` = script that rewrites the target, `.tmpl` = Go template.
 
 ## Architecture
 
+### Layers (later wins)
+1. Common: this public repository (`home/`)
+2. Work: `~/.config/work/`, a private repo per employer cloned by `home/.chezmoiexternal.toml.tmpl` when `workRepo` is set at `chezmoi init`. Never put employer names or the repo URL into this public repository.
+3. Machine local (unmanaged): `~/.local.zsh`, `~/.gitconfig.local`, `~/.tmux.local.conf`, `~/.claude/CLAUDE.local.md`
+
 ### Core Components
 
-**Installation System** (`install.py`):
-- Python-based installer that handles cloning, symlinking, and initialization
-- Supports macOS and Linux platforms
-- Creates symlinks for all dotfiles except excluded ones (.git, .github, etc.)
-- Location: Repository clones to `~/.dotconfig/dotfiles`
+**chezmoi configuration** (`home/`):
+- `.chezmoi.toml.tmpl` - Prompts `workRepo` on init and sets `sourceDir` to the repo root
+- `.chezmoiexternal.toml.tmpl` - Clones tpm and the work repository
+- `.chezmoiignore` - Files that exist in the source but are not deployed
 
-**Shell Configuration** (`zsh.d/`):
+**Shell Configuration** (`home/dot_config/zsh/` → `~/.config/zsh/`):
 - Modular zsh configuration split into logical files:
   - `alias.zsh` - Custom aliases (g=git, t=tmux, p=python3, etc.)
   - `command.zsh` - Custom functions including `dot()`, `extract()`, file utilities
@@ -41,18 +46,19 @@ This is a personal dotfiles repository for managing shell configurations, primar
   - `zim.zsh` - Zim framework integration
 
 **Dependency Management**:
-- Uses Zim framework for zsh (`zimrc` configuration)
-- Uses TPM (Tmux Plugin Manager) for tmux plugins
-- Initialization scripts in `init/` directory handle setup
+- Uses Zim framework for zsh (`home/dot_config/zsh/zimrc`)
+- Uses TPM (Tmux Plugin Manager) for tmux plugins (tpm itself is cloned by chezmoi external)
 
-**Claude Code Configuration** (`claude/`):
-- `claude/settings.json` - Claude Code global settings template, symlinked to `~/.claude/settings.json`
-- `claude/CLAUDE.md` - Claude Code グローバル CLAUDE.md, symlinked to `~/.claude/CLAUDE.md`
-- Note: `.claude/settings.local.json` is a separate project-level Claude Code config (permissions for this repo)
+**Claude Code Configuration** (`home/dot_claude/` → `~/.claude/`):
+- `settings.base.json` - Claude Code global settings (not deployed directly)
+- `modify_settings.json.tmpl` - Generates `~/.claude/settings.json` by merging the current file (Claude Code's own changes), `settings.base.json`, and `~/.config/work/claude/settings.json`. Permissions are unioned, hooks are owned by base + work. Requires `jq`.
+- `CLAUDE.md` - Claude Code グローバル CLAUDE.md
+- `hooks/find-guard.sh`, `statusline.sh` - Referenced from settings as `~/.claude/...`
+- Note: `.claude/settings.json` at the repo root is a separate project-level Claude Code config (permissions for this repo)
 
 ### 権限ポリシー(settings.json)
 
-`claude/settings.json` の `permissions` でコマンドの許可/不許可を管理している。方針は以下の通り：
+`home/dot_claude/settings.base.json` の `permissions` でコマンドの許可/不許可を管理している。方針は以下の通り：
 
 **Claude Code ツール**:
 - **Allow(自動許可)**: `Glob`, `Grep`, `Read`, `WebSearch`(読み取り専用で副作用なし)
@@ -84,14 +90,11 @@ This is a personal dotfiles repository for managing shell configurations, primar
 
 **構文**: 全ルールで非推奨の `:*` サフィックスを廃止し、スペース + `*` 構文に統一
 
-**Customization System**:
-- `~/.local.zsh` - User-specific zsh customizations
-- `~/.gitconfig.local` - User-specific git configuration
-- Files are created automatically during initialization
+**Customization System**: See "Layers" above. Machine-local files are optional and are not created automatically.
 
 ### Key Features
 
-**Auto-tmux**: Automatically starts/attaches to tmux sessions when opening terminal (configured in `zsh.d/command.zsh:114-121`)
+**Auto-tmux**: Automatically starts/attaches to tmux sessions when opening terminal (configured in `home/dot_config/zsh/command.zsh`)
 
 **Archive Extraction**: Universal `extract()` function with file association aliases for common archive formats
 
@@ -102,10 +105,8 @@ This is a personal dotfiles repository for managing shell configurations, primar
 
 ## Dependencies
 
-Required commands: tmux, zsh, vim, git
+Required commands: chezmoi, tmux, zsh, vim, git, jq
 Optional: peco, ghq, resolveip
-
-The installer validates these dependencies before proceeding.
 
 ## Claude Interactions
 
