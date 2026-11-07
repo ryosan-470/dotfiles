@@ -1,9 +1,8 @@
 # dotfiles が前提にするツール。macOS で `chezmoi apply` 時に brew bundle で入る
 # (run_onchange_after_brew-bundle.sh.tmpl)。仕事用は ~/.config/work/Brewfile に書く。
-# 言語ランタイムは mise で管理するのでここに書かない。
+# 言語ランタイムと ccgate は mise で管理するのでここに書かない。
 
 tap "augani/dory"
-tap "tak848/tap"
 tap "stablyai/orca"
 
 # シェル / ターミナル
@@ -38,10 +37,9 @@ brew "gnupg"
 brew "chezmoi"
 brew "mise"
 
-# Claude Code と、その hooks から呼ばれるツール
+# Claude Code と、その hooks から呼ばれるツール (ccgate は mise で管理)
 cask "claude-code@latest"
 brew "rtk"
-brew "tak848/tap/ccgate"
 
 # 1Password
 cask "1password"
