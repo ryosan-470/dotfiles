@@ -56,7 +56,7 @@ home/dot_config/zsh/alias.zsh  →  ~/.config/zsh/alias.zsh
 | 内容が変わったときだけコマンドを実行したい | `home/.chezmoiscripts/run_onchange_after_<名前>.sh.tmpl` を作る (後述) |
 | 外部のツール / リポジトリを置きたい | `home/.chezmoiexternal.toml.tmpl` に追記する。サプライチェーン対策として、ブランチ先頭 (`git-repo`) ではなくタグ固定の `archive` / `file` + `checksum.sha256` で取り込む (tpm / zimfw と同じ書き方。checksum は 0 埋めで apply して出る SHA256 mismatch の値を使う) |
 | Claude Code の設定を変える | `home/dot_claude/settings.base.json` を編集する (後述) |
-| CLI / GUI アプリを追加したい (macOS) | リポジトリ直下の `Brewfile` に `brew "foo"` / `cask "foo"` を追記する。次の `chezmoi apply` で `brew bundle` が走る。仕事用は `~/.config/work/Brewfile` (mise で管理するランタイムや ccgate は書かない) |
+| CLI / GUI アプリを追加したい (macOS) | リポジトリ直下の `Brewfile` に `brew "foo"` / `cask "foo"` を追記する。次の `chezmoi apply` で `brew bundle` が走る。仕事用は `~/.config/work/Brewfile` (mise で管理する言語ランタイムは書かない) |
 | macOS の LaunchAgent を追加したい | `home/private_Library/private_LaunchAgents/` に plist を置き、`run_onchange` スクリプトで再ロードする (既存の cleanup-caches を参照) |
 
 ### テンプレートでよく使う値
