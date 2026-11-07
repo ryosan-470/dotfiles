@@ -14,9 +14,15 @@ if [[ -d "/Applications/Visual Studio Code.app/Contents/Resources/app/bin" ]]; t
     export PATH="/Applications/Visual Studio Code.app/Contents/Resources/app/bin:$PATH"
 fi
 export ZIM_CONFIG_FILE=$HOME/.config/zsh/zimrc
-if (($+commands[brew])); then
-    eval "$(/opt/homebrew/bin/brew shellenv)"
-fi
+# brew は PATH に入る前に評価されるため、既知のインストール先を順に探す
+# (Apple Silicon / Intel Mac / Linuxbrew)
+for _brew in /opt/homebrew/bin/brew /usr/local/bin/brew /home/linuxbrew/.linuxbrew/bin/brew; do
+    if [[ -x $_brew ]]; then
+        eval "$($_brew shellenv)"
+        break
+    fi
+done
+unset _brew
 ################################################################################
 ## Qiita: tmuxのウィンドウ名をsshでつないでいるときは接続先ホストにする
 ################################################################################
