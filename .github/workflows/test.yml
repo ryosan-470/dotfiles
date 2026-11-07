@@ -38,12 +38,24 @@ jobs:
           chezmoi verify
       - name: Test modify_settings.json.tmpl merge logic
         run: tests/modify_settings.sh
+      - name: Install zsh
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y zsh
       - name: Syntax check zsh files
-        if: runner.os == 'macOS'
         run: |
           for f in "$HOME"/.zshrc "$HOME"/.zshenv "$HOME"/.config/zsh/*.zsh; do
             zsh -n "$f"
           done
+      - name: Check deployed gitconfig parses
+        run: git config --file "$HOME/.gitconfig" --list > /dev/null
+      - name: Lint LaunchAgent plist
+        if: runner.os == 'macOS'
+        run: |
+          set -eu
+          plist="$RUNNER_TEMP/cleanup-caches.plist"
+          chezmoi execute-template --source "$GITHUB_WORKSPACE" \
+            < home/private_Library/private_LaunchAgents/com.ryosan470.cleanup-caches.plist.tmpl > "$plist"
+          plutil -lint "$plist"
       - name: Check brew-bundle script renders
         if: runner.os == 'macOS'
         run: |
@@ -68,3 +80,36 @@ jobs:
           brew info --json=v2 --formula $formulae >/dev/null
           # shellcheck disable=SC2086
           brew info --json=v2 --cask $casks >/dev/null
+
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7.0.1
+        with:
+          fetch-depth: 1
+      - name: Install chezmoi
+        run: |
+          sh -c "$(curl -fsLS get.chezmoi.io)" -- -b "$HOME/.local/bin" -t v2.74.0
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+      - name: shellcheck (テンプレートは展開してからチェック)
+        run: |
+          set -eu
+          shellcheck -S warning \
+            home/dot_claude/hooks/find-guard.sh \
+            home/dot_claude/executable_statusline.sh \
+            home/dot_local/bin/executable_cleanup-caches.sh \
+            home/dot_tmux/executable_used-mem
+          rendered="$RUNNER_TEMP/rendered"
+          mkdir -p "$rendered"
+          for f in home/dot_bashrc.tmpl home/dot_claude/modify_settings.json.tmpl home/.chezmoiscripts/*.tmpl; do
+            out="$rendered/$(basename "$f").sh"
+            chezmoi execute-template --source "$GITHUB_WORKSPACE" < "$f" > "$out"
+            shellcheck -S warning -s bash "$out"
+          done
+      - name: actionlint
+        run: pipx run actionlint-py==1.7.12.25
+      - name: JSON schema (Claude Code settings)
+        run: |
+          pipx run check-jsonschema==0.33.3 \
+            --schemafile https://json.schemastore.org/claude-code-settings.json \
+            home/dot_claude/settings.base.json .claude/settings.json
