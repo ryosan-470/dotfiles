@@ -1,5 +1,5 @@
 #!/bin/bash
-# 再生成可能な開発キャッシュを掃除する。launchd (launchd/com.ryosan470.cleanup-caches.plist) から月 1 回実行される。
+# 再生成可能な開発キャッシュを掃除する。launchd (~/Library/LaunchAgents/com.ryosan470.cleanup-caches.plist) から月 1 回実行される。
 # データが消えるもの (docker volume, LM Studio のモデルなど) は対象外。
 set -u
 

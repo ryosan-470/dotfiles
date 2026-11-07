@@ -92,6 +92,12 @@ This is a personal dotfiles repository for managing shell configurations, primar
 
 **Customization System**: See "Layers" above. Machine-local files are optional and are not created automatically.
 
+**macOS LaunchAgents** (`home/private_Library/private_LaunchAgents/`):
+- `com.ryosan470.cleanup-caches.plist.tmpl` runs `~/.local/bin/cleanup-caches.sh` monthly
+- `home/.chezmoiscripts/run_onchange_after_load-launchagents.sh.tmpl` reloads it via `launchctl` when the plist changes
+- Keep the `private_` prefix on `Library` directories; otherwise chezmoi chmods `~/Library` to 755
+- `Library` and macOS-only scripts are ignored on non-darwin in `home/.chezmoiignore`
+
 ### Key Features
 
 **Auto-tmux**: Automatically starts/attaches to tmux sessions when opening terminal (configured in `home/dot_config/zsh/command.zsh`)
