@@ -4,7 +4,7 @@
 ![platform-osx](https://img.shields.io/badge/platform-osx-blue.svg?style=flat-square)
 ![platform-linux](https://img.shields.io/badge/platform-Linux-blue.svg?style=flat-square)
 
-Managed by [chezmoi](https://www.chezmoi.io/).
+Managed by [chezmoi](https://www.chezmoi.io/). See [docs/chezmoi.md](./docs/chezmoi.md) (Japanese) for how to add or change settings.
 
 ## How to setup
 

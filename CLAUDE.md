@@ -20,7 +20,8 @@ This is a personal dotfiles repository for managing shell configurations, primar
 
 ### Editing rules
 - Edit files under `home/` in this repository, then run `chezmoi apply`. Do not edit the deployed files in `~` directly.
-- chezmoi naming: `dot_` = leading `.`, `executable_` = +x, `modify_` = script that rewrites the target, `.tmpl` = Go template.
+- chezmoi naming: `dot_` = leading `.`, `executable_` = +x, `private_` = 600/700, `empty_` = deploy empty file, `modify_` = script that rewrites the target, `.tmpl` = Go template.
+- Where to put new settings (common / work / machine-local layers), recipes, and Claude settings merge rules: see `docs/chezmoi.md`. Keep it updated when the structure changes.
 
 ## Architecture
 
