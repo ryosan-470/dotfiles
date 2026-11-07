@@ -118,7 +118,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "rtk hook claude"
+            "command": "if command -v rtk >/dev/null 2>&1; then rtk hook claude; fi"
           },
           {
             "type": "command",
@@ -139,8 +139,6 @@
     "pr-review-toolkit@claude-plugins-official": true,
     "code-simplifier@claude-plugins-official": true,
     "context7@claude-plugins-official": true,
-    "jira-create-ticket@auth-group-claude-plugins": true,
-    "ai-pr@auth-group-claude-plugins": true,
     "cclens@cclens": true
   },
   "extraKnownMarketplaces": {

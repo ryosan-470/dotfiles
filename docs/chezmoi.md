@@ -54,7 +54,7 @@ home/dot_config/zsh/alias.zsh  →  ~/.config/zsh/alias.zsh
 | macOS / Linux で内容を変えたい | ファイル名に `.tmpl` を付けて `{{ if eq .chezmoi.os "darwin" }}...{{ end }}` で分岐する |
 | 特定の OS ではファイルごと配置しない | `home/.chezmoiignore` に追記する (このファイル自体がテンプレート) |
 | 内容が変わったときだけコマンドを実行したい | `home/.chezmoiscripts/run_onchange_after_<名前>.sh.tmpl` を作る (後述) |
-| 外部の git リポジトリを置きたい | `home/.chezmoiexternal.toml.tmpl` に追記する (tpm と同じ書き方) |
+| 外部のツール / リポジトリを置きたい | `home/.chezmoiexternal.toml.tmpl` に追記する。サプライチェーン対策として、ブランチ先頭 (`git-repo`) ではなくタグ固定の `archive` / `file` + `checksum.sha256` で取り込む (tpm / zimfw と同じ書き方。checksum は 0 埋めで apply して出る SHA256 mismatch の値を使う) |
 | Claude Code の設定を変える | `home/dot_claude/settings.base.json` を編集する (後述) |
 | macOS の LaunchAgent を追加したい | `home/private_Library/private_LaunchAgents/` に plist を置き、`run_onchange` スクリプトで再ロードする (既存の cleanup-caches を参照) |
 

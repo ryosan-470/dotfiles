@@ -1,13 +1,24 @@
+{{- /* 署名鍵の秘密鍵がこのマシンにある場合だけ gpgsign を有効にする。
+       鍵を後から import した場合は chezmoi apply を再実行すれば有効になる */ -}}
+{{- $signingKey := "60C13C7737C6E4D0707828B19E53E96EAD309F72" -}}
+{{- $hasSigningKey := false -}}
+{{- if lookPath "gpg" -}}
+{{-   $hasSigningKey = output "sh" "-c" (printf "gpg --list-secret-keys --with-colons %s 2>/dev/null || true" $signingKey) | contains "sec:" -}}
+{{- end -}}
 [core]
 	editor = "nano"
 	excludesfile = ~/.gitignore_global
 [user]
 	name = ryosan-470
 	email = rskjtwp@gmail.com
-	signingkey = 60C13C7737C6E4D0707828B19E53E96EAD309F72
+	signingkey = {{ $signingKey }}
 [commit]
-	gpgsign = true
 	template = ~/.config/git/commit_template.txt
+{{- if $hasSigningKey }}
+	gpgsign = true
+{{- else }}
+	# 署名鍵 ({{ $signingKey }}) が無いため gpgsign は無効
+{{- end }}
 [color]
 	ui = auto
 	status  = auto
@@ -43,12 +54,21 @@
 	ag = "!git ls-files | xargs ag --pager=\"less -F -R\" --nogroup --color-match=0\\;31 --color-path=0\\;0 --no-numbers"
 [grep]
 	lineNumber = true
+{{- /* diff-highlight は PATH にあればそれを、無ければ git 同梱の contrib を探す。見つからなければ設定しない */}}
+{{- $dh := lookPath "diff-highlight" }}
+{{- if not $dh }}
+{{-   range list "/opt/homebrew/share/git-core/contrib/diff-highlight/diff-highlight" "/usr/local/share/git-core/contrib/diff-highlight/diff-highlight" "/usr/share/doc/git/contrib/diff-highlight/diff-highlight" "/usr/share/git-core/contrib/diff-highlight/diff-highlight" }}
+{{-     if and (not $dh) (stat .) }}{{ $dh = . }}{{ end }}
+{{-   end }}
+{{- end }}
+{{- if $dh }}
 [pager]
-	log = diff-highlight | less
-	show = diff-highlight | less
-	diff = diff-highlight | less
+	log = {{ $dh }} | less
+	show = {{ $dh }} | less
+	diff = {{ $dh }} | less
 [interactive]
-	diffFilter = diff-highlight
+	diffFilter = {{ $dh }}
+{{- end }}
 [diff]
 	compactionHeuristic = true
 [ghq]
@@ -57,8 +77,17 @@
 	rebase = false
 [fetch]
 	prune = true
+{{- /* Git Credential Manager が入っている環境だけ credential.helper を設定する */}}
+{{- $gcm := lookPath "git-credential-manager" }}
+{{- if not $gcm }}
+{{-   range list "/usr/local/share/gcm-core/git-credential-manager" "/opt/homebrew/share/gcm-core/git-credential-manager" }}
+{{-     if and (not $gcm) (stat .) }}{{ $gcm = . }}{{ end }}
+{{-   end }}
+{{- end }}
+{{- if $gcm }}
 [credential]
-	helper = /usr/local/share/gcm-core/git-credential-manager
+	helper = {{ $gcm }}
+{{- end }}
 
 # 仕事用レイヤー → マシン固有の設定の順に読み込む (後勝ち。ファイルが無ければ無視される)
 # 仕事用 gitconfig 側で includeIf "gitdir:~/code/src/github.com/<社のorg>/" を使うと
