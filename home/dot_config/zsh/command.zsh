@@ -28,8 +28,6 @@ function c2b() {
 }
 
 # gpg2
-# GnuPG 2.1 以降は gpg-agent が必要時に自動起動し、--write-env-file / GPG_AGENT_INFO は廃止
-# pinentry 用に GPG_TTY だけ設定する
 if (($+commands[gpg])) && [[ -t 0 ]]; then
     export GPG_TTY=$(tty)
 fi
