@@ -1,0 +1,24 @@
+{{ if eq .chezmoi.os "darwin" -}}
+#!/bin/bash
+# Brewfile が変わったときだけ brew bundle を実行する (chezmoi apply の後に実行)
+# Brewfile hash: {{ include (joinPath .chezmoi.workingTree "Brewfile") | sha256sum }}
+{{- $workBrewfile := joinPath .chezmoi.homeDir ".config/work/Brewfile" }}
+{{- if stat $workBrewfile }}
+# work Brewfile hash: {{ include $workBrewfile | sha256sum }}
+{{- end }}
+set -eu
+
+# CI はインストールに時間がかかるのでスキップ
+[ -n "${CI:-}" ] && exit 0
+
+# Homebrew 自体のインストールは sudo と対話が必要なので行わない (docs/chezmoi.md 参照)
+if ! command -v brew >/dev/null 2>&1; then
+    echo "brew が見つからないので brew bundle をスキップ"
+    exit 0
+fi
+
+brew bundle --no-upgrade --file={{ joinPath .chezmoi.workingTree "Brewfile" | quote }}
+{{- if stat $workBrewfile }}
+brew bundle --no-upgrade --file={{ $workBrewfile | quote }}
+{{- end }}
+{{ end -}}

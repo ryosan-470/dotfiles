@@ -47,6 +47,7 @@ This is a personal dotfiles repository for managing shell configurations, primar
   - `zim.zsh` - Zim framework integration
 
 **Dependency Management**:
+- `Brewfile` (repo root, not deployed) + `home/.chezmoiscripts/run_onchange_after_brew-bundle.sh.tmpl` run `brew bundle` on macOS when the Brewfile (or `~/.config/work/Brewfile`) changes; skipped when `CI` is set or brew is missing
 - Uses Zim framework for zsh (`home/dot_config/zsh/zimrc`)
 - Uses TPM (Tmux Plugin Manager) for tmux plugins (tpm itself is cloned by chezmoi external)
 
