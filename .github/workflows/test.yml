@@ -42,3 +42,27 @@ jobs:
           for f in "$HOME"/.zshrc "$HOME"/.zshenv "$HOME"/.config/zsh/*.zsh; do
             zsh -n "$f"
           done
+      - name: Check brew-bundle script renders
+        if: runner.os == 'macOS'
+        run: |
+          set -eu
+          script=home/.chezmoiscripts/run_onchange_after_brew-bundle.sh.tmpl
+          chezmoi execute-template --source "$GITHUB_WORKSPACE" < "$script" > "$RUNNER_TEMP/brew-bundle.sh"
+          test -s "$RUNNER_TEMP/brew-bundle.sh"
+          bash -n "$RUNNER_TEMP/brew-bundle.sh"
+      - name: "Verify Brewfile (インストールはせず、名前が解決できるかだけ確認)"
+        if: runner.os == 'macOS'
+        run: |
+          set -eu
+          brew bundle list --all --file=Brewfile
+          for tap in $(brew bundle list --tap --file=Brewfile); do
+            brew tap "$tap"
+            # 未信頼 tap の formula/cask を読み込めない Homebrew 向け (trust コマンドが無ければ何もしない)
+            if brew trust --help >/dev/null 2>&1; then brew trust "$tap"; fi
+          done
+          formulae=$(brew bundle list --formula --file=Brewfile)
+          casks=$(brew bundle list --cask --file=Brewfile)
+          # shellcheck disable=SC2086
+          brew info --json=v2 --formula $formulae >/dev/null
+          # shellcheck disable=SC2086
+          brew info --json=v2 --cask $casks >/dev/null
