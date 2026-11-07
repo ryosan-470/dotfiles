@@ -168,4 +168,5 @@ chezmoi cat ~/.zshrc    # apply したら何が書かれるか表示 (テンプ�
 ```
 
 - `chezmoi apply` で「has changed since chezmoi last wrote it」と聞かれたら、配置先が直接編集されている。`d` で差分を見て、残したい変更なら中断して `chezmoi re-add` する
+- インストーラーが `~/.zshrc` などに設定を追記するツール (dory など) は、apply で消しても再追記して差分 (`chezmoi status` で `MM`) になる。追記されるブロックと**同一内容**をリポジトリ側に入れておくと再追記されなくなる (`home/dot_zshrc.tmpl` 末尾の dory ブロックを参照。パスは `{{ .chezmoi.homeDir }}`、未インストールのマシン向けに `stat` で条件分岐)
 - 公式ドキュメント: https://www.chezmoi.io/user-guide/command-overview/

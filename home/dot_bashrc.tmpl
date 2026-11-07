@@ -39,12 +39,17 @@ shopt -s checkwinsize
 # match all files and zero or more directories and subdirectories.
 shopt -s globstar
 
-# dory cli (インストール済みのマシンのみ)
-if [[ -d "$HOME/.dory/bin" && ":$PATH:" != *":$HOME/.dory/bin:"* ]]; then
-    export PATH="$HOME/.dory/bin:$PATH"
-fi
-
 # load ~/.local.bash if it exists
 [[ -f ~/.local.bash ]] && . ~/.local.bash
 
 [[ "$TERM_PROGRAM" == "vscode" ]] && . "$(code --locate-shell-integration-path bash)"
+{{- if stat (joinPath .chezmoi.homeDir ".dory" "bin") }}
+{{- /* dory が起動時に追記するブロックと同一内容にしておく (違うと dory が再追記して chezmoi と差分になる) */}}
+# >>> dory cli >>>
+DORY_CLI_BIN="{{ .chezmoi.homeDir }}/.dory/bin"
+case ":$PATH:" in
+  *":$DORY_CLI_BIN:"*) ;;
+  *) export PATH="$DORY_CLI_BIN:$PATH" ;;
+esac
+# <<< dory cli <<<
+{{- end }}

@@ -13,8 +13,6 @@ export PATH="$HOME/bin:$PATH"
 if [[ -d "/Applications/Visual Studio Code.app/Contents/Resources/app/bin" ]]; then
     export PATH="/Applications/Visual Studio Code.app/Contents/Resources/app/bin:$PATH"
 fi
-# dory cli (インストール済みのマシンのみ)
-[[ -d $HOME/.dory/bin ]] && export PATH="$HOME/.dory/bin:$PATH"
 export ZIM_CONFIG_FILE=$HOME/.config/zsh/zimrc
 if (($+commands[brew])); then
     eval "$(/opt/homebrew/bin/brew shellenv)"
