@@ -103,10 +103,10 @@ This is a personal dotfiles repository for managing shell configurations, primar
 
 **Auto-tmux**: Automatically starts/attaches to tmux sessions when opening terminal (configured in `home/dot_config/zsh/command.zsh`)
 
-**Archive Extraction**: Universal `extract()` function with file association aliases for common archive formats
+**Archive Extraction**: Universal `extract()` function with file association aliases for common archive formats (`.jar` は展開対象外)
 
 **Development Utilities**:
-- `run()` function for compiling and executing C/C++/Java files
+- `run()` function for compiling and executing C/C++/Java files (`run foo.c` のように明示的に呼ぶ。ファイル名だけで実行される suffix alias は廃止。ダウンロードしたファイルの誤実行を防ぐため、実行系の suffix alias は追加しないこと)
 - `peco-src` integration with ghq for repository navigation (Ctrl+])
 - GPG agent management
 
