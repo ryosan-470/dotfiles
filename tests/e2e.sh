@@ -50,9 +50,10 @@ PY
 fix_compaudit() {
     [ -n "${CI:-}" ] || return 0
     local d
-    zsh -f -c 'autoload -U compaudit; compaudit' 2>/dev/null | while read -r d; do
+    # compaudit は問題があると非ゼロを返すので、pipefail / set -e で落ちないようにする
+    { zsh -f -c 'autoload -U compaudit; compaudit' 2>/dev/null || true; } | while read -r d; do
         sudo chmod go-w "$d" 2>/dev/null || true
-    done
+    done || true
 }
 
 test_zsh() {
@@ -60,12 +61,13 @@ test_zsh() {
     # command.zsh の tmux 自動起動を避ける
     export TMUX=dummy
     fix_compaudit
+    # `exit` だけだと .zshrc 末尾のコマンドの終了ステータスが返るので `exit 0` で起動の成否だけを見る
     # 初回は zimfw がモジュールをネットワークから取得するので、ウォームアップとして 1 回流す (計測しない)
-    zsh_pty exit >/dev/null 2>&1 || true
+    zsh_pty 'exit 0' >/dev/null 2>&1 || true
 
     local out="$TMP_ROOT/zsh.out" start end
     start=$(date +%s)
-    if zsh_pty exit >"$out" 2>&1; then
+    if zsh_pty 'exit 0' >"$out" 2>&1; then
         end=$(date +%s)
         pass "zsh -i -c exit は終了コード 0 ($((end - start)) 秒)"
     else
