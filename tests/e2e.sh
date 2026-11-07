@@ -23,26 +23,49 @@ fail() { echo "FAIL: $*" >&2; FAILED=1; }
 TMP_ROOT="$(mktemp -d)"
 trap 'rm -rf "$TMP_ROOT"' EXIT
 
-# tty 無しの CI では zsh -i が "can't open terminal" で失敗するので、script で擬似端末を与えて実行する
-# (stdout / stderr は端末に混ざって 1 本の出力になる。引数: zsh -c に渡すコマンド)
+# tty 無しの CI では zsh -i が "can't open terminal" で失敗するので、擬似端末 (pty) を与えて実行する
+# (stdout / stderr は端末に混ざって 1 本の出力になる。終了コードは zsh のもの。引数: zsh -c に渡すコマンド)
 zsh_pty() {
-    if [ "$(uname -s)" = Darwin ]; then
-        script -q /dev/null zsh -i -c "$1"
-    else
-        script -qec "zsh -i -c '$1'" /dev/null
-    fi
+    python3 -I - "$1" <<'PY'
+import os, pty, sys
+pid, fd = pty.fork()
+if pid == 0:
+    os.execvp("zsh", ["zsh", "-i", "-c", sys.argv[1]])
+out = b""
+while True:
+    try:
+        data = os.read(fd, 4096)
+    except OSError:
+        break
+    if not data:
+        break
+    out += data
+_, status = os.waitpid(pid, 0)
+sys.stdout.write(out.decode(errors="replace"))
+sys.exit(os.waitstatus_to_exitcode(status))
+PY
+}
+
+# CI の Linux runner は一部ディレクトリが group-writable で compinit が "insecure directories" で止まるので直す
+fix_compaudit() {
+    [ -n "${CI:-}" ] || return 0
+    local d
+    zsh -f -c 'autoload -U compaudit; compaudit' 2>/dev/null | while read -r d; do
+        sudo chmod go-w "$d" 2>/dev/null || true
+    done
 }
 
 test_zsh() {
     command -v zsh >/dev/null || { fail "zsh がインストールされていない"; return; }
     # command.zsh の tmux 自動起動を避ける
     export TMUX=dummy
+    fix_compaudit
     # 初回は zimfw がモジュールをネットワークから取得するので、ウォームアップとして 1 回流す (計測しない)
     zsh_pty exit >/dev/null 2>&1 || true
 
     local out="$TMP_ROOT/zsh.out" start end
     start=$(date +%s)
-    if zsh_pty exit >"$out" 2>&1 </dev/null; then
+    if zsh_pty exit >"$out" 2>&1; then
         end=$(date +%s)
         pass "zsh -i -c exit は終了コード 0 ($((end - start)) 秒)"
     else
@@ -168,13 +191,16 @@ test_work_layer() {
         printf '[data]\n    workRepo = "file://%s"\n' "$bare" > "$XDG_CONFIG_HOME/chezmoi/chezmoi.toml"
         chezmoi init --apply --no-tty --source "$REPO_ROOT" >/dev/null \
             || { fail "work: chezmoi init --apply に失敗"; exit 1; }
+        # 初回 apply では .claude/settings.json (modify) が ~/.config/work の clone より先に処理されるため、
+        # 仕事用 settings がマージされるのは 2 回目の apply 以降 (chezmoi update 等で自然に解消する)
+        chezmoi apply --no-tty >/dev/null || { fail "work: 2 回目の chezmoi apply に失敗"; exit 1; }
         local rc=0
 
         [ -f "$HOME/.config/work/gitconfig" ] || { fail "work: ~/.config/work が clone されていない"; exit 1; }
         pass "work: ~/.config/work に workRepo が clone された"
 
         # zsh: 仕事用の *.zsh が source される
-        if zsh_pty 'echo work-layer=$E2E_WORK_LAYER' </dev/null 2>&1 | grep -q 'work-layer=loaded'; then
+        if zsh_pty 'echo work-layer=$E2E_WORK_LAYER' 2>&1 | grep -q 'work-layer=loaded'; then
             pass "work: zsh が work/zsh/*.zsh を読み込む"
         else
             fail "work: zsh が work/zsh/*.zsh を読み込まない"; rc=1
