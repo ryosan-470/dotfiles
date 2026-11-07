@@ -23,27 +23,37 @@ fail() { echo "FAIL: $*" >&2; FAILED=1; }
 TMP_ROOT="$(mktemp -d)"
 trap 'rm -rf "$TMP_ROOT"' EXIT
 
+# tty 無しの CI では zsh -i が "can't open terminal" で失敗するので、script で擬似端末を与えて実行する
+# (stdout / stderr は端末に混ざって 1 本の出力になる。引数: zsh -c に渡すコマンド)
+zsh_pty() {
+    if [ "$(uname -s)" = Darwin ]; then
+        script -q /dev/null zsh -i -c "$1"
+    else
+        script -qec "zsh -i -c '$1'" /dev/null
+    fi
+}
+
 test_zsh() {
     command -v zsh >/dev/null || { fail "zsh がインストールされていない"; return; }
     # command.zsh の tmux 自動起動を避ける
     export TMUX=dummy
     # 初回は zimfw がモジュールをネットワークから取得するので、ウォームアップとして 1 回流す (計測しない)
-    zsh -i -c exit >/dev/null 2>&1 || true
+    zsh_pty exit >/dev/null 2>&1 || true
 
-    local err="$TMP_ROOT/zsh.err" start end
+    local out="$TMP_ROOT/zsh.out" start end
     start=$(date +%s)
-    if zsh -i -c exit >/dev/null 2>"$err"; then
+    if zsh_pty exit >"$out" 2>&1 </dev/null; then
         end=$(date +%s)
         pass "zsh -i -c exit は終了コード 0 ($((end - start)) 秒)"
     else
-        fail "zsh -i -c exit が失敗: $(cat "$err")"
+        fail "zsh -i -c exit が失敗: $(cat "$out")"
         return
     fi
-    if [ -s "$err" ]; then
-        fail "zsh -i -c exit の stderr が空でない:"
-        cat "$err" >&2
+    if [ -n "$(tr -d '[:space:]' < "$out")" ]; then
+        fail "zsh -i -c exit の出力が空でない:"
+        cat "$out" >&2
     else
-        pass "zsh -i -c exit の stderr は空"
+        pass "zsh -i -c exit の出力 (stderr 含む) は空"
     fi
 }
 
@@ -77,7 +87,7 @@ test_git() {
 test_find_guard() {
     local hook="$HOME/.claude/hooks/find-guard.sh" out
     run_hook() {
-        jq -n --arg c "$1" '{tool_input: {command: $c}}' | "$hook" || echo "hook exit $?"
+        jq -n --arg c "$1" '{tool_input: {command: $c}}' | bash "$hook" || echo "hook exit $?"
     }
     out=$(run_hook 'find / -name foo')
     if [ "$(printf '%s' "$out" | jq -r '.hookSpecificOutput.permissionDecision')" = "ask" ]; then
@@ -153,7 +163,10 @@ test_work_layer() {
     (
         export HOME="$work_home" XDG_CONFIG_HOME="$work_home/.config" TMUX=dummy TERM=xterm-256color
         unset ZDOTDIR
-        chezmoi init --apply --no-tty --source "$REPO_ROOT" --promptString "workRepo=file://$bare" >/dev/null \
+        # promptStringOnce は既存の data を優先するので、事前に chezmoi.toml へ workRepo を書いておく
+        mkdir -p "$XDG_CONFIG_HOME/chezmoi"
+        printf '[data]\n    workRepo = "file://%s"\n' "$bare" > "$XDG_CONFIG_HOME/chezmoi/chezmoi.toml"
+        chezmoi init --apply --no-tty --source "$REPO_ROOT" >/dev/null \
             || { fail "work: chezmoi init --apply に失敗"; exit 1; }
         local rc=0
 
@@ -161,7 +174,7 @@ test_work_layer() {
         pass "work: ~/.config/work に workRepo が clone された"
 
         # zsh: 仕事用の *.zsh が source される
-        if [ "$(zsh -i -c 'echo $E2E_WORK_LAYER' 2>/dev/null | tail -1)" = loaded ]; then
+        if zsh_pty 'echo work-layer=$E2E_WORK_LAYER' </dev/null 2>&1 | grep -q 'work-layer=loaded'; then
             pass "work: zsh が work/zsh/*.zsh を読み込む"
         else
             fail "work: zsh が work/zsh/*.zsh を読み込まない"; rc=1
