@@ -1,12 +1,23 @@
+{{- /* 署名鍵の秘密鍵がこのマシンにある場合だけ gpgsign を有効にする。
+       鍵を後から import した場合は chezmoi apply を再実行すれば有効になる */ -}}
+{{- $signingKey := "60C13C7737C6E4D0707828B19E53E96EAD309F72" -}}
+{{- $hasSigningKey := false -}}
+{{- if lookPath "gpg" -}}
+{{-   $hasSigningKey = output "sh" "-c" (printf "gpg --list-secret-keys --with-colons %s 2>/dev/null || true" $signingKey) | contains "sec:" -}}
+{{- end -}}
 [core]
 	editor = "nano"
 	excludesfile = ~/.gitignore_global
 [user]
 	name = ryosan-470
 	email = rskjtwp@gmail.com
-	signingkey = 60C13C7737C6E4D0707828B19E53E96EAD309F72
+	signingkey = {{ $signingKey }}
 [commit]
+{{- if $hasSigningKey }}
 	gpgsign = true
+{{- else }}
+	# 署名鍵 ({{ $signingKey }}) が無いため gpgsign は無効
+{{- end }}
 [color]
 	ui = auto
 	status  = auto
