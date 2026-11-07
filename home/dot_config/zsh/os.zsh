@@ -2,7 +2,6 @@
 case `uname` in
     "Darwin")
         if (($+commands[brew])); then
-            # eval "$(brew --prefix)/bin/brew shellenv"
             alias update="brew update -v && brew upgrade -vy"
         fi
         ;;

@@ -55,12 +55,21 @@
 	template = ~/.config/git/commit_template.txt
 [grep]
 	lineNumber = true
+{{- /* diff-highlight は PATH にあればそれを、無ければ git 同梱の contrib を探す。見つからなければ設定しない */}}
+{{- $dh := lookPath "diff-highlight" }}
+{{- if not $dh }}
+{{-   range list "/opt/homebrew/share/git-core/contrib/diff-highlight/diff-highlight" "/usr/local/share/git-core/contrib/diff-highlight/diff-highlight" "/usr/share/doc/git/contrib/diff-highlight/diff-highlight" "/usr/share/git-core/contrib/diff-highlight/diff-highlight" }}
+{{-     if and (not $dh) (stat .) }}{{ $dh = . }}{{ end }}
+{{-   end }}
+{{- end }}
+{{- if $dh }}
 [pager]
-	log = diff-highlight | less
-	show = diff-highlight | less
-	diff = diff-highlight | less
+	log = {{ $dh }} | less
+	show = {{ $dh }} | less
+	diff = {{ $dh }} | less
 [interactive]
-	diffFilter = diff-highlight
+	diffFilter = {{ $dh }}
+{{- end }}
 [diff]
 	compactionHeuristic = true
 [ghq]
@@ -69,8 +78,17 @@
 	rebase = false
 [fetch]
 	prune = true
+{{- /* Git Credential Manager が入っている環境だけ credential.helper を設定する */}}
+{{- $gcm := lookPath "git-credential-manager" }}
+{{- if not $gcm }}
+{{-   range list "/usr/local/share/gcm-core/git-credential-manager" "/opt/homebrew/share/gcm-core/git-credential-manager" }}
+{{-     if and (not $gcm) (stat .) }}{{ $gcm = . }}{{ end }}
+{{-   end }}
+{{- end }}
+{{- if $gcm }}
 [credential]
-	helper = /usr/local/share/gcm-core/git-credential-manager
+	helper = {{ $gcm }}
+{{- end }}
 
 # 仕事用レイヤー → マシン固有の設定の順に読み込む (後勝ち。ファイルが無ければ無視される)
 # 仕事用 gitconfig 側で includeIf "gitdir:~/code/src/github.com/<社のorg>/" を使うと
