@@ -17,7 +17,7 @@ chezmoi cd                 # リポジトリに移動 (ghq の clone)
 # home/ 以下を編集
 chezmoi diff               # 反映前に何が変わるか確認
 chezmoi apply              # ~ に反映
-git commit && git push     # 他のマシンでは dot update (= chezmoi update) で取り込む
+git commit && git push     # 他のマシンでは dot update (= private の pull + chezmoi update) で取り込む
 ```
 
 > [!WARNING]

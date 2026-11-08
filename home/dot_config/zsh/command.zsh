@@ -47,14 +47,22 @@ function dot() {
 The dot command is a controller my dotfiles based on CLI
 There are common dot commands used in various situations:
 
-update         Update your dotfiles from GitHub and apply them (chezmoi update)
+update         Update public/private dotfiles from GitHub and apply them (chezmoi update)
 diff           Show changes chezmoi would apply (chezmoi diff)
 private        Move to the private repository (~/.config/private)
 help           Print this message
 DOT
 )
     case $1 in
-        update) chezmoi update;;
+        update)
+            # ~/.config/private は chezmoi external (refreshPeriod = 24h) なので、
+            # chezmoi update だけでは最新にならないことがある。先に明示的に pull しておき、
+            # 後続の chezmoi update (= apply) で両方の変更を一度に反映する
+            if git -C "$HOME/.config/private" rev-parse --git-dir >/dev/null 2>&1; then
+                git -C "$HOME/.config/private" pull --ff-only || return 1
+            fi
+            chezmoi update
+            ;;
         diff) chezmoi diff;;
         private)
             if [[ -d ~/.config/private ]]; then
