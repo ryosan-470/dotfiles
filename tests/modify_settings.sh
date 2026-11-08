@@ -8,7 +8,7 @@ tmpl="$root/home/dot_claude/modify_settings.json.tmpl"
 tmp=$(mktemp -d)
 trap 'rm -rf "$tmp"' EXIT
 
-# fixture の base を使うため、描画したスクリプトの base= 行を差し替える
+# fixture の base と profile を使うため、描画したスクリプトの該当行を差し替える
 base_json='{
   "env": {"A": "base"},
   "permissions": {"allow": ["Read", "Bash(ls *)"], "deny": ["Bash(sudo *)"]},
@@ -16,7 +16,8 @@ base_json='{
 }'
 printf '%s' "$base_json" >"$tmp/base.json"
 chezmoi execute-template --source "$root" <"$tmpl" |
-    sed "s|^base=.*|base=\"$tmp/base.json\"|" >"$tmp/modify.sh" || { echo "render failed"; exit 1; }
+    sed -e "s|^base=.*|base=\"$tmp/base.json\"|" \
+        -e 's|^private_profile=.*|private_profile="test"|' >"$tmp/modify.sh" || { echo "render failed"; exit 1; }
 
 home="$tmp/home"
 mkdir -p "$home/.config/private/claude"
@@ -64,6 +65,17 @@ printf '%s' '{"env": {"A": "private"}, "permissions": {"allow": ["Bash(private *
 out=$(run '{"permissions": {"allow": ["Read"]}}')
 check "private file overrides and unions" \
     '.env.A == "private" and .permissions.allow == ["Read", "Bash(ls *)", "Bash(private *)"] and .hooks.Stop[0].hooks[0].command == "p.sh"' "$out"
+
+# 5b. profile 別 private 設定 (machineProfile=test → settings.test.json)
+private_profile_file="$home/.config/private/claude/settings.test.json"
+printf '%s' '{"env": {"A": "profile"}, "permissions": {"allow": ["Bash(profile *)"]}, "hooks": {"Stop": [{"hooks": [{"type": "command", "command": "t.sh"}]}]}}' >"$private_profile_file"
+out=$(run '{"permissions": {"allow": ["Read"]}}')
+check "profile overrides common and unions" \
+    '.env.A == "profile" and (.permissions.allow | index("Bash(private *)")) and (.permissions.allow | index("Bash(profile *)")) and (.hooks.Stop | map(.hooks[0].command) | index("t.sh"))' "$out"
+rm -f "$private_profile_file"
+out=$(run "")
+check "profile file absent" \
+    '.env.A == "private" and .hooks.Stop[0].hooks[0].command == "p.sh"' "$out"
 
 # 6. 冪等性
 once=$(run '{"permissions": {"allow": ["Z"]}, "hooks": {"Stop": [{"hooks": [{"type": "command", "command": "l.sh"}]}]}}')

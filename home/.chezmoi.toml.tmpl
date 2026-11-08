@@ -1,5 +1,6 @@
 {{- /* chezmoi init 時に一度だけ評価され ~/.config/chezmoi/chezmoi.toml を生成する */ -}}
 {{- $privateRepo := promptStringOnce . "privateRepo" "private リポジトリの URL (全マシンで同じ値を入力。使わないなら空のまま Enter)" "" -}}
+{{- $machineProfile := promptStringOnce . "machineProfile" "このマシンのプロファイル (personal / work。空なら profile 別設定なし)" "" -}}
 
 # リポジトリのルート (ghq の clone をそのまま source として使う)
 sourceDir = {{ .chezmoi.workingTree | quote }}
@@ -8,3 +9,5 @@ sourceDir = {{ .chezmoi.workingTree | quote }}
     # 空なら private レイヤー無し。設定されていれば ~/.config/private に clone して各設定から読み込む
     # URL は公開リポジトリに書かず、このファイル (ローカルの chezmoi.toml) にだけ保存する
     privateRepo = {{ $privateRepo | quote }}
+    # マシンのプロファイル。private の claude/settings.<profile>.json を共通設定の後にマージする
+    machineProfile = {{ $machineProfile | quote }}
