@@ -113,6 +113,15 @@ jobs:
           pipx run check-jsonschema==0.33.3 \
             --schemafile https://json.schemastore.org/claude-code-settings.json \
             home/dot_claude/settings.base.json .claude/settings.json
+      - name: Check Claude Code marketplaces are pinned
+        run: |
+          # 外部コードを取り込む GitHub マーケットプレイスは ref で固定し、自動更新を切る
+          jq -e '
+            (.extraKnownMarketplaces // {}) | to_entries | all(
+              (.value.source.source != "github")
+              or ((.value.source.ref // "") != "" and .value.autoUpdate == false)
+            )
+          ' home/dot_claude/settings.base.json
 
   e2e:
     needs: apply
