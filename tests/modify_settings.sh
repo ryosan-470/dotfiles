@@ -19,8 +19,8 @@ chezmoi execute-template --source "$root" <"$tmpl" |
     sed "s|^base=.*|base=\"$tmp/base.json\"|" >"$tmp/modify.sh" || { echo "render failed"; exit 1; }
 
 home="$tmp/home"
-mkdir -p "$home/.config/work/claude"
-work_file="$home/.config/work/claude/settings.json"
+mkdir -p "$home/.config/private/claude"
+private_file="$home/.config/private/claude/settings.json"
 
 # run <stdin の内容>: modify スクリプトを実行して stdout を返す
 run() { printf '%s' "$1" | HOME="$home" bash "$tmp/modify.sh"; }
@@ -56,14 +56,14 @@ out=$(run "$cur")
 check "same-command hook replaced by base" \
     '.hooks.PreToolUse | length == 1 and .[0].hooks[0].timeout == 10' "$out"
 
-# 5. 仕事用設定なし / あり
-rm -f "$work_file"
+# 5. private 設定なし / あり
+rm -f "$private_file"
 out=$(run "")
-check "no work file" '.env.A == "base"' "$out"
-printf '%s' '{"env": {"A": "work"}, "permissions": {"allow": ["Bash(work *)"]}, "hooks": {"Stop": [{"hooks": [{"type": "command", "command": "w.sh"}]}]}}' >"$work_file"
+check "no private file" '.env.A == "base"' "$out"
+printf '%s' '{"env": {"A": "private"}, "permissions": {"allow": ["Bash(private *)"]}, "hooks": {"Stop": [{"hooks": [{"type": "command", "command": "p.sh"}]}]}}' >"$private_file"
 out=$(run '{"permissions": {"allow": ["Read"]}}')
-check "work file overrides and unions" \
-    '.env.A == "work" and .permissions.allow == ["Read", "Bash(ls *)", "Bash(work *)"] and .hooks.Stop[0].hooks[0].command == "w.sh"' "$out"
+check "private file overrides and unions" \
+    '.env.A == "private" and .permissions.allow == ["Read", "Bash(ls *)", "Bash(private *)"] and .hooks.Stop[0].hooks[0].command == "p.sh"' "$out"
 
 # 6. 冪等性
 once=$(run '{"permissions": {"allow": ["Z"]}, "hooks": {"Stop": [{"hooks": [{"type": "command", "command": "l.sh"}]}]}}')

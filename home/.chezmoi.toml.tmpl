@@ -1,9 +1,10 @@
 {{- /* chezmoi init 時に一度だけ評価され ~/.config/chezmoi/chezmoi.toml を生成する */ -}}
-{{- $workRepo := promptStringOnce . "workRepo" "仕事用 private リポジトリの URL (私用マシンなら空のまま Enter)" "" -}}
+{{- $privateRepo := promptStringOnce . "privateRepo" "private リポジトリの URL (全マシンで同じ値を入力。使わないなら空のまま Enter)" "" -}}
 
 # リポジトリのルート (ghq の clone をそのまま source として使う)
 sourceDir = {{ .chezmoi.workingTree | quote }}
 
 [data]
-    # 空なら私用マシン。設定されていれば ~/.config/work に clone して各設定から読み込む
-    workRepo = {{ $workRepo | quote }}
+    # 空なら private レイヤー無し。設定されていれば ~/.config/private に clone して各設定から読み込む
+    # URL は公開リポジトリに書かず、このファイル (ローカルの chezmoi.toml) にだけ保存する
+    privateRepo = {{ $privateRepo | quote }}

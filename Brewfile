@@ -1,5 +1,5 @@
 # dotfiles が前提にするツール。macOS で `chezmoi apply` 時に brew bundle で入る
-# (run_onchange_after_brew-bundle.sh.tmpl)。仕事用は ~/.config/work/Brewfile に書く。
+# (run_onchange_after_brew-bundle.sh.tmpl)。private は ~/.config/private/Brewfile に書く。
 # 言語ランタイムと ccgate は mise で管理するのでここに書かない。
 
 tap "augani/dory"

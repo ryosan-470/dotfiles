@@ -16,26 +16,33 @@ This is a personal dotfiles repository for managing shell configurations, primar
 
 ### Daily Usage
 - `dot update` / `dot diff` - Wrappers for `chezmoi update` / `chezmoi diff`
+- `dot private` - Move to the private repository (`~/.config/private`)
 - `s` - Reload zsh configuration (source ~/.zshrc)
 
 ### Editing rules
 - Edit files under `home/` in this repository, then run `chezmoi apply`. Do not edit the deployed files in `~` directly.
 - chezmoi naming: `dot_` = leading `.`, `executable_` = +x, `private_` = 600/700, `empty_` = deploy empty file, `modify_` = script that rewrites the target, `.tmpl` = Go template.
-- Where to put new settings (common / work / machine-local layers), recipes, and Claude settings merge rules: see `docs/chezmoi.md`. Keep it updated when the structure changes.
+- Where to put new settings (common / private / machine-local layers), recipes, and Claude settings merge rules: see `docs/chezmoi.md`. The private repo contract is `docs/private-repo.md`. Keep both updated when the structure changes.
 
 ## Architecture
 
 ### Layers (later wins)
 1. Common: this public repository (`home/`)
-2. Work: `~/.config/work/`, a private repo per employer cloned by `home/.chezmoiexternal.toml.tmpl` when `workRepo` is set at `chezmoi init`. Never put employer names or the repo URL into this public repository.
+2. Private: `~/.config/private/`, cloned by `home/.chezmoiexternal.toml.tmpl` when `privateRepo` is set at `chezmoi init`. One private repo holds both personal and work-specific settings. Its URL is stored only in the local `chezmoi.toml`, never in this public repository. Never commit secrets (tokens, private keys, AWS access keys).
 3. Machine local (unmanaged): `~/.local.zsh`, `~/.gitconfig.local`, `~/.tmux.local.conf`, `~/.claude/CLAUDE.local.md`
 
 ### Core Components
 
 **chezmoi configuration** (`home/`):
-- `.chezmoi.toml.tmpl` - Prompts `workRepo` on init and sets `sourceDir` to the repo root
-- `.chezmoiexternal.toml.tmpl` - Clones tpm and the work repository
+- `.chezmoi.toml.tmpl` - Prompts `privateRepo` on init and sets `sourceDir` to the repo root
+- `.chezmoiexternal.toml.tmpl` - Clones tpm and the private repository
 - `.chezmoiignore` - Files that exist in the source but are not deployed
+
+**Private layer** (`~/.config/private/`, cloned by `.chezmoiexternal`):
+- Contract: `docs/private-repo.md`
+- Slots: `zsh/*.zsh`, `gitconfig`, `tmux.conf`, `claude/CLAUDE.md`, `claude/settings.json`, `Brewfile`, `aws/config`
+- File slots (`aws/*`) are symlinked by `home/.chezmoiscripts/run_onchange_after_private-links.sh.tmpl`
+- The private repository must not contain secrets
 
 **Shell Configuration** (`home/dot_config/zsh/` → `~/.config/zsh/`):
 - Modular zsh configuration split into logical files:
@@ -47,13 +54,13 @@ This is a personal dotfiles repository for managing shell configurations, primar
   - `zim.zsh` - Zim framework integration
 
 **Dependency Management**:
-- `Brewfile` (repo root, not deployed) + `home/.chezmoiscripts/run_onchange_after_brew-bundle.sh.tmpl` run `brew bundle` on macOS when the Brewfile (or `~/.config/work/Brewfile`) changes; skipped when `CI` is set or brew is missing
+- `Brewfile` (repo root, not deployed) + `home/.chezmoiscripts/run_onchange_after_brew-bundle.sh.tmpl` run `brew bundle` on macOS when the Brewfile (or `~/.config/private/Brewfile`) changes; skipped when `CI` is set or brew is missing
 - Uses Zim framework for zsh (`home/dot_config/zsh/zimrc`)
 - Uses TPM (Tmux Plugin Manager) for tmux plugins (tpm itself is cloned by chezmoi external)
 
 **Claude Code Configuration** (`home/dot_claude/` → `~/.claude/`):
 - `settings.base.json` - Claude Code global settings (not deployed directly)
-- `modify_settings.json.tmpl` - Generates `~/.claude/settings.json` by merging the current file (Claude Code's own changes), `settings.base.json`, and `~/.config/work/claude/settings.json`. Permissions are unioned, hooks are owned by base + work. Requires `jq`.
+- `modify_settings.json.tmpl` - Generates `~/.claude/settings.json` by merging the current file (Claude Code's own changes), `settings.base.json`, and `~/.config/private/claude/settings.json`. Permissions are unioned, hooks are owned by base + private. Requires `jq`.
 - `CLAUDE.md` - Claude Code グローバル CLAUDE.md
 - `hooks/find-guard.sh`, `statusline.sh` - Referenced from settings as `~/.claude/...`
 - Note: `.claude/settings.json` at the repo root is a separate project-level Claude Code config (permissions for this repo)

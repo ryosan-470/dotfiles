@@ -2,9 +2,9 @@
 #!/bin/bash
 # Brewfile が変わったときだけ brew bundle を実行する (chezmoi apply の後に実行)
 # Brewfile hash: {{ include (joinPath .chezmoi.workingTree "Brewfile") | sha256sum }}
-{{- $workBrewfile := joinPath .chezmoi.homeDir ".config/work/Brewfile" }}
-{{- if stat $workBrewfile }}
-# work Brewfile hash: {{ include $workBrewfile | sha256sum }}
+{{- $privateBrewfile := joinPath .chezmoi.homeDir ".config/private/Brewfile" }}
+{{- if stat $privateBrewfile }}
+# private Brewfile hash: {{ include $privateBrewfile | sha256sum }}
 {{- end }}
 set -eu
 
@@ -18,7 +18,7 @@ if ! command -v brew >/dev/null 2>&1; then
 fi
 
 brew bundle --no-upgrade --file={{ joinPath .chezmoi.workingTree "Brewfile" | quote }}
-{{- if stat $workBrewfile }}
-brew bundle --no-upgrade --file={{ $workBrewfile | quote }}
+{{- if stat $privateBrewfile }}
+brew bundle --no-upgrade --file={{ $privateBrewfile | quote }}
 {{- end }}
 {{ end -}}
