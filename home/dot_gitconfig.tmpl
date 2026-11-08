@@ -36,10 +36,10 @@
 	c = commit
 	stashes = stash list              # stash した一覧
 	unstage = reset -q HEAD --
-	discard = checkout --
 	uncommit = reset --mixed HEAD~
 	amend = commit --amend
-	nevermind = !git reset --hard HEAD && git clean -d -f
+	# 破壊的なエイリアス (旧 discard = checkout --, nevermind = reset --hard && clean -d -f) は
+	# Claude Code の deny / ask ルールを迂回できるため廃止した。作業ツリーを捨てるときは明示的に実行する
 	# リアルタイムのタイムラインを見ることができる
 	precommit = diff --cached --diff-algorithm=minimal -w
 	last = log -1 HEAD --format=format:"%Cred%H"

@@ -131,6 +131,28 @@ test_find_guard() {
         || fail "find-guard: find 以外なのに出力がある: $out"
 }
 
+test_dangerous_command_guard() {
+    local hook="$HOME/.claude/hooks/dangerous-command-guard.sh" out
+    run_hook() {
+        jq -n --arg c "$1" '{tool_input: {command: $c}}' | bash "$hook" || echo "hook exit $?"
+    }
+    out=$(run_hook 'cd /tmp && rm -fr foo')
+    if [ "$(printf '%s' "$out" | jq -r '.hookSpecificOutput.permissionDecision')" = "deny" ]; then
+        pass "dangerous-command-guard: 複合コマンド内の rm -fr は deny"
+    else
+        fail "dangerous-command-guard: 'rm -fr' が deny にならない (出力: $out)"
+    fi
+    out=$(run_hook 'git reset --hard')
+    if [ "$(printf '%s' "$out" | jq -r '.hookSpecificOutput.permissionDecision')" = "ask" ]; then
+        pass "dangerous-command-guard: git reset --hard は ask"
+    else
+        fail "dangerous-command-guard: 'git reset --hard' が ask にならない (出力: $out)"
+    fi
+    out=$(run_hook 'git log --oneline')
+    [ -z "$out" ] && pass "dangerous-command-guard: 通常のコマンドは無出力" \
+        || fail "dangerous-command-guard: 通常のコマンドなのに出力がある: $out"
+}
+
 test_idempotent() {
     chezmoi apply --no-tty
     local diff
@@ -166,10 +188,16 @@ test_settings_preserved() {
     jq -e '[.hooks.PreToolUse[]?.hooks[]?.command] | any(endswith("find-guard.sh"))' "$settings" >/dev/null \
         && pass "settings.json: リポジトリ管理の hook (find-guard) も入っている" \
         || fail "settings.json: find-guard hook が無い"
+    jq -e '[.hooks.PreToolUse[]?.hooks[]?.command] | any(endswith("dangerous-command-guard.sh"))' "$settings" >/dev/null \
+        && pass "settings.json: リポジトリ管理の hook (dangerous-command-guard) も入っている" \
+        || fail "settings.json: dangerous-command-guard hook が無い"
     local dup
     dup=$(jq '[.hooks.PreToolUse[]?.hooks[]?.command | select(endswith("find-guard.sh"))] | length' "$settings")
-    [ "$dup" = 1 ] && pass "settings.json: 繰り返し apply しても hook が重複しない" \
+    [ "$dup" = 1 ] && pass "settings.json: 繰り返し apply しても find-guard hook が重複しない" \
         || fail "settings.json: find-guard hook が ${dup} 個ある"
+    dup=$(jq '[.hooks.PreToolUse[]?.hooks[]?.command | select(endswith("dangerous-command-guard.sh"))] | length' "$settings")
+    [ "$dup" = 1 ] && pass "settings.json: 繰り返し apply しても dangerous-command-guard hook が重複しない" \
+        || fail "settings.json: dangerous-command-guard hook が ${dup} 個ある"
 }
 
 test_private_layer() {
@@ -252,7 +280,7 @@ test_private_layer() {
     ) || FAILED=1
 }
 
-ALL_TESTS=(zsh tmux git find_guard idempotent settings_preserved private_layer)
+ALL_TESTS=(zsh tmux git find_guard dangerous_command_guard idempotent settings_preserved private_layer)
 if [ "$#" -eq 0 ]; then
     set -- "${ALL_TESTS[@]}"
 fi

@@ -174,6 +174,17 @@ dotfiles で管理できるテキスト設定ファイルが無いため、`Brew
 - `~/.claude/CLAUDE.md` が参照する `@RTK.md` は chezmoi 管理外。rtk (`rtk init -g`) が生成する `~/.claude/RTK.md` で、無くても `@` 参照が無視されるだけで害はない。hook (`rtk hook claude`) も rtk 本体が前提
 - `@~/.config/private/claude/CLAUDE.md` も private リポジトリが無ければ単に無視される
 
+### 破壊的コマンドのガード (PreToolUse hook)
+
+`permissions` はコマンド文字列の前方一致でしか判定できないため、`rm -fr` / `rm -r -f` のような表記揺れや `cd x && rm -rf y` のような複合コマンド、git エイリアス経由の操作はルールをすり抜ける。
+
+これを補うため、`home/dot_claude/hooks/dangerous-command-guard.sh` (解析本体は `dangerous-command-guard.awk`) を PreToolUse hook として登録している。`settings.base.json` の `PreToolUse` (matcher: `Bash`) から `bash ~/.claude/hooks/dangerous-command-guard.sh` で呼ばれ、以下を返す。
+
+- `deny`: `rm` / `git rm` の再帰的強制削除 (`rm -rf`, `rm -fr`, `rm -r -f`, `sudo rm -rf` など)
+- `ask`: 上記以外の `rm` / `mv`、`git commit / push` (force を含む)、`git reset --hard`, `git clean -f`, `git restore`, `git checkout -- / . / -f`
+
+判定は `settings.base.json` の方針に合わせる。`bash -c '...'`、`eval`、`find -exec` の中身は再帰的に解析するが、完全なシェルパーサではないため、変数展開や難読化されたコマンド、スクリプトファイルの中身までは追跡しない。破壊的な git エイリアス (`nevermind`, `discard`) は bypass を防ぐため `home/dot_gitconfig.tmpl` から廃止した。
+
 ### プラグイン / マーケットプレイス
 
 外部コードを自動で取り込むため、`settings.base.json` に置くものは最小限にする。
