@@ -154,7 +154,8 @@ link_slot "$PRIVATE_DIR/ssh/config" "$HOME/.ssh/config" 600
 ## 運用
 
 - 編集は `dot private` で `~/.config/private` に移動し、直接編集して commit / push する
-- `dot update` は公開リポジトリを pull して apply する。private リポジトリは `refreshPeriod = 24h` で更新される。すぐ反映したい場合は `chezmoi apply --refresh-externals` か `git -C ~/.config/private pull`
+- `dot update` は `~/.config/private` があれば先に `git pull --ff-only` し、その後 `chezmoi update` (公開リポジトリの pull + apply) を実行する。apply は 1 回だけなので、public / private 両方の変更がまとめて `~/.claude/settings.json` などに反映される
+- `dot update` を使わずに反映したい場合は `git -C ~/.config/private pull` してから `chezmoi apply`。`chezmoi update` 単体では private は `refreshPeriod = 24h` のペースでしか更新されない (`chezmoi apply --refresh-externals` でも更新できるが、tpm や zimfw の external も取り直す)
 - private リポジトリも chezmoi の external なので、`~/.config/private` を削除すると次の apply で clone し直される
 - private リポジトリの git 操作は通常どおり `git` を使う
 - 初回の `chezmoi init --apply` では private の clone が後になることがある。AWS のリンクや Claude の settings が反映されない場合は、もう一度 `chezmoi apply` を実行する

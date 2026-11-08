@@ -15,7 +15,8 @@ This is a personal dotfiles repository for managing shell configurations, primar
 - `chezmoi update` - git pull + apply
 
 ### Daily Usage
-- `dot update` / `dot diff` - Wrappers for `chezmoi update` / `chezmoi diff`
+- `dot update` - Pulls `~/.config/private` first (when present), then runs `chezmoi update` so public and private changes are applied together
+- `dot diff` - Wrapper for `chezmoi diff`
 - `dot private` - Move to the private repository (`~/.config/private`)
 - `s` - Reload zsh configuration (source ~/.zshrc)
 
@@ -55,6 +56,7 @@ This is a personal dotfiles repository for managing shell configurations, primar
 
 **Dependency Management**:
 - `Brewfile` (repo root, not deployed) + `home/.chezmoiscripts/run_onchange_after_brew-bundle.sh.tmpl` run `brew bundle` on macOS when the Brewfile (or `~/.config/private/Brewfile`) changes; skipped when `CI` is set or brew is missing
+- `home/.chezmoiscripts/run_onchange_after_docker-cli-plugins.sh` removes dangling symlinks left in `~/.docker/cli-plugins/` (e.g. from an uninstalled Docker Desktop) so Homebrew's `docker-compose` / `docker-buildx` plugins are visible to the brew docker CLI. `~/.docker/config.json` is not managed because it holds credentials
 - Uses Zim framework for zsh (`home/dot_config/zsh/zimrc`)
 - Uses TPM (Tmux Plugin Manager) for tmux plugins (tpm itself is cloned by chezmoi external)
 
@@ -119,6 +121,7 @@ This is a personal dotfiles repository for managing shell configurations, primar
 - Karabiner-Elements: `home/dot_config/private_karabiner/private_karabiner.json` → `~/.config/karabiner/karabiner.json`
 - BetterTouchTool: `home/dot_btt_autoload_preset.json` → `~/.btt_autoload_preset.json` (BTT が起動時に自動 import する JSON プリセット。実体の SQLite は管理しない)
 - Raycast: dotfiles 向きのテキスト設定が無いので `Brewfile` の cask のみ。`~/.config/raycast/config.json` はアクセストークンなので管理しない
+- LINE: Mac App Store 版のみで cask が無く、`mas` も Spotlight 索引が無効だと使えないため Brewfile 管理外 (手動インストール)。詳細は `docs/chezmoi.md`
 - These are macOS-only; `home/.chezmoiignore` excludes them on non-darwin
 
 ### Key Features
