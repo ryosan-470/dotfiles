@@ -107,6 +107,12 @@ This is a personal dotfiles repository for managing shell configurations, primar
 - Keep the `private_` prefix on `Library` directories; otherwise chezmoi chmods `~/Library` to 755
 - `Library` and macOS-only scripts are ignored on non-darwin in `home/.chezmoiignore`
 
+**macOS GUI アプリ設定**:
+- Karabiner-Elements: `home/dot_config/private_karabiner/private_karabiner.json` → `~/.config/karabiner/karabiner.json`
+- BetterTouchTool: `home/dot_btt_autoload_preset.json` → `~/.btt_autoload_preset.json` (BTT が起動時に自動 import する JSON プリセット。実体の SQLite は管理しない)
+- Raycast: dotfiles 向きのテキスト設定が無いので `Brewfile` の cask のみ。`~/.config/raycast/config.json` はアクセストークンなので管理しない
+- These are macOS-only; `home/.chezmoiignore` excludes them on non-darwin
+
 ### Key Features
 
 **Auto-tmux**: Automatically starts/attaches to tmux sessions when opening terminal (configured in `home/dot_config/zsh/command.zsh`)

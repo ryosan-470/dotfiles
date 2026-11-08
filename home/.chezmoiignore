@@ -4,5 +4,7 @@
 {{ if ne .chezmoi.os "darwin" }}
 # macOS 専用
 Library
+.btt_autoload_preset.json
+.config/karabiner
 .local/bin/cleanup-caches.sh
 {{ end }}
