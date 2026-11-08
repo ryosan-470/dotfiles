@@ -223,8 +223,11 @@ Homebrew 自体のインストールは sudo と対話が必要なため、chezm
 インストール直後のシェルでは PATH を通しておく。
 
 ```sh
-eval "$(/opt/homebrew/bin/brew shellenv)"   # Apple Silicon
-eval "$(/usr/local/bin/brew shellenv)"      # Intel Mac
+if [ -x /opt/homebrew/bin/brew ]; then
+    eval "$(/opt/homebrew/bin/brew shellenv)"   # Apple Silicon
+elif [ -x /usr/local/bin/brew ]; then
+    eval "$(/usr/local/bin/brew shellenv)"      # Intel Mac
+fi
 ```
 
 `chezmoi apply` で `~/.zshenv` が配置されると、`/opt/homebrew` / `/usr/local` / Linuxbrew を順に探して `brew shellenv` するようになるため、この設定を自分で書く必要はない。
@@ -247,6 +250,8 @@ brew install gh
 gh auth login
 gh auth setup-git   # HTTPS で clone する場合
 ```
+
+`gh auth setup-git` が `~/.gitconfig` に書く credential helper は、`chezmoi apply` が `~/.gitconfig` を再生成すると消える。apply 後は Brewfile の Git Credential Manager が credential helper になり、初回の git 操作で認証を求められる。
 
 SSH で clone する場合は SSH 鍵を用意し、private リポジトリの URL に SSH 形式 (`git@github.com:...`) を指定する。
 
@@ -321,7 +326,10 @@ cask でアプリはインストールされるが、初回起動・ログイン
 
 #### 最後に確認する
 
+初回の apply では `brew bundle` と private リポジトリの clone が後半に走るため、`~/.gitconfig` (Git Credential Manager の検出) や private の Claude 設定がまだ反映されていない。もう一度 apply してから確認する。
+
 ```sh
+chezmoi apply           # 2 回目 (brew bundle と private clone の結果を反映)
 exec zsh                # 設定を読み直す
 chezmoi doctor          # 環境の診断
 chezmoi status          # 未反映のファイルが無いこと
