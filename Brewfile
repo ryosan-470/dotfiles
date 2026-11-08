@@ -78,6 +78,5 @@ cask "iina"
 cask "font-jetbrains-mono"
 
 # Mac App Store (mas)
-# LINE (id 539883307) は mas で管理しない: mas 7 は Spotlight の索引に依存し、
-# このマシンでは索引が無効 (mdutil -s / → Indexing disabled) のため。
+# LINE (id 539883307) は mas で管理しない: mas 7 は Spotlight の索引に依存するため。
 brew "mas"

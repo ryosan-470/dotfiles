@@ -150,7 +150,7 @@ dotfiles で管理できるテキスト設定ファイルが無いため、`Brew
 
 ### LINE
 
-LINE (Mac App Store id `539883307`) は `mas` で管理しない。mas 7 はインストール済み App Store アプリの列挙に Spotlight の索引を使うが、このマシンでは索引が無効 (`mdutil -s /` → `Indexing disabled`) で、有効化には `sudo mdutil -Eai on` が必要なため。新マシンでは App Store から手動でインストールする。
+LINE (Mac App Store id `539883307`) は `mas` で管理しない。mas 7 はインストール済み App Store アプリの列挙に Spotlight の索引を使うため。App Store から手動でインストールする。
 
 ## Claude Code の settings.json
 
