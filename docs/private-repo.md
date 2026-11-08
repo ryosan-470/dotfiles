@@ -94,7 +94,7 @@ fi
 
 - マシンだけの一時設定は `~/.local.zsh`, `~/.gitconfig.local`, `~/.tmux.local.conf`, `~/.claude/CLAUDE.local.md` (管理外) に置く
 - 会社名・社内ホスト名・社内ツール名を含む設定は private に置く。公開リポジトリには書かない
-- 仕事用・プロジェクト固有の Claude Code プラグインとマーケットプレイスは `claude/settings.json` の `enabledPlugins` / `extraKnownMarketplaces` に置く。外部コードは `ref` で固定し、`autoUpdate` は `false` にする
+- 仕事用・プロジェクト固有の Claude Code プラグインとマーケットプレイスは `claude/settings.json` の `enabledPlugins` / `extraKnownMarketplaces` に置く。外部コードは `ref` で固定し、`autoUpdate` は `false` にする (タグが無いリポジトリは少なくとも `autoUpdate` を `false` にする)
 
 ## AWS
 
