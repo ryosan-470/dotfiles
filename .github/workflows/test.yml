@@ -29,7 +29,10 @@ jobs:
           for f in .zshrc .zshenv .gitconfig .tmux.conf \
                    .config/zsh/command.zsh .config/zsh/zimrc \
                    .config/git/commit_template.txt \
-                   .claude/CLAUDE.md .claude/settings.json .claude/statusline.sh .claude/hooks/find-guard.sh \
+                   .claude/CLAUDE.md .claude/settings.json .claude/statusline.sh \
+                   .claude/hooks/find-guard.sh \
+                   .claude/hooks/dangerous-command-guard.sh \
+                   .claude/hooks/dangerous-command-guard.awk \
                    .tmux/plugins/tpm/tpm; do
             test -e "$HOME/$f" || { echo "missing: $f"; exit 1; }
           done
@@ -38,6 +41,8 @@ jobs:
           chezmoi verify
       - name: Test modify_settings.json.tmpl merge logic
         run: tests/modify_settings.sh
+      - name: Test dangerous-command-guard hook
+        run: tests/dangerous-command-guard.sh
       - name: Install zsh
         if: runner.os == 'Linux'
         run: sudo apt-get update && sudo apt-get install -y zsh
@@ -96,6 +101,7 @@ jobs:
           set -eu
           shellcheck -S warning \
             home/dot_claude/hooks/find-guard.sh \
+            home/dot_claude/hooks/dangerous-command-guard.sh \
             home/dot_claude/executable_statusline.sh \
             home/dot_local/bin/executable_cleanup-caches.sh \
             home/dot_tmux/executable_used-mem
