@@ -55,6 +55,7 @@ This is a personal dotfiles repository for managing shell configurations, primar
 
 **Dependency Management**:
 - `Brewfile` (repo root, not deployed) + `home/.chezmoiscripts/run_onchange_after_brew-bundle.sh.tmpl` run `brew bundle` on macOS when the Brewfile (or `~/.config/private/Brewfile`) changes; skipped when `CI` is set or brew is missing
+- `home/.chezmoiscripts/run_onchange_after_docker-cli-plugins.sh` removes dangling symlinks left in `~/.docker/cli-plugins/` (e.g. from an uninstalled Docker Desktop) so Homebrew's `docker-compose` / `docker-buildx` plugins are visible to the brew docker CLI. `~/.docker/config.json` is not managed because it holds credentials
 - Uses Zim framework for zsh (`home/dot_config/zsh/zimrc`)
 - Uses TPM (Tmux Plugin Manager) for tmux plugins (tpm itself is cloned by chezmoi external)
 

@@ -1,6 +1,6 @@
 # dotfiles が前提にするツール。macOS で `chezmoi apply` 時に brew bundle で入る
 # (run_onchange_after_brew-bundle.sh.tmpl)。private は ~/.config/private/Brewfile に書く。
-# 言語ランタイムと ccgate は mise で管理するのでここに書かない。
+# ccgate は mise で管理するのでここに書かない。go / uv は現状この Brewfile で管理する。
 
 tap "augani/dory"
 tap "stablyai/orca"
@@ -24,6 +24,7 @@ brew "grep"
 brew "gawk"
 
 # Git / GitHub
+brew "git"
 brew "gh"
 cask "git-credential-manager"
 
@@ -36,6 +37,16 @@ brew "gnupg"
 # dotfiles 管理 / ランタイム管理
 brew "chezmoi"
 brew "mise"
+
+# 言語 / 開発ツール
+brew "go"
+brew "uv"
+
+# コンテナ (ランタイムは cask "augani/dory/dory")
+brew "docker"
+brew "docker-compose"
+brew "docker-buildx"
+brew "docker-credential-helper"
 
 # Claude Code と、その hooks から呼ばれるツール (ccgate は mise で管理)
 cask "claude-code@latest"
@@ -54,6 +65,9 @@ cask "stablyai/orca/orca"
 cask "bettertouchtool"
 cask "raycast"
 cask "codexbar"
+
+# フォント
+cask "font-jetbrains-mono"
 
 # Mac App Store (mas)
 brew "mas"
