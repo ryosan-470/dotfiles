@@ -47,7 +47,6 @@ claude/CLAUDE.md        # imported by ~/.claude/CLAUDE.md
 claude/settings.json    # merged into ~/.claude/settings.json
 Brewfile                # installed by brew bundle (macOS)
 aws/config              # symlinked to ~/.aws/config (600)
-aws/profile             # symlinked to ~/.aws/profile (600)
 ```
 
 ### Claude Code settings

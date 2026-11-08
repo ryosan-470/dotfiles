@@ -1,11 +1,9 @@
 {{- $awsConfig := joinPath .chezmoi.homeDir ".config/private/aws/config" -}}
-{{- $awsProfile := joinPath .chezmoi.homeDir ".config/private/aws/profile" -}}
 #!/bin/bash
 # private リポジトリ (~/.config/private) の素材を HOME 配下へシンボリックリンクする。
 # private 側のファイルが変わったときだけ実行する (ファイルのハッシュをコメントに埋め込む)。
 #
 # aws/config hash: {{ if stat $awsConfig }}{{ include $awsConfig | sha256sum }}{{ else }}absent{{ end }}
-# aws/profile hash: {{ if stat $awsProfile }}{{ include $awsProfile | sha256sum }}{{ else }}absent{{ end }}
 #
 # 方針:
 # - private 側にファイルが無ければ何もしない
@@ -44,4 +42,3 @@ link_slot() {
 # 追加するときは link_slot <private 側> <HOME 側> [パーミッション] を 1 行足す。
 # 例: link_slot "$PRIVATE_DIR/ssh/config" "$HOME/.ssh/config" 600
 link_slot "$PRIVATE_DIR/aws/config" "$HOME/.aws/config" 600
-link_slot "$PRIVATE_DIR/aws/profile" "$HOME/.aws/profile" 600

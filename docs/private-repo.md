@@ -52,7 +52,6 @@ private リポジトリの直下に置く。すべて任意で、無いものは
 | `claude/settings.json` | `~/.claude/settings.json` にマージ | permissions は和集合、hooks は base + private |
 | `Brewfile` | macOS で `brew bundle` | 公開 Brewfile の後に適用 |
 | `aws/config` | `~/.aws/config` へシンボリックリンク | 600。`aws configure` の変更も private 側に入る |
-| `aws/profile` | `~/.aws/profile` へシンボリックリンク | 600。標準は `aws/config` の profile なので、別ファイル運用のときだけ |
 
 > [!NOTE]
 > `Brewfile` は全マシンで共通に適用される。ホストごとに分けたいパッケージは `Brewfile` に書かず、そのマシンで手動で入れる。
@@ -99,6 +98,7 @@ fi
 ## AWS
 
 - `aws/config` を private に置くと `~/.aws/config` にリンクされる
+- AWS CLI のプロファイルは `~/.aws/config` の `[profile <name>]` (default は `[default]`) で定義する。`~/.aws/profile` という標準ファイルは無い
 - `~/.aws/credentials` はサポートしない (access key は秘密情報)。SSO か `credential_process` を使う
 - 既存の `~/.aws/config` が実ファイルの場合は上書きしない。中身を `~/.config/private/aws/config` に移し、元ファイルを退避してから `chezmoi apply` する
 - `aws configure` などで書き換えた内容は private 側のファイルに入る。`dot private` で移動して commit / push する
