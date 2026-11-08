@@ -138,6 +138,15 @@ brew bundle --file={{ joinPath .chezmoi.workingTree "Brewfile" | quote }}
 - `~/.claude/CLAUDE.md` が参照する `@RTK.md` は chezmoi 管理外。rtk (`rtk init -g`) が生成する `~/.claude/RTK.md` で、無くても `@` 参照が無視されるだけで害はない。hook (`rtk hook claude`) も rtk 本体が前提
 - `@~/.config/private/claude/CLAUDE.md` も private リポジトリが無ければ単に無視される
 
+### プラグイン / マーケットプレイス
+
+外部コードを自動で取り込むため、`settings.base.json` に置くものは最小限にする。
+
+- 公開リポジトリに置くのは、全マシンで使うと決めたものだけ。仕事用・プロジェクト固有のマーケットプレイスやプラグインは private レイヤー (`~/.config/private/claude/settings.json`) に置く
+- `extraKnownMarketplaces` の GitHub ソースは `ref` でタグに固定し、`autoUpdate` を `false` にする (タグが無いリポジトリは少なくとも `autoUpdate` を `false` にする)。更新は `claude plugin marketplace update <name>` で明示的に行う。`autoUpdate` の既定値は有効なので、書かないと自動更新になる
+- マーケットプレイスを追加すると、そのリポジトリの `.claude-plugin/marketplace.json` やプラグインの hooks / MCP サーバーが実行されうる。追加前にリポジトリの内容を確認する
+- `enabledPlugins` と `extraKnownMarketplaces` は 3 層が深いマージになる。同じキーは base → private の順で上書きされ、ローカルで追加したプラグインは残る。ただし **base から削除したエントリは既存マシンのローカル設定には残る** ので、各マシンの `~/.claude/settings.json` からも手で削除する
+
 ## 新しいマシンのセットアップ
 
 ```sh

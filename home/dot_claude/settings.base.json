@@ -142,24 +142,13 @@
     "cclens@cclens": true
   },
   "extraKnownMarketplaces": {
-    "agent-toolkit-for-aws": {
-      "source": {
-        "source": "github",
-        "repo": "aws/agent-toolkit-for-aws"
-      }
-    },
-    "ryosan-470-plugins": {
-      "source": {
-        "source": "github",
-        "repo": "ryosan-470/claude-plugins"
-      },
-      "autoUpdate": true
-    },
     "cclens": {
       "source": {
         "source": "github",
-        "repo": "lambdalisue/cclens"
-      }
+        "repo": "lambdalisue/cclens",
+        "ref": "v0.1.1"
+      },
+      "autoUpdate": false
     }
   },
   "language": "日本語",
