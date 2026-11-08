@@ -65,6 +65,7 @@ cask "stablyai/orca/orca"
 cask "bettertouchtool"
 cask "raycast"
 cask "codexbar"
+cask "hot"
 
 # フォント
 cask "font-jetbrains-mono"
