@@ -78,23 +78,23 @@ This is a personal dotfiles repository for managing shell configurations, primar
 
 **gh CLI**:
 - **Allow(自動許可)**: 閲覧・参照系コマンド(`view`, `list`, `status`, `diff`, `checks`, `search` など)
-- **Ask(都度確認)**: `gh api`, `issue comment/edit`, `pr create/edit/comment/merge/review`
-- **Deny(常に拒否)**: 破壊的・不可逆な操作(`delete`, `close`, `archive`, `rename` など)、認証・鍵の操作(`auth`, `ssh-key`, `gpg-key`)、リポジトリ設定の変更(`secret`, `variable`)、ワークフロー変更(`workflow enable/disable`)
+- **Ask(都度確認)**: `gh api`, `issue comment/edit/close`, `pr create/edit/comment/merge/review/close`, `variable`
+- **Deny(常に拒否)**: 破壊的・不可逆な操作(`delete`, `archive`, `rename` など)、認証・鍵の操作(`auth`, `ssh-key`, `gpg-key`)、リポジトリ設定の変更(`secret`)、ワークフロー変更(`workflow enable/disable`)
 
 **git**:
-- **Allow(自動許可)**: 閲覧・参照系(`log`, `diff`, `show`, `status`, `branch`, `remote`, `tag`, `stash list`)
-- **Ask(都度確認)**: `commit`, `push`, 破壊的な作業ツリー操作(`reset --hard`, `restore`, `clean -f`, `checkout -- / . / -f`, `rm`)、`push --force/-f`
+- **Allow(自動許可)**: 閲覧・参照系(`log`, `diff`, `show`, `status`, `branch`, `remote`, `tag`, `stash list`)、`push`(force 系を除く)
+- **Ask(都度確認)**: `commit`, 破壊的な作業ツリー操作(`reset --hard`, `restore`, `clean -f`, `checkout -- / . / -f`, `rm`)、force push(`--force`, `-f`, `--force-with-lease`, `--force-if-includes`)
 - **Deny(常に拒否)**: 再帰的強制削除(`git rm -rf` など)
 
 **brew**:
-- **Deny(全操作拒否)**: 全コマンドをブロック
+- **Ask(都度確認)**: 全コマンド(install / upgrade などの実行前に確認)
 
 **システム**:
 - **Deny(常に拒否)**: `sudo`, `shutdown`(特権昇格・システム停止の防止)
 
 **ファイル操作 / ネットワーク**:
-- **Ask(都度確認)**: `rm`, `mv`(誤削除・誤移動の防止)、`curl`(任意のネットワークリクエストの防止)
-- **Deny(常に拒否)**: `rm -rf`(再帰的削除は絶対禁止)、`wget`(任意のネットワークリクエストの防止)
+- **Ask(都度確認)**: `rm`, `mv`(誤削除・誤移動の防止)、`curl`, `wget`(任意のネットワークリクエストの防止)
+- **Deny(常に拒否)**: `rm -rf`(再帰的削除は絶対禁止)
 
 **表記揺れ・複合コマンド対策**:
 - `permissions` はコマンド文字列の前方一致でしか判定できないため、PreToolUse hook `home/dot_claude/hooks/dangerous-command-guard.sh` が `rm -fr` / `rm -r -f`、`cd x && rm -rf y`、`sudo rm -rf`、git エイリアス越しの破壊的操作を検出して deny / ask を返す
@@ -103,7 +103,9 @@ This is a personal dotfiles repository for managing shell configurations, primar
 
 **構文**: 全ルールで非推奨の `:*` サフィックスを廃止し、スペース + `*` 構文に統一
 
-**chezmoi のマージに関する注意**: `modify_settings.json.tmpl` は permissions を和集合でマージする。deny の追加は既存マシンにも反映されるが、allow / ask / deny から削除したエントリは既存マシンの `~/.claude/settings.json` に残るため、各マシンで手動削除が必要。今回 ask に移した `Bash(git checkout -- . *)` と `Bash(git clean -fd *)` は、既存マシンの deny に残っていれば手動で削除する。
+**chezmoi のマージに関する注意**: `modify_settings.json.tmpl` は permissions を和集合でマージする。deny の追加は既存マシンにも反映されるが、allow / ask / deny から削除したエントリは既存マシンの `~/.claude/settings.json` に残るため、各マシンで手動削除が必要。今回の変更で手動削除が必要なもの:
+- deny に残る: `Bash(brew *)`, `Bash(wget *)`, `Bash(gh issue close *)`, `Bash(gh pr close *)`, `Bash(gh variable *)`, `Bash(git checkout -- . *)`, `Bash(git clean -fd *)`
+- ask に残る: `Bash(git push)`, `Bash(git push *)`(安全な push を allow にするため)
 
 **Customization System**: See "Layers" above. Machine-local files are optional and are not created automatically.
 

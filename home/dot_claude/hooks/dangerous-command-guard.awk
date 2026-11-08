@@ -211,8 +211,8 @@ function analyze_push(args,   n, a, i, t, f) {
     n = split(args, a, " ")
     for (i = 1; i <= n; i++) {
         t = a[i]
-        if (t == "--force") {
-            emit(1, "git push --force は履歴を書き換えるため確認します")
+        if (t == "--force" || t ~ /^--force-with-lease/ || t ~ /^--force-if-includes/) {
+            emit(1, "git push の force 系オプションは履歴を書き換えるため確認します")
             return
         }
         if (t ~ /^--/)
@@ -225,8 +225,7 @@ function analyze_push(args,   n, a, i, t, f) {
             }
         }
     }
-    # git エイリアス (git p など) から呼ばれた場合も push 自体を ask にする
-    emit(1, "git push はリモートを更新するため確認します")
+    # 通常の push は settings.base.json の allow に従う (安全な push)
 }
 
 function analyze_git(args,   scmd, rest) {

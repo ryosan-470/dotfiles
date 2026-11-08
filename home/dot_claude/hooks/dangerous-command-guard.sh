@@ -7,8 +7,9 @@
 #
 # 判定は settings.base.json の方針と揃える:
 #   deny: rm / git rm の再帰的強制削除
-#   ask : 上記以外の rm / mv、git commit / push (--force / -f を含む)、
+#   ask : 上記以外の rm / mv、git commit、force push (--force / -f / --force-with-lease)、
 #         git reset --hard、git clean -f、git restore、git checkout -- / . / -f
+# 通常の git push は settings.base.json の allow に従う。
 #
 # `bash -c '...'`、`eval`、`find -exec` の中身は再帰的に解析する。
 # 限界: 完全なシェルパーサではない。変数展開や難読化されたコマンド、

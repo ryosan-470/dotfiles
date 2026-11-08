@@ -20,6 +20,7 @@ cat >"$HOME/.gitconfig" <<'EOF'
 	multi = !git nevermind
 	c = commit
 	p = !git push origin HEAD --force-with-lease
+	plainpush = !git push origin HEAD
 EOF
 
 fail=0
@@ -114,12 +115,15 @@ expect none 'git checkout main'
 expect ask 'git restore foo'
 expect ask 'git restore --staged foo'
 expect ask 'git commit -m foo'
-expect ask 'git push'
+expect none 'git push'
 expect ask 'git push -f'
 expect ask 'git push --force'
 expect ask 'git push -f origin main'
 expect ask 'git push --force-with-lease'
-expect ask 'git push origin main'
+expect ask 'git push origin main --force'
+expect ask 'git push --force-with-lease=origin/main'
+expect none 'git push origin main'
+expect none 'git push origin main --no-verify'
 expect none 'git log --oneline'
 
 # --- git エイリアス ---
@@ -129,6 +133,7 @@ expect ask 'git -C /tmp nevermind'
 expect ask 'git multi'
 expect ask 'git c -m foo'
 expect ask 'git p'
+expect none 'git plainpush'
 
 # --- その他 ---
 expect ask 'mv a b'

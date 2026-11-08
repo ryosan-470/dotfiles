@@ -181,7 +181,8 @@ dotfiles で管理できるテキスト設定ファイルが無いため、`Brew
 これを補うため、`home/dot_claude/hooks/dangerous-command-guard.sh` (解析本体は `dangerous-command-guard.awk`) を PreToolUse hook として登録している。`settings.base.json` の `PreToolUse` (matcher: `Bash`) から `bash ~/.claude/hooks/dangerous-command-guard.sh` で呼ばれ、以下を返す。
 
 - `deny`: `rm` / `git rm` の再帰的強制削除 (`rm -rf`, `rm -fr`, `rm -r -f`, `sudo rm -rf` など)
-- `ask`: 上記以外の `rm` / `mv`、`git commit / push` (force を含む)、`git reset --hard`, `git clean -f`, `git restore`, `git checkout -- / . / -f`
+- `ask`: 上記以外の `rm` / `mv`、`git commit`、force push (`--force` / `-f` / `--force-with-lease` / `--force-if-includes`)、`git reset --hard`, `git clean -f`, `git restore`, `git checkout -- / . / -f`
+- allow に何も返さない: 通常の `git push` は `settings.base.json` の allow に従う
 
 判定は `settings.base.json` の方針に合わせる。`bash -c '...'`、`eval`、`find -exec` の中身は再帰的に解析するが、完全なシェルパーサではないため、変数展開や難読化されたコマンド、スクリプトファイルの中身までは追跡しない。破壊的な git エイリアス (`nevermind`, `discard`) は bypass を防ぐため `home/dot_gitconfig.tmpl` から廃止した。
 
