@@ -18,6 +18,10 @@ sh -c "$(curl -fsLS get.chezmoi.io)" -- init --apply \
 Use the same URL on every machine. Leave it empty if you do not use the private layer.
 If you use the private layer, run `gh auth login` before `chezmoi init`.
 
+It also asks for a machine profile (`personal`, `work`, ...). The profile is stored only in
+`~/.config/chezmoi/chezmoi.toml` and selects `~/.config/private/claude/settings.<profile>.json`
+when present. Leave it empty to use only the common private settings.
+
 ## Update the configuration
 
 ```console
