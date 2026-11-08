@@ -6,7 +6,7 @@
 # そのため単純なコピー/リンクではなく、以下の 3 層をマージして出力する:
 #   1. 現在のファイル (stdin)          ... ローカルで追加された設定
 #   2. settings.base.json (リポジトリ) ... 共通設定。同じキーは 1 を上書きする
-#   3. ~/.config/work/claude/settings.json (あれば) ... 仕事用設定。同じキーは 2 を上書きする
+#   3. ~/.config/private/claude/settings.json (あれば) ... private 設定。同じキーは 2 を上書きする
 # permissions の allow/ask/deny/additionalDirectories は 3 層の和集合。
 # hooks はイベントごとに 3 層を合わせる。ただしリポジトリ側 (2, 3) と同じ command を含む
 # ローカルのエントリはリポジトリ側で置き換える (timeout 等の変更が重複しないように)。
@@ -14,10 +14,10 @@
 set -euo pipefail
 
 base={{ joinPath .chezmoi.sourceDir "dot_claude" "settings.base.json" | quote }}
-work="$HOME/.config/work/claude/settings.json"
+private_settings="$HOME/.config/private/claude/settings.json"
 
 current=$(cat)
-[ -f "$work" ] || work=/dev/null
+[ -f "$private_settings" ] || private_settings=/dev/null
 
 if ! command -v jq >/dev/null 2>&1; then
     # マージできないときは既存のファイルを壊さない
@@ -34,20 +34,20 @@ fi
 jq -n \
     --argjson cur "$current" \
     --slurpfile base "$base" \
-    --slurpfile work "$work" '
+    --slurpfile private "$private_settings" '
 def dedupe: reduce .[] as $x ([]; if any(.[]; . == $x) then . else . + [$x] end);
 def cmds: [.hooks[]?.command];
 
 $base[0] as $b
-| ($work[0] // {}) as $w
-| ($cur * $b * $w)
+| ($private[0] // {}) as $p
+| ($cur * $b * $p)
 | reduce ("allow", "ask", "deny", "additionalDirectories") as $k (.;
-    ([$cur, $b, $w] | map(.permissions[$k] // []) | add | dedupe) as $v
+    ([$cur, $b, $p] | map(.permissions[$k] // []) | add | dedupe) as $v
     | if ($v | length) > 0 then .permissions[$k] = $v else . end)
-| ([$cur, $b, $w] | map(.hooks // {} | keys) | add | unique) as $events
+| ([$cur, $b, $p] | map(.hooks // {} | keys) | add | unique) as $events
 | if ($events | length) > 0 then
     .hooks = reduce $events[] as $e ({};
-      (($b.hooks[$e] // []) + ($w.hooks[$e] // [])) as $managed
+      (($b.hooks[$e] // []) + ($p.hooks[$e] // [])) as $managed
       | [$managed[] | cmds[]] as $mc
       | [($cur.hooks[$e] // [])[] | select((cmds - $mc) == cmds)] as $local
       | .[$e] = ($local + $managed | dedupe))

@@ -21,7 +21,7 @@ jobs:
         run: |
           sh -c "$(curl -fsLS get.chezmoi.io)" -- -b "$HOME/.local/bin" -t v2.74.0
           echo "$HOME/.local/bin" >> "$GITHUB_PATH"
-      - name: "chezmoi init --apply (私用マシン相当: workRepo は空)"
+      - name: "chezmoi init --apply (privateRepo は空)"
         run: chezmoi init --apply --no-tty --promptDefaults --source "$GITHUB_WORKSPACE"
       - name: Verify deployed files
         run: |

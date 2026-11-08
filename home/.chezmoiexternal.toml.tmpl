@@ -12,11 +12,12 @@
     url = "https://github.com/zimfw/zimfw/releases/download/v1.20.2/zimfw.zsh"
     checksum.sha256 = "918e8948d08346d5f1373ec628d858e4732fbbb9991b25c22d1a9b3443a2edc2"
 
-{{ if .workRepo -}}
-# 仕事用レイヤー: 勤務先ごとの private リポジトリ (シークレットはコミットしない)
+{{ if index . "privateRepo" -}}
+# private レイヤー: 個人用・仕事用の非公開設定 (シークレットはコミットしない)
 # 公開リポジトリには URL を含めず、chezmoi init 時の入力値 (ローカルの chezmoi.toml) からのみ参照する
-[".config/work"]
+# index を使うのは、移行前の chezmoi.toml (workRepo のみ) でもテンプレートエラーにしないため
+[".config/private"]
     type = "git-repo"
-    url = {{ .workRepo | quote }}
+    url = {{ index . "privateRepo" | quote }}
     refreshPeriod = "24h"
 {{- end }}

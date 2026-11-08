@@ -3,7 +3,7 @@
 #
 # 使い方: tests/e2e.sh <テスト名>...   (引数なしで全テスト)
 #   前提: `chezmoi init --apply` 済みの $HOME で実行する (CI の test.yml を参照)。
-#   work-layer だけは一時的な HOME を作って自前で init するので、他の状態に依存しない。
+#   private-layer だけは一時的な HOME を作って自前で init するので、他の状態に依存しない。
 #
 # 注意: テストは $HOME 配下の ~/.claude/settings.json を書き換えるので、手元の実環境では実行しないこと。
 set -euo pipefail
@@ -172,67 +172,74 @@ test_settings_preserved() {
         || fail "settings.json: find-guard hook が ${dup} 個ある"
 }
 
-test_work_layer() {
-    # 一時 HOME に閉じた環境で、ダミーの workRepo (ローカルの bare リポジトリ) を使って init する
-    local work_home="$TMP_ROOT/work-home" seed="$TMP_ROOT/work-seed" bare="$TMP_ROOT/work.git"
-    mkdir -p "$work_home" "$seed/zsh" "$seed/claude"
-    echo 'export E2E_WORK_LAYER=loaded' > "$seed/zsh/e2e.zsh"
-    printf '[e2e]\n\tworklayer = loaded\n' > "$seed/gitconfig"
-    echo 'set -g @e2e-work-layer loaded' > "$seed/tmux.conf"
-    echo '{"permissions":{"allow":["Bash(e2e-work-allow *)"]}}' > "$seed/claude/settings.json"
+test_private_layer() {
+    # 一時 HOME に閉じた環境で、ダミーの privateRepo (ローカルの bare リポジトリ) を使って init する
+    local private_home="$TMP_ROOT/private-home" seed="$TMP_ROOT/private-seed" bare="$TMP_ROOT/private.git"
+    mkdir -p "$private_home" "$seed/zsh" "$seed/claude" "$seed/aws"
+    echo 'export E2E_PRIVATE_LAYER=loaded' > "$seed/zsh/e2e.zsh"
+    printf '[e2e]\n\tprivatelayer = loaded\n' > "$seed/gitconfig"
+    echo 'set -g @e2e-private-layer loaded' > "$seed/tmux.conf"
+    echo '{"permissions":{"allow":["Bash(e2e-private-allow *)"]}}' > "$seed/claude/settings.json"
+    printf '[profile e2e]\nregion = ap-northeast-1\n# e2e-private-aws\n' > "$seed/aws/config"
     git -C "$seed" init -q -b main
     git -C "$seed" add -A
     git -C "$seed" -c user.name=e2e -c user.email=e2e@example.com commit -q -m seed
     git clone -q --bare "$seed" "$bare"
 
     (
-        export HOME="$work_home" XDG_CONFIG_HOME="$work_home/.config" TMUX=dummy TERM=xterm-256color
+        export HOME="$private_home" XDG_CONFIG_HOME="$private_home/.config" TMUX=dummy TERM=xterm-256color
         unset ZDOTDIR
-        # promptStringOnce は既存の data を優先するので、事前に chezmoi.toml へ workRepo を書いておく
+        # promptStringOnce は既存の data を優先するので、事前に chezmoi.toml へ privateRepo を書いておく
         mkdir -p "$XDG_CONFIG_HOME/chezmoi"
-        printf '[data]\n    workRepo = "file://%s"\n' "$bare" > "$XDG_CONFIG_HOME/chezmoi/chezmoi.toml"
+        printf '[data]\n    privateRepo = "file://%s"\n' "$bare" > "$XDG_CONFIG_HOME/chezmoi/chezmoi.toml"
         chezmoi init --apply --no-tty --source "$REPO_ROOT" >/dev/null \
-            || { fail "work: chezmoi init --apply に失敗"; exit 1; }
-        # 初回 apply では .claude/settings.json (modify) が ~/.config/work の clone より先に処理されるため、
-        # 仕事用 settings がマージされるのは 2 回目の apply 以降 (chezmoi update 等で自然に解消する)
-        chezmoi apply --no-tty >/dev/null || { fail "work: 2 回目の chezmoi apply に失敗"; exit 1; }
+            || { fail "private: chezmoi init --apply に失敗"; exit 1; }
+        # 初回 apply では .claude/settings.json (modify) が ~/.config/private の clone より先に処理されるため、
+        # private settings がマージされるのは 2 回目の apply 以降 (chezmoi update 等で自然に解消する)
+        chezmoi apply --no-tty >/dev/null || { fail "private: 2 回目の chezmoi apply に失敗"; exit 1; }
         local rc=0
 
-        [ -f "$HOME/.config/work/gitconfig" ] || { fail "work: ~/.config/work が clone されていない"; exit 1; }
-        pass "work: ~/.config/work に workRepo が clone された"
+        [ -f "$HOME/.config/private/gitconfig" ] || { fail "private: ~/.config/private が clone されていない"; exit 1; }
+        pass "private: ~/.config/private に privateRepo が clone された"
 
-        # zsh: 仕事用の *.zsh が source される
-        if zsh_pty 'echo work-layer=$E2E_WORK_LAYER' 2>&1 | grep -q 'work-layer=loaded'; then
-            pass "work: zsh が work/zsh/*.zsh を読み込む"
+        # zsh: private の *.zsh が source される
+        if zsh_pty 'echo private-layer=$E2E_PRIVATE_LAYER' 2>&1 | grep -q 'private-layer=loaded'; then
+            pass "private: zsh が private/zsh/*.zsh を読み込む"
         else
-            fail "work: zsh が work/zsh/*.zsh を読み込まない"; rc=1
+            fail "private: zsh が private/zsh/*.zsh を読み込まない"; rc=1
         fi
         # git: include される
-        if [ "$(git config --get e2e.worklayer || true)" = loaded ]; then
-            pass "work: git が work/gitconfig を読み込む"
+        if [ "$(git config --get e2e.privatelayer || true)" = loaded ]; then
+            pass "private: git が private/gitconfig を読み込む"
         else
-            fail "work: git が work/gitconfig を読み込まない"; rc=1
+            fail "private: git が private/gitconfig を読み込まない"; rc=1
         fi
         # tmux: source-file される
-        local sock="e2e-work-$$"
+        local sock="e2e-private-$$"
         tmux -L "$sock" -f "$HOME/.tmux.conf" new-session -d -s e2e 2>/dev/null || true
-        if [ "$(tmux -L "$sock" show-options -gv @e2e-work-layer 2>/dev/null || true)" = loaded ]; then
-            pass "work: tmux が work/tmux.conf を読み込む"
+        if [ "$(tmux -L "$sock" show-options -gv @e2e-private-layer 2>/dev/null || true)" = loaded ]; then
+            pass "private: tmux が private/tmux.conf を読み込む"
         else
-            fail "work: tmux が work/tmux.conf を読み込まない"; rc=1
+            fail "private: tmux が private/tmux.conf を読み込まない"; rc=1
         fi
         tmux -L "$sock" kill-server 2>/dev/null || true
         # claude: settings.json にマージされる
-        if jq -e '.permissions.allow | index("Bash(e2e-work-allow *)")' "$HOME/.claude/settings.json" >/dev/null; then
-            pass "work: settings.json に work/claude/settings.json がマージされる"
+        if jq -e '.permissions.allow | index("Bash(e2e-private-allow *)")' "$HOME/.claude/settings.json" >/dev/null; then
+            pass "private: settings.json に private/claude/settings.json がマージされる"
         else
-            fail "work: settings.json に work/claude/settings.json がマージされない"; rc=1
+            fail "private: settings.json に private/claude/settings.json がマージされない"; rc=1
+        fi
+        # private-links: aws/config が ~/.aws/config にリンクされる
+        if [ -L "$HOME/.aws/config" ] && grep -q 'e2e-private-aws' "$HOME/.aws/config"; then
+            pass "private: private/aws/config が ~/.aws/config にリンクされる"
+        else
+            fail "private: private/aws/config が ~/.aws/config にリンクされない"; rc=1
         fi
         exit "$rc"
     ) || FAILED=1
 }
 
-ALL_TESTS=(zsh tmux git find_guard idempotent settings_preserved work_layer)
+ALL_TESTS=(zsh tmux git find_guard idempotent settings_preserved private_layer)
 if [ "$#" -eq 0 ]; then
     set -- "${ALL_TESTS[@]}"
 fi

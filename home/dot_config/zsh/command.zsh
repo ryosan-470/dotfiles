@@ -49,12 +49,20 @@ There are common dot commands used in various situations:
 
 update         Update your dotfiles from GitHub and apply them (chezmoi update)
 diff           Show changes chezmoi would apply (chezmoi diff)
+private        Move to the private repository (~/.config/private)
 help           Print this message
 DOT
 )
     case $1 in
         update) chezmoi update;;
         diff) chezmoi diff;;
+        private)
+            if [[ -d ~/.config/private ]]; then
+                cd ~/.config/private
+            else
+                echo "~/.config/private がありません。chezmoi apply で clone されます" >&2
+            fi
+            ;;
         *) echo $help_message;;
     esac
 }

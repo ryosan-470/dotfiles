@@ -2,6 +2,7 @@
 
 この dotfiles は [chezmoi](https://www.chezmoi.io/) で管理している。
 このドキュメントは「設定を追加・変更したくなったとき、どこをどう触ればいいか」をまとめたもの。
+private レイヤーの仕様は [private-repo.md](./private-repo.md) を参照。
 
 ## 全体像
 
@@ -56,7 +57,8 @@ home/dot_config/zsh/alias.zsh  →  ~/.config/zsh/alias.zsh
 | 内容が変わったときだけコマンドを実行したい | `home/.chezmoiscripts/run_onchange_after_<名前>.sh.tmpl` を作る (後述) |
 | 外部のツール / リポジトリを置きたい | `home/.chezmoiexternal.toml.tmpl` に追記する。サプライチェーン対策として、ブランチ先頭 (`git-repo`) ではなくタグ固定の `archive` / `file` + `checksum.sha256` で取り込む (tpm / zimfw と同じ書き方。checksum は 0 埋めで apply して出る SHA256 mismatch の値を使う) |
 | Claude Code の設定を変える | `home/dot_claude/settings.base.json` を編集する (後述) |
-| CLI / GUI アプリを追加したい (macOS) | リポジトリ直下の `Brewfile` に `brew "foo"` / `cask "foo"` を追記する。次の `chezmoi apply` で `brew bundle` が走る。仕事用は `~/.config/work/Brewfile` (mise で管理する言語ランタイムや ccgate は書かない) |
+| CLI / GUI アプリを追加したい (macOS) | リポジトリ直下の `Brewfile` に `brew "foo"` / `cask "foo"` を追記する。次の `chezmoi apply` で `brew bundle` が走る。private は `~/.config/private/Brewfile` に書く (mise で管理する言語ランタイムや ccgate は書かない) |
+| private リポジトリに設定を追加したい | [private-repo.md](./private-repo.md) のスロットに従ってファイルを置く。新しい種類はスロット追加の手順で公開側にフックを足す |
 | macOS の LaunchAgent を追加したい | `home/private_Library/private_LaunchAgents/` に plist を置き、`run_onchange` スクリプトで再ロードする (既存の cleanup-caches を参照) |
 
 ### テンプレートでよく使う値
@@ -65,7 +67,7 @@ home/dot_config/zsh/alias.zsh  →  ~/.config/zsh/alias.zsh
 {{ .chezmoi.os }}        # "darwin" / "linux"
 {{ .chezmoi.homeDir }}   # /Users/ryosan470 など (launchd の plist のように ~ が使えない場所で使う)
 {{ .chezmoi.hostname }}  # マシン名
-{{ .workRepo }}          # 仕事用リポジトリの URL (私用マシンでは空)
+{{ .privateRepo }}       # private リポジトリの URL (未使用なら空)
 ```
 
 展開結果は `chezmoi execute-template < home/<ファイル>.tmpl` や `chezmoi cat ~/<配置先>` で確認できる。
@@ -93,34 +95,24 @@ brew bundle --file={{ joinPath .chezmoi.workingTree "Brewfile" | quote }}
 | レイヤー | 置き場所 | 書くもの |
 |---|---|---|
 | 共通 | このリポジトリの `home/` (公開) | どのマシンでも使う設定 |
-| 仕事用 | 仕事用 private リポジトリ (`~/.config/work/` に clone される) | 勤務先でだけ使う設定。会社名・社内ツール・社内ホスト名など |
+| private | private リポジトリ (`~/.config/private/` に clone される) | 個人用・仕事用の非公開設定。会社名・社内ツール・社内ホスト名・AWS の profile など |
 | マシン固有 | `~/.local.zsh`, `~/.local.bash`, `~/.gitconfig.local`, `~/.tmux.local.conf`, `~/.claude/CLAUDE.local.md` (管理外) | そのマシンだけの一時的な設定 |
 | 秘密情報 | 1Password など | トークン・鍵など。**どのリポジトリにも書かない** |
 
-迷ったら「会社名が推測できる内容なら仕事用、そうでなければ共通」。
+迷ったら「公開したくない内容なら private、そうでなければ共通」。
 
-### 仕事用リポジトリ
+### private リポジトリ
 
-- 勤務先ごとに個人アカウントの private リポジトリを作る。リポジトリ名に会社名を入れないと公開プロフィールから推測されない (例: `dotfiles-work`)
-- `chezmoi init` 時に URL を入力する。URL は `~/.config/chezmoi/chezmoi.toml` にだけ保存され、公開リポジトリには入らない
+- 個人用と仕事用を 1 つの private リポジトリにまとめる。リポジトリ名は任意 (例: `dotfiles-private`)
+- URL は `chezmoi init` で入力し、`~/.config/chezmoi/chezmoi.toml` にだけ保存する。公開リポジトリには書かない。全マシンで同じ URL を入力する
 - private リポジトリなので、新しいマシンでは `chezmoi init` の前に `gh auth login` などで認証しておく
-- 転職時は新しい勤務先用のリポジトリを作り、`~/.config/chezmoi/chezmoi.toml` の `workRepo` を書き換え、古い `~/.config/work` を削除してから `chezmoi apply` する (既存の clone があると chezmoi は pull するだけで URL の変更を反映しないため)。公開リポジトリは変更不要
-
-想定しているファイル構成 (すべて任意。無いものは読み込まれないだけ):
-
-```
-zsh/*.zsh               # ~/.zshrc から source される
-gitconfig               # ~/.gitconfig から include される
-tmux.conf               # ~/.tmux.conf から source される
-claude/CLAUDE.md        # ~/.claude/CLAUDE.md から import される
-claude/settings.json    # ~/.claude/settings.json にマージされる
-```
-
-仕事用 `gitconfig` では `includeIf` を使うと、社用 PC 上でも私用リポジトリは私用の email/署名のままにできる。
+- 想定しているファイル構成・読み込み順・スロットの追加方法は [private-repo.md](./private-repo.md) を参照
+- 平文の秘密情報は置かない。トークン・秘密鍵・AWS の access key などは 1Password などに置く
+- private の `gitconfig` では `includeIf` を使うと、会社のマシンでも私用リポジトリは私用の email / 署名のままにできる
 
 ```gitconfig
 [includeIf "gitdir:~/code/src/github.com/<社のorg>/"]
-    path = ~/.config/work/gitconfig-org
+    path = ~/.config/private/gitconfig-org
 ```
 
 ## Claude Code の settings.json
@@ -130,7 +122,7 @@ claude/settings.json    # ~/.claude/settings.json にマージされる
 
 1. 現在の `~/.claude/settings.json` (ローカルで追加されたもの)
 2. `home/dot_claude/settings.base.json` (リポジトリ。同じキーは 1 を上書き)
-3. `~/.config/work/claude/settings.json` (仕事用。同じキーは 2 を上書き)
+3. `~/.config/private/claude/settings.json` (private。同じキーは 2 を上書き)
 
 マージのルール:
 
@@ -144,20 +136,21 @@ claude/settings.json    # ~/.claude/settings.json にマージされる
 - **`settings.base.json` から削除した権限や hook は、既存マシンからは消えない**。消したい場合は各マシンの `~/.claude/settings.json` からも手で削除する
 - マージには `jq` が必要 (macOS は標準で入っている)。無い場合は既存のファイルをそのまま残す
 - `~/.claude/CLAUDE.md` が参照する `@RTK.md` は chezmoi 管理外。rtk (`rtk init -g`) が生成する `~/.claude/RTK.md` で、無くても `@` 参照が無視されるだけで害はない。hook (`rtk hook claude`) も rtk 本体が前提
+- `@~/.config/private/claude/CLAUDE.md` も private リポジトリが無ければ単に無視される
 
 ## 新しいマシンのセットアップ
 
 ```sh
-# 仕事用リポジトリを使う場合は先に認証しておく
+# private リポジトリを使う場合は先に認証しておく
 gh auth login
 
 sh -c "$(curl -fsLS get.chezmoi.io)" -- init --apply \
   --source ~/code/src/github.com/ryosan-470/dotfiles ryosan-470
 ```
 
-「仕事用 private リポジトリの URL」と聞かれたら、私用マシンでは空のまま Enter。
+「private リポジトリの URL」と聞かれたら、全マシンで同じ URL を入力する。使わない場合は空のまま Enter。
 
-Homebrew 自体のインストールは sudo と対話が必要なため chezmoi では行わない。macOS では先に [公式手順](https://brew.sh/) で Homebrew を入れておくと、`chezmoi apply` が `Brewfile` (と `~/.config/work/Brewfile`) を `brew bundle` する。brew が無ければスキップされる。
+Homebrew 自体のインストールは sudo と対話が必要なため chezmoi では行わない。macOS では先に [公式手順](https://brew.sh/) で Homebrew を入れておくと、`chezmoi apply` が `Brewfile` (と `~/.config/private/Brewfile`) を `brew bundle` する。brew が無ければスキップされる。
 
 ## 困ったとき
 
