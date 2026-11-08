@@ -57,6 +57,7 @@ home/dot_config/zsh/alias.zsh  →  ~/.config/zsh/alias.zsh
 | 内容が変わったときだけコマンドを実行したい | `home/.chezmoiscripts/run_onchange_after_<名前>.sh.tmpl` を作る (後述) |
 | 外部のツール / リポジトリを置きたい | `home/.chezmoiexternal.toml.tmpl` に追記する。サプライチェーン対策として、ブランチ先頭 (`git-repo`) ではなくタグ固定の `archive` / `file` + `checksum.sha256` で取り込む (tpm / zimfw と同じ書き方。checksum は 0 埋めで apply して出る SHA256 mismatch の値を使う) |
 | Claude Code の設定を変える | `home/dot_claude/settings.base.json` を編集する (後述) |
+| GUI アプリの設定を管理したい | Karabiner は `home/dot_config/private_karabiner/`、BTT はプリセットを `home/dot_btt_autoload_preset.json` に置く (後述)。Raycast はテキスト設定が無いので Brewfile のみ |
 | CLI / GUI アプリを追加したい (macOS) | リポジトリ直下の `Brewfile` に `brew "foo"` / `cask "foo"` を追記する。次の `chezmoi apply` で `brew bundle` が走る。private は `~/.config/private/Brewfile` に書く (mise で管理する言語ランタイムや ccgate は書かない) |
 | private リポジトリに設定を追加したい | [private-repo.md](./private-repo.md) のスロットに従ってファイルを置く。新しい種類はスロット追加の手順で公開側にフックを足す |
 | macOS の LaunchAgent を追加したい | `home/private_Library/private_LaunchAgents/` に plist を置き、`run_onchange` スクリプトで再ロードする (既存の cleanup-caches を参照) |
@@ -114,6 +115,37 @@ brew bundle --file={{ joinPath .chezmoi.workingTree "Brewfile" | quote }}
 [includeIf "gitdir:~/code/src/github.com/<社のorg>/"]
     path = ~/.config/private/gitconfig-org
 ```
+
+## GUI アプリの設定
+
+macOS の GUI アプリは、設定の持ち方に合わせて管理方法を変えている。
+
+### Karabiner-Elements
+
+`~/.config/karabiner/karabiner.json` を `home/dot_config/private_karabiner/private_karabiner.json` として管理する (`private_` は Karabiner がファイルを 600 で作るため)。
+Karabiner の UI で変更した内容は `chezmoi re-add ~/.config/karabiner/karabiner.json` で取り込む。
+
+### BetterTouchTool
+
+設定の実体は SQLite (`~/Library/Application Support/BetterTouchTool/btt_data_store.*`) で、そのままでは git に向かない。
+そのため、BTT のプリセットを JSON (`.bttpreset`) に書き出し、`home/dot_btt_autoload_preset.json` (`~/.btt_autoload_preset.json`) として配置している。BTT は起動時にこのファイルを自動で import する。
+
+現在の設定を書き出すには、BTT が起動している状態で:
+
+```sh
+osascript -e 'tell application "BetterTouchTool" to export_preset "imported" outputPath "/tmp"'
+jq . /tmp/imported.bttpreset > home/dot_btt_autoload_preset.json
+```
+
+- `outputPath` にはファイルではなく **ディレクトリ** を渡す (BTT が `<プリセット名>.bttpreset` を作る)
+- `with includeSettings` を付けると一般設定も入るが、ライセンス情報などが混ざる可能性があるので付けない
+- プリセット以外 (ウィンドウスナップなど `NSUserDefaults` 側の設定) は管理対象外
+
+### Raycast
+
+dotfiles で管理できるテキスト設定ファイルが無いため、`Brewfile` の `cask "raycast"` でインストールだけを行う。
+`~/.config/raycast/config.json` はアクセストークン (`rca_...`) なので**コミットしない**。新マシンでは Raycast を起動して認証する。
+設定の Export (`.rayconfig`) はクリップボード履歴やノートを含むデータバックアップなので、dotfiles には置かない。
 
 ## Claude Code の settings.json
 

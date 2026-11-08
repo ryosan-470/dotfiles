@@ -1,0 +1,147 @@
+{
+  "BTTPresetName": "imported",
+  "BTTPresetColor": "216.750000, 155.951625, 2.167500, 255.000000",
+  "BTTPresetUUID": "AF872A01-2CD8-4DA5-B8A2-140641E31BEA",
+  "BTTPresetContent": [
+    {
+      "BTTAppBundleIdentifier": "BT.G",
+      "BTTAppName": "Global",
+      "BTTAppAutoInvertIcon": 1,
+      "BTTAppSpecificSettings": {
+        "BTTDisableGlobalTriggers": false
+      },
+      "BTTTriggers": [
+        {
+          "BTTLastUpdatedAt": 1791786778.9700441,
+          "BTTTriggerClass": "BTTTriggerTypeKeyboardShortcut",
+          "BTTUUID": "BB06C3D5-F050-4B48-9D07-8336CCA0A330",
+          "BTTPredefinedActionType": 20,
+          "BTTPredefinedActionName": "Maximize Window Right Half",
+          "BTTShortcutKeyboardType": 0,
+          "BTTShortcutKeyCode": 124,
+          "BTTShortcutModifierKeys": 9437184,
+          "BTTOrder": 0,
+          "BTTAutoAdaptToKeyboardLayout": 0
+        },
+        {
+          "BTTLastUpdatedAt": 1791786778.9700332,
+          "BTTTriggerClass": "BTTTriggerTypeKeyboardShortcut",
+          "BTTUUID": "87560BB7-BBA5-4364-B8EA-A41B654F4CB3",
+          "BTTPredefinedActionType": 19,
+          "BTTPredefinedActionName": "Maximize Window Left Half",
+          "BTTShortcutKeyboardType": 0,
+          "BTTShortcutKeyCode": 123,
+          "BTTShortcutModifierKeys": 9437184,
+          "BTTOrder": 1,
+          "BTTAutoAdaptToKeyboardLayout": 0
+        },
+        {
+          "BTTLastUpdatedAt": 1791786778.9700389,
+          "BTTTriggerClass": "BTTTriggerTypeKeyboardShortcut",
+          "BTTUUID": "A742934F-D864-419A-AC0F-7FE13F21D221",
+          "BTTPredefinedActionType": 21,
+          "BTTPredefinedActionName": "Maximize Window",
+          "BTTShortcutKeyboardType": 0,
+          "BTTShortcutKeyCode": 126,
+          "BTTShortcutModifierKeys": 9437184,
+          "BTTOrder": 2,
+          "BTTAutoAdaptToKeyboardLayout": 0
+        },
+        {
+          "BTTLastUpdatedAt": 1791786778.970048,
+          "BTTTriggerClass": "BTTTriggerTypeKeyboardShortcut",
+          "BTTUUID": "EC6A8A7B-75B9-4A98-AB57-31E3A4B2FE24",
+          "BTTPredefinedActionType": 152,
+          "BTTPredefinedActionName": "Move Window One Space or Desktop Right",
+          "BTTShortcutKeyboardType": 0,
+          "BTTShortcutKeyCode": 124,
+          "BTTShortcutModifierKeys": 9568256,
+          "BTTOrder": 3,
+          "BTTAutoAdaptToKeyboardLayout": 0
+        },
+        {
+          "BTTLastUpdatedAt": 1791786778.970005,
+          "BTTTriggerClass": "BTTTriggerTypeKeyboardShortcut",
+          "BTTUUID": "737E01DC-8FFB-48FD-B40E-943A3BED06F6",
+          "BTTPredefinedActionType": 151,
+          "BTTPredefinedActionName": "Move Window One Space or Desktop Left",
+          "BTTShortcutKeyboardType": 0,
+          "BTTShortcutKeyCode": 123,
+          "BTTShortcutModifierKeys": 9568256,
+          "BTTOrder": 4,
+          "BTTAutoAdaptToKeyboardLayout": 0
+        },
+        {
+          "BTTLastUpdatedAt": 1748609823.9157529,
+          "BTTTriggerClass": "BTTTriggerTypeKeyboardShortcut",
+          "BTTUUID": "8AA31A1E-F5E8-4FCA-A634-F91D483FAE27",
+          "BTTPredefinedActionType": 47,
+          "BTTPredefinedActionName": "Move Window to Next Monitor",
+          "BTTShortcutKeyboardType": 0,
+          "BTTShortcutKeyCode": 45,
+          "BTTShortcutModifierKeys": 1572864,
+          "BTTOrder": 5,
+          "BTTAutoAdaptToKeyboardLayout": 0
+        },
+        {
+          "BTTLastUpdatedAt": 1748609823.9160991,
+          "BTTTriggerClass": "BTTTriggerTypeKeyboardShortcut",
+          "BTTUUID": "C138DBAD-099F-4577-A728-513E185E686D",
+          "BTTShortcutKeyboardType": 0,
+          "BTTShortcutKeyCode": -1,
+          "BTTOrder": 6,
+          "BTTAutoAdaptToKeyboardLayout": 0
+        }
+      ]
+    },
+    {
+      "BTTAppBundleIdentifier": "BT.L",
+      "BTTAppName": "Recently Used",
+      "BTTAppAutoInvertIcon": 1,
+      "BTTTriggers": []
+    },
+    {
+      "BTTAppBundleIdentifier": "com.apple.finder",
+      "BTTAppName": "Finder",
+      "BTTAppAutoInvertIcon": 1,
+      "BTTAppSpecificSettings": {
+        "BTTDisableGlobalTriggers": false
+      },
+      "BTTTriggers": []
+    },
+    {
+      "BTTAppBundleIdentifier": "com.google.Chrome",
+      "BTTAppName": "Google Chrome",
+      "BTTAppAutoInvertIcon": 1,
+      "BTTAppSpecificSettings": {
+        "BTTDisableGlobalTriggers": false
+      },
+      "BTTTriggers": [
+        {
+          "BTTLastUpdatedAt": 1748609823.9138179,
+          "BTTTriggerType": 104,
+          "BTTTriggerTypeDescription": "3 Finger Tap",
+          "BTTTriggerClass": "BTTTriggerTypeTouchpadAll",
+          "BTTUUID": "22D45D0B-4453-40A4-A291-19AFFC77AA30",
+          "BTTPredefinedActionType": 2,
+          "BTTPredefinedActionName": "CMD(⌘)+Click",
+          "BTTOrder": 0,
+          "BTTGestureNotes": "3 Finger Tap"
+        },
+        {
+          "BTTLastUpdatedAt": 1748609823.9142241,
+          "BTTTriggerType": 112,
+          "BTTTriggerTypeDescription": "3 Finger Click",
+          "BTTTriggerClass": "BTTTriggerTypeTouchpadAll",
+          "BTTUUID": "189F2254-14AB-4448-B6C3-71BAAA004321",
+          "BTTAutoAdaptActionToKeyboardLayout": true,
+          "BTTGenericActionConfig": "autoAdapt",
+          "BTTShortcutToSend": "55,13",
+          "BTTOrder": 1,
+          "BTTGestureNotes": "3 Finger Click"
+        }
+      ]
+    }
+  ],
+  "BTTPresetSnapAreas": []
+}

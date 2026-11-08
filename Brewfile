@@ -52,6 +52,7 @@ cask "scroll-reverser"
 cask "augani/dory/dory"
 cask "stablyai/orca/orca"
 cask "bettertouchtool"
+cask "raycast"
 cask "codexbar"
 
 # Mac App Store (mas)
