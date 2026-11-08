@@ -180,6 +180,8 @@ test_private_layer() {
     printf '[e2e]\n\tprivatelayer = loaded\n' > "$seed/gitconfig"
     echo 'set -g @e2e-private-layer loaded' > "$seed/tmux.conf"
     echo '{"permissions":{"allow":["Bash(e2e-private-allow *)"]}}' > "$seed/claude/settings.json"
+    echo '{"permissions":{"allow":["Bash(e2e-profile-allow *)"]}}' > "$seed/claude/settings.work.json"
+    echo '{"permissions":{"allow":["Bash(e2e-other-profile *)"]}}' > "$seed/claude/settings.personal.json"
     printf '[profile e2e]\nregion = ap-northeast-1\n# e2e-private-aws\n' > "$seed/aws/config"
     git -C "$seed" init -q -b main
     git -C "$seed" add -A
@@ -189,9 +191,9 @@ test_private_layer() {
     (
         export HOME="$private_home" XDG_CONFIG_HOME="$private_home/.config" TMUX=dummy TERM=xterm-256color
         unset ZDOTDIR
-        # promptStringOnce は既存の data を優先するので、事前に chezmoi.toml へ privateRepo を書いておく
+        # promptStringOnce は既存の data を優先するので、事前に chezmoi.toml へ privateRepo と machineProfile を書いておく
         mkdir -p "$XDG_CONFIG_HOME/chezmoi"
-        printf '[data]\n    privateRepo = "file://%s"\n' "$bare" > "$XDG_CONFIG_HOME/chezmoi/chezmoi.toml"
+        printf '[data]\n    privateRepo = "file://%s"\n    machineProfile = "work"\n' "$bare" > "$XDG_CONFIG_HOME/chezmoi/chezmoi.toml"
         chezmoi init --apply --no-tty --source "$REPO_ROOT" >/dev/null \
             || { fail "private: chezmoi init --apply に失敗"; exit 1; }
         # 初回 apply では .claude/settings.json (modify) が ~/.config/private の clone より先に処理されるため、
@@ -228,6 +230,17 @@ test_private_layer() {
             pass "private: settings.json に private/claude/settings.json がマージされる"
         else
             fail "private: settings.json に private/claude/settings.json がマージされない"; rc=1
+        fi
+        # claude: machineProfile と一致する settings.<profile>.json だけがマージされる
+        if jq -e '.permissions.allow | index("Bash(e2e-profile-allow *)")' "$HOME/.claude/settings.json" >/dev/null; then
+            pass "private: settings.<machineProfile>.json がマージされる"
+        else
+            fail "private: settings.<machineProfile>.json がマージされない"; rc=1
+        fi
+        if jq -e '.permissions.allow | index("Bash(e2e-other-profile *)")' "$HOME/.claude/settings.json" >/dev/null; then
+            fail "private: 一致しない profile の settings がマージされている"; rc=1
+        else
+            pass "private: 一致しない profile の settings はマージされない"
         fi
         # private-links: aws/config が ~/.aws/config にリンクされる
         if [ -L "$HOME/.aws/config" ] && grep -q 'e2e-private-aws' "$HOME/.aws/config"; then
