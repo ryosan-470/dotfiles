@@ -108,7 +108,7 @@ fi
 
 1. 公開リポジトリ側に読み込みフックを追加する
    - source / include 系: `.zshrc`, `.gitconfig`, `.tmux.conf`, `CLAUDE.md`, `modify_settings.json.tmpl` など
-   - ファイルリンク系: `home/.chezmoiscripts/run_always_after_private-links.sh.tmpl` に `link_slot` を 1 行追加する
+   - ファイルリンク系: `home/.chezmoiscripts/run_onchange_after_private-links.sh.tmpl` に `link_slot` を 1 行追加する
 2. `docs/chezmoi.md` とこのファイルに追記する
 3. `tests/e2e.sh` の `test_private_layer` に検証を追加する
 

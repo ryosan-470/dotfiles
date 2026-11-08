@@ -1,6 +1,11 @@
+{{- $awsConfig := joinPath .chezmoi.homeDir ".config/private/aws/config" -}}
+{{- $awsProfile := joinPath .chezmoi.homeDir ".config/private/aws/profile" -}}
 #!/bin/bash
 # private リポジトリ (~/.config/private) の素材を HOME 配下へシンボリックリンクする。
-# chezmoi apply のたびに実行する (private の clone が後から来ても次回で追いつく)。
+# private 側のファイルが変わったときだけ実行する (ファイルのハッシュをコメントに埋め込む)。
+#
+# aws/config hash: {{ if stat $awsConfig }}{{ include $awsConfig | sha256sum }}{{ else }}absent{{ end }}
+# aws/profile hash: {{ if stat $awsProfile }}{{ include $awsProfile | sha256sum }}{{ else }}absent{{ end }}
 #
 # 方針:
 # - private 側にファイルが無ければ何もしない
