@@ -22,6 +22,10 @@ It also asks for a machine profile (`personal`, `work`, ...). The profile is sto
 `~/.config/chezmoi/chezmoi.toml` and selects `~/.config/private/claude/settings.<profile>.json`
 when present. Leave it empty to use only the common private settings.
 
+For the full procedure from an empty Mac (Xcode Command Line Tools, Homebrew, GitHub authentication
+for the private layer, and the manual steps after `chezmoi apply`), see
+[Setup from an empty Mac](./docs/chezmoi.md#新しいマシンのセットアップ) in docs/chezmoi.md (Japanese).
+
 ## Update the configuration
 
 ```console

@@ -15,6 +15,7 @@
 ### private リポジトリを作る
 
 ```sh
+# 空の Mac など gh が無い環境では先に brew install gh
 gh auth login
 gh repo create <your-account>/<private-repo> --private --add-readme
 ```
@@ -22,6 +23,10 @@ gh repo create <your-account>/<private-repo> --private --add-readme
 `<private-repo>` の例は `dotfiles-private`。名前は任意だが、公開リポジトリ (`dotfiles`) とは別の名前にする。
 
 ### 各マシンで init する
+
+空の Mac からの手順全体 (Xcode Command Line Tools / Homebrew / `gh` の準備) は
+[chezmoi.md の「新しいマシンのセットアップ」](./chezmoi.md#新しいマシンのセットアップ) を参照。
+private リポジトリは init の途中で clone されるため、その前に `brew install gh`、`gh auth login`、`gh auth setup-git` を済ませておく (HTTPS の場合)。
 
 ```sh
 sh -c "$(curl -fsLS get.chezmoi.io)" -- init --apply \
@@ -69,7 +74,7 @@ private リポジトリの直下に置く。すべて任意で、無いものは
 - zsh: 公開 `~/.config/zsh/*.zsh` (`.zshrc` で固定順) → private `zsh/*.zsh` (ファイル名順) → `~/.local.zsh`
 - git: 公開 `~/.gitconfig` → private `gitconfig` → `~/.gitconfig.local`
 - tmux: 公開 `~/.tmux.conf` → private `tmux.conf` → `~/.tmux.local.conf`
-- Claude Code: 現在の `~/.claude/settings.json` を土台に、公開 `settings.base.json` → private `claude/settings.json` の順で上書きする。`permissions` は 3 つの和集合
+- Claude Code: 現在の `~/.claude/settings.json` を土台に、公開 `settings.base.json` → private `claude/settings.json` → private `claude/settings.<profile>.json` の順で上書きする。`permissions` は 4 層の和集合
 - Brewfile: 公開 `Brewfile` → private `Brewfile`
 - AWS: private のみ (シンボリックリンク)
 
