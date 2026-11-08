@@ -15,6 +15,7 @@
 ### private リポジトリを作る
 
 ```sh
+# 空の Mac など gh が無い環境では先に brew install gh
 gh auth login
 gh repo create <your-account>/<private-repo> --private --add-readme
 ```
@@ -22,6 +23,10 @@ gh repo create <your-account>/<private-repo> --private --add-readme
 `<private-repo>` の例は `dotfiles-private`。名前は任意だが、公開リポジトリ (`dotfiles`) とは別の名前にする。
 
 ### 各マシンで init する
+
+空の Mac からの手順全体 (Xcode Command Line Tools / Homebrew / `gh` の準備) は
+[chezmoi.md の「新しいマシンのセットアップ」](./chezmoi.md#新しいマシンのセットアップ) を参照。
+private リポジトリは init の途中で clone されるため、その前に `brew install gh` と `gh auth login` を済ませておく。
 
 ```sh
 sh -c "$(curl -fsLS get.chezmoi.io)" -- init --apply \

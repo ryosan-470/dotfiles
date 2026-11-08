@@ -197,17 +197,132 @@ dotfiles で管理できるテキスト設定ファイルが無いため、`Brew
 
 ## 新しいマシンのセットアップ
 
-```sh
-# private リポジトリを使う場合は先に認証しておく
-gh auth login
+空の Mac に何も無い状態から、`chezmoi apply` で設定が入り、日常で使えるようになるまでの手順。
+Homebrew の cask と LaunchAgent は macOS のみ。Linux では該当する箇所を読み飛ばす。
 
+### 1. chezmoi 実行前の準備
+
+#### Xcode Command Line Tools
+
+```sh
+xcode-select --install
+```
+
+git は Xcode Command Line Tools に含まれる。Homebrew のインストールにも必要。
+
+#### Homebrew
+
+[公式サイト](https://brew.sh/) の手順でインストールする。
+Homebrew 自体のインストールは sudo と対話が必要なため、chezmoi では行わない。
+
+インストール直後のシェルでは PATH を通しておく。
+
+```sh
+eval "$(/opt/homebrew/bin/brew shellenv)"   # Apple Silicon
+eval "$(/usr/local/bin/brew shellenv)"      # Intel Mac
+```
+
+`chezmoi apply` で `~/.zshenv` が配置されると、`/opt/homebrew` / `/usr/local` / Linuxbrew を順に探して `brew shellenv` するようになるため、この設定を自分で書く必要はない。
+
+#### ツールのインストール
+
+`Brewfile` のツールと GUI アプリは、`chezmoi apply` の最後に `brew bundle` で入る。
+apply の前に個別にインストールするのは、次の 2 つだけ。
+
+- `gh`: private レイヤーを使う場合 (後述)
+- `jq`: `~/.claude/settings.json` のマージに使う。macOS 標準の jq で足りる。無い環境では `brew install jq`
+
+#### private レイヤーを使う場合の認証
+
+private リポジトリは `chezmoi init` の途中で clone される。
+この時点ではまだ `gh` も Git Credential Manager も入っていないため、先に認証を用意する。
+
+```sh
+brew install gh
+gh auth login
+gh auth setup-git   # HTTPS で clone する場合
+```
+
+SSH で clone する場合は SSH 鍵を用意し、private リポジトリの URL に SSH 形式 (`git@github.com:...`) を指定する。
+
+### 2. chezmoi を実行する
+
+```sh
 sh -c "$(curl -fsLS get.chezmoi.io)" -- init --apply \
   --source ~/code/src/github.com/ryosan-470/dotfiles ryosan-470
 ```
 
-「private リポジトリの URL」と聞かれたら、全マシンで同じ URL を入力する。使わない場合は空のまま Enter。
+- `get.chezmoi.io` のインストーラは、chezmoi のバイナリを**カレントディレクトリの `./bin`** にダウンロードし、`--` 以降の引数でそのバイナリを実行する。恒久的なインストールではない
+- `--source` は ghq の clone 先。`chezmoi init` はここにリポジトリを clone し、`~/.config/chezmoi/chezmoi.toml` の `sourceDir` もこのパスになる
+- `ryosan-470` は GitHub のユーザー名で、`https://github.com/ryosan-470/dotfiles.git` が clone される
+- 対話で 2 つ聞かれる
+  - private リポジトリの URL: 全マシンで同じ値を入力する。使わないなら空のまま Enter
+  - machineProfile: `personal` / `work` など。空なら profile 別設定を読み込まない
+- `--apply` まで付けると、clone した設定をそのまま `~` に反映する。初回は `brew bundle` も走るため時間がかかり、cask によっては sudo のパスワードを聞かれる
+- apply 後は Brewfile の `brew "chezmoi"` で Homebrew の chezmoi が入る。`./bin` は PATH に入らない。`~` で実行して `~/bin` に置いた場合も、`brew shellenv` が Homebrew を PATH の先頭に置くため、以後は Homebrew の chezmoi が使われる。`./bin/chezmoi` は削除してよい
 
-Homebrew 自体のインストールは sudo と対話が必要なため chezmoi では行わない。macOS では先に [公式手順](https://brew.sh/) で Homebrew を入れておくと、`chezmoi apply` が `Brewfile` (と `~/.config/private/Brewfile`) を `brew bundle` する。brew が無ければスキップされる。
+### 3. apply で自動的に行われること
+
+- `home/.chezmoiexternal.toml.tmpl`: tpm (`~/.tmux/plugins/tpm`) と zimfw 本体 (`~/.zim/zimfw.zsh`) を配置する。`privateRepo` を設定していれば `~/.config/private` に private リポジトリを clone する
+- `run_onchange_after_brew-bundle.sh.tmpl`: `Brewfile` と `~/.config/private/Brewfile` を `brew bundle` する (macOS で brew がある場合)
+- `run_onchange_after_private-links.sh.tmpl`: private の `aws/config` を `~/.aws/config` にシンボリックリンクする (存在する場合)
+- `run_onchange_after_load-launchagents.sh.tmpl`: `cleanup-caches` の LaunchAgent を登録する (macOS)
+- `modify_settings.json.tmpl`: `~/.claude/settings.json` を 4 層でマージする
+
+### 4. 実行後の手作業
+
+#### zsh (zimfw)
+
+初回のインタラクティブシェル起動時に `~/.config/zsh/zim.zsh` が `zimfw.zsh init -q` を実行し、`zimrc` のモジュールをネットワークから取得する。初回だけ時間がかかる。
+
+#### tmux (tpm)
+
+tmux を起動し、prefix (`C-q`) + `I` でプラグインをインストールする。
+tpm 本体は apply で配置済みだが、`tmux-yank` / `tmux-copycat` は初回にインストールが必要。
+
+#### GPG 署名鍵
+
+`home/dot_gitconfig.tmpl` は、署名鍵の秘密鍵が存在するマシンでだけ `commit.gpgsign = true` にする。
+鍵が無くてもコミットは失敗せず、署名なしになる。
+
+署名を有効にするには、鍵を安全な場所 (1Password の添付やバックアップ) から import して `chezmoi apply` を再実行する。鍵はリポジトリに置かない。
+
+```sh
+gpg --import /path/to/secret-key.asc
+chezmoi apply
+git config --get commit.gpgsign   # true なら有効
+```
+
+#### chezmoi 管理外のファイル
+
+- `~/.claude/RTK.md`: rtk が `rtk init -g` で生成する。無い場合、`~/.claude/CLAUDE.md` の `@RTK.md` は単に無視される。`rtk hook claude` も rtk が前提 (Brewfile の `brew "rtk"` で入る)
+- `~/.local.zsh`, `~/.gitconfig.local`, `~/.tmux.local.conf`, `~/.claude/CLAUDE.local.md`: マシン固有の設定。必要なら作成する
+- `~/.config/mise/config.toml`: mise で入れるツール。`ccgate` は Brewfile ではなくここで管理する
+  ```sh
+  mise use -g aqua:tak848/ccgate
+  ```
+  mise の shim を有効にするには `~/.local.zsh` に `eval "$(mise activate zsh)"` を書く
+
+#### アプリの初回起動 (macOS)
+
+cask でアプリはインストールされるが、初回起動・ログイン・権限の許可は手作業。
+
+- Claude Code: 初回起動でログインする
+- Orca: 初回起動でセットアップする
+- 1Password / 1Password CLI: サインインする。CLI は `op signin`。補完は `~/.config/zsh/completion.zsh` が設定する
+- Raycast: 起動してサインインする。`~/.config/raycast/config.json` はアクセストークンなので管理しない
+- Karabiner-Elements: 入力監視とドライバの許可を与える。設定 (`~/.config/karabiner/karabiner.json`) は apply 済み
+- BetterTouchTool: ライセンス認証とアクセシビリティの許可を与える。プリセット (`~/.btt_autoload_preset.json`) は起動時に自動で import される
+
+#### 最後に確認する
+
+```sh
+exec zsh                # 設定を読み直す
+chezmoi doctor          # 環境の診断
+chezmoi status          # 未反映のファイルが無いこと
+```
+
+2 台目以降は `dot update` (= `chezmoi update`) で追従する。
 
 ## 困ったとき
 
