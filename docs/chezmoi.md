@@ -118,22 +118,26 @@ brew bundle --file={{ joinPath .chezmoi.workingTree "Brewfile" | quote }}
 ## Claude Code の settings.json
 
 `~/.claude/settings.json` は Claude Code (「常に許可」) や Orca (hooks の注入) が自分で書き換えるため、
-単純なコピーではなく `home/dot_claude/modify_settings.json.tmpl` が `chezmoi apply` のたびに次の 3 つをマージして生成している。
+単純なコピーではなく `home/dot_claude/modify_settings.json.tmpl` が `chezmoi apply` のたびに次の 4 つをマージして生成している。
 
 1. 現在の `~/.claude/settings.json` (ローカルで追加されたもの)
 2. `home/dot_claude/settings.base.json` (リポジトリ。同じキーは 1 を上書き)
-3. `~/.config/private/claude/settings.json` (private。同じキーは 2 を上書き)
+3. `~/.config/private/claude/settings.json` (private 共通。同じキーは 2 を上書き)
+4. `~/.config/private/claude/settings.<machineProfile>.json` (profile 別。同じキーは 3 を上書き)
+
+`machineProfile` は `chezmoi init` 時にマシンごとに入力し、`~/.config/chezmoi/chezmoi.toml` にだけ保存する (`personal` / `work` など)。空なら 4 は読み込まない。
 
 マージのルール:
 
-- `permissions` の `allow` / `ask` / `deny` / `additionalDirectories` は 3 つの和集合
-- `hooks` はイベントごとに 3 つを合わせる。ただしリポジトリ側と同じ command を含むローカルのエントリはリポジトリ側で置き換える
+- `permissions` の `allow` / `ask` / `deny` / `additionalDirectories` は 4 層の和集合
+- `hooks` はイベントごとに 4 層を合わせる。ただしリポジトリ側と同じ command を含むローカルのエントリはリポジトリ側で置き換える
 - それ以外のキーはリポジトリ側の値が優先 (ローカルで `/config` から変えても apply で戻る)
 
 注意点:
 
 - 「常に許可」で増えた権限はローカルにだけ残る。全マシンで使いたいものは `settings.base.json` にも追記する
 - **`settings.base.json` から削除した権限や hook は、既存マシンからは消えない**。消したい場合は各マシンの `~/.claude/settings.json` からも手で削除する
+- 既存マシンで `machineProfile` が未設定の場合は、`chezmoi init` を再実行するか `~/.config/chezmoi/chezmoi.toml` の `[data]` に追記する。未設定なら profile 別設定は読み込まれない
 - マージには `jq` が必要 (macOS は標準で入っている)。無い場合は既存のファイルをそのまま残す
 - `~/.claude/CLAUDE.md` が参照する `@RTK.md` は chezmoi 管理外。rtk (`rtk init -g`) が生成する `~/.claude/RTK.md` で、無くても `@` 参照が無視されるだけで害はない。hook (`rtk hook claude`) も rtk 本体が前提
 - `@~/.config/private/claude/CLAUDE.md` も private リポジトリが無ければ単に無視される
@@ -142,10 +146,10 @@ brew bundle --file={{ joinPath .chezmoi.workingTree "Brewfile" | quote }}
 
 外部コードを自動で取り込むため、`settings.base.json` に置くものは最小限にする。
 
-- 公開リポジトリに置くのは、全マシンで使うと決めたものだけ。仕事用・プロジェクト固有のマーケットプレイスやプラグインは private レイヤー (`~/.config/private/claude/settings.json`) に置く
+- 公開リポジトリに置くのは、全マシンで使うと決めたものだけ。仕事用・プロジェクト固有のマーケットプレイスやプラグインは private レイヤーに置く。個人/仕事を切り替えたいものは `claude/settings.<profile>.json` に置く
 - `extraKnownMarketplaces` の GitHub ソースは `ref` でタグに固定し、`autoUpdate` を `false` にする (タグが無いリポジトリは少なくとも `autoUpdate` を `false` にする)。更新は `claude plugin marketplace update <name>` で明示的に行う。`autoUpdate` の既定値は有効なので、書かないと自動更新になる
 - マーケットプレイスを追加すると、そのリポジトリの `.claude-plugin/marketplace.json` やプラグインの hooks / MCP サーバーが実行されうる。追加前にリポジトリの内容を確認する
-- `enabledPlugins` と `extraKnownMarketplaces` は 3 層が深いマージになる。同じキーは base → private の順で上書きされ、ローカルで追加したプラグインは残る。ただし **base から削除したエントリは既存マシンのローカル設定には残る** ので、各マシンの `~/.claude/settings.json` からも手で削除する
+- `enabledPlugins` と `extraKnownMarketplaces` は 4 層が深いマージになる。同じキーは base → private 共通 → profile 別の順で上書きされ、ローカルで追加したプラグインは残る。ただし **base から削除したエントリは既存マシンのローカル設定には残る** ので、各マシンの `~/.claude/settings.json` からも手で削除する
 
 ## 新しいマシンのセットアップ
 

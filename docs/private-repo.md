@@ -49,7 +49,8 @@ private リポジトリの直下に置く。すべて任意で、無いものは
 | `gitconfig` | `~/.gitconfig` から include | 公開 → private → `~/.gitconfig.local` の順 |
 | `tmux.conf` | `~/.tmux.conf` から source-file | 公開 → private → `~/.tmux.local.conf` の順 |
 | `claude/CLAUDE.md` | `~/.claude/CLAUDE.md` から `@` import | |
-| `claude/settings.json` | `~/.claude/settings.json` にマージ | permissions は和集合、hooks は base + private。仕事用・プロジェクト固有の marketplace / enabledPlugins もここに置く |
+| `claude/settings.json` | `~/.claude/settings.json` にマージ | 全マシン共通。permissions は和集合、hooks は base + private |
+| `claude/settings.<profile>.json` | `~/.claude/settings.json` に追加マージ | `machineProfile` と一致するファイルだけ読み込む。仕事用・個人用で分けたい marketplace / enabledPlugins を置く |
 | `Brewfile` | macOS で `brew bundle` | 公開 Brewfile の後に適用 |
 | `aws/config` | `~/.aws/config` へシンボリックリンク | 600。`aws configure` の変更も private 側に入る |
 
@@ -75,7 +76,7 @@ private リポジトリの直下に置く。すべて任意で、無いものは
 ## 仕事用と個人用の同居
 
 1 つのリポジトリを全マシンで使うため、private の設定は常に全部読み込まれる。
-切り替えたいものはファイル内で条件分岐する。
+切り替えたいものはファイル内で条件分岐する。ただし Claude Code の `settings.json` はプレーン JSON で分岐できないため、profile 別ファイルを使う (後述)。
 
 git の identity は `includeIf` で切り替える。
 
@@ -95,6 +96,28 @@ fi
 - マシンだけの一時設定は `~/.local.zsh`, `~/.gitconfig.local`, `~/.tmux.local.conf`, `~/.claude/CLAUDE.local.md` (管理外) に置く
 - 会社名・社内ホスト名・社内ツール名を含む設定は private に置く。公開リポジトリには書かない
 - 仕事用・プロジェクト固有の Claude Code プラグインとマーケットプレイスは `claude/settings.json` の `enabledPlugins` / `extraKnownMarketplaces` に置く。外部コードは `ref` で固定し、`autoUpdate` は `false` にする (タグが無いリポジトリは少なくとも `autoUpdate` を `false` にする)
+
+### Claude Code の profile 別設定
+
+`claude/settings.json` は全マシン共通、`claude/settings.<profile>.json` はマシンの profile が一致するときだけ追加でマージされる。個人専用・仕事専用のプラグインはこちらに分ける。
+
+```
+claude/settings.json          # 全マシン共通
+claude/settings.work.json     # machineProfile = work のマシンだけ
+claude/settings.personal.json # machineProfile = personal のマシンだけ
+```
+
+profile は `chezmoi init` 時にマシンごとに入力し、`~/.config/chezmoi/chezmoi.toml` の `[data] machineProfile` にだけ保存する。公開リポジトリにも private リポジトリにも書かない。
+
+既存マシンでは `chezmoi init` を再実行するか、`~/.config/chezmoi/chezmoi.toml` に追記する。
+
+```toml
+[data]
+    privateRepo = "https://github.com/<your-account>/<private-repo>"
+    machineProfile = "work"
+```
+
+profile 別ファイルが無い、または `machineProfile` が空の場合は、共通の `settings.json` だけが読み込まれる。
 
 ## AWS
 
