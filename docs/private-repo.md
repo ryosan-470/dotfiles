@@ -56,11 +56,12 @@ private リポジトリの直下に置く。すべて任意で、無いものは
 | `claude/CLAUDE.md` | `~/.claude/CLAUDE.md` から `@` import | |
 | `claude/settings.json` | `~/.claude/settings.json` にマージ | 全マシン共通。permissions は和集合、hooks は base + private。`"$replace": ["env"]` で列挙したキーは深いマージせず置き換える |
 | `claude/settings.<profile>.json` | `~/.claude/settings.json` に追加マージ | `machineProfile` と一致するファイルだけ読み込む。仕事用・個人用で分けたい marketplace / enabledPlugins を置く |
-| `Brewfile` | macOS で `brew bundle` | 公開 Brewfile の後に適用 |
+| `Brewfile` | macOS で `brew bundle` | 全マシン共通。公開 Brewfile の後に適用 |
+| `Brewfile.<profile>` | macOS で `brew bundle` | `machineProfile` と一致するファイルだけ、private `Brewfile` の後に適用。仕事用・個人用で分けたいパッケージを置く |
 | `aws/config` | `~/.aws/config` へシンボリックリンク | 600。`aws configure` の変更も private 側に入る |
 
 > [!NOTE]
-> `Brewfile` は全マシンで共通に適用される。ホストごとに分けたいパッケージは `Brewfile` に書かず、そのマシンで手動で入れる。
+> `Brewfile` は全マシンで共通に適用される。profile ごとに分けたいパッケージは `Brewfile.<profile>` に書く。`machineProfile` が空、または一致するファイルが無い場合は、profile 別の Brewfile はスキップされる。ホスト単位 (同じ profile 内のマシン差) で分けたいものは、そのマシンで手動で入れる。
 
 未対応 (必要になったら「新しいスロットを追加する」の手順で足す):
 
@@ -75,7 +76,7 @@ private リポジトリの直下に置く。すべて任意で、無いものは
 - git: 公開 `~/.gitconfig` → private `gitconfig` → `~/.gitconfig.local`
 - tmux: 公開 `~/.tmux.conf` → private `tmux.conf` → `~/.tmux.local.conf`
 - Claude Code: 現在の `~/.claude/settings.json` を土台に、公開 `settings.base.json` → private `claude/settings.json` → private `claude/settings.<profile>.json` の順で上書きする。`permissions` は 4 層の和集合。`"$replace"` に列挙したキーはその層の値で置き換える
-- Brewfile: 公開 `Brewfile` → private `Brewfile`
+- Brewfile: 公開 `Brewfile` → private `Brewfile` → private `Brewfile.<profile>` (いずれも `brew bundle --no-upgrade`。後のファイルは前のファイルの内容を打ち消さず、追加でインストールする)
 - AWS: private のみ (シンボリックリンク)
 
 ## 仕事用と個人用の同居
@@ -124,6 +125,22 @@ profile は `chezmoi init` 時にマシンごとに入力し、`~/.config/chezmo
 
 profile 別ファイルが無い、または `machineProfile` が空の場合は、共通の `settings.json` だけが読み込まれる。
 
+### Brewfile の profile 別設定
+
+`Brewfile` は全マシン共通、`Brewfile.<profile>` はマシンの profile が一致するときだけ追加で `brew bundle` される。仕事用・個人用だけで使う CLI / cask はこちらに分ける。`machineProfile` の設定方法は前節と同じ。
+
+```
+Brewfile             # 全マシン共通 (公開 Brewfile の後に適用)
+Brewfile.work        # machineProfile = work のマシンだけ
+Brewfile.personal    # machineProfile = personal のマシンだけ
+```
+
+- 適用順は 公開 `Brewfile` → private `Brewfile` → private `Brewfile.<profile>`
+- `machineProfile` が空、または一致するファイルが無い場合はスキップされる (エラーにならない)。`machineProfile` が未設定の古い `chezmoi.toml` でも同様
+- 3 つのファイルは、それぞれの内容の hash がスクリプトに埋め込まれる。どれか 1 つでも変わると次の `chezmoi apply` で `brew bundle` が再実行される
+- `--no-upgrade` で実行し、`cleanup` はしない。ファイルから消したパッケージはアンインストールされない
+- 他のスロットと同様、会社名や社内ツール名を含むパッケージは private に置き、公開 `Brewfile` には書かない
+
 ## AWS
 
 - `aws/config` を private に置くと `~/.aws/config` にリンクされる
@@ -163,4 +180,5 @@ link_slot "$PRIVATE_DIR/ssh/config" "$HOME/.ssh/config" 600
 ## テスト
 
 `tests/e2e.sh private_layer` が、ローカルの bare リポジトリを privateRepo として init し、zsh / git / tmux / Claude / AWS リンクを検証する。
+`Brewfile.<profile>` は、brew bundle 自体は CI ではスキップされるため、`run_onchange_after_brew-bundle.sh.tmpl` のレンダリング結果 (適用順・hash・一致しない profile の除外) だけを macOS で確認する。
 CI では private リポジトリを使わない (`privateRepo` は空)。

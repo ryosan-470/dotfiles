@@ -6,6 +6,18 @@
 {{- if stat $privateBrewfile }}
 # private Brewfile hash: {{ include $privateBrewfile | sha256sum }}
 {{- end }}
+{{- /* machineProfile が未設定の古い chezmoi.toml でもエラーにならないよう index で参照する。空 / ファイル無しなら $profileBrewfile は空のまま */ -}}
+{{- $machineProfile := index . "machineProfile" | default "" }}
+{{- $profileBrewfile := "" }}
+{{- if $machineProfile }}
+{{- $profileBrewfile = joinPath .chezmoi.homeDir ".config/private" (printf "Brewfile.%s" $machineProfile) }}
+{{- if not (stat $profileBrewfile) }}
+{{- $profileBrewfile = "" }}
+{{- end }}
+{{- end }}
+{{- if $profileBrewfile }}
+# private Brewfile.{{ $machineProfile }} hash: {{ include $profileBrewfile | sha256sum }}
+{{- end }}
 set -eu
 
 # CI はインストールに時間がかかるのでスキップ
@@ -20,5 +32,8 @@ fi
 brew bundle --no-upgrade --file={{ joinPath .chezmoi.workingTree "Brewfile" | quote }}
 {{- if stat $privateBrewfile }}
 brew bundle --no-upgrade --file={{ $privateBrewfile | quote }}
+{{- end }}
+{{- if $profileBrewfile }}
+brew bundle --no-upgrade --file={{ $profileBrewfile | quote }}
 {{- end }}
 {{ end -}}

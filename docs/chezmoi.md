@@ -58,7 +58,7 @@ home/dot_config/zsh/alias.zsh  →  ~/.config/zsh/alias.zsh
 | 外部のツール / リポジトリを置きたい | `home/.chezmoiexternal.toml.tmpl` に追記する。サプライチェーン対策として、ブランチ先頭 (`git-repo`) ではなくタグ固定の `archive` / `file` + `checksum.sha256` で取り込む (tpm / zimfw と同じ書き方。checksum は 0 埋めで apply して出る SHA256 mismatch の値を使う) |
 | Claude Code の設定を変える | `home/dot_claude/settings.base.json` を編集する (後述) |
 | GUI アプリの設定を管理したい | Karabiner は `home/dot_config/private_karabiner/`、BTT はプリセットを `home/dot_btt_autoload_preset.json` に置く (後述)。Raycast はテキスト設定が無いので Brewfile のみ |
-| CLI / GUI アプリを追加したい (macOS) | リポジトリ直下の `Brewfile` に `brew "foo"` / `cask "foo"` を追記する。次の `chezmoi apply` で `brew bundle` が走る。private は `~/.config/private/Brewfile` に書く (ccgate は mise で管理するので書かない。go / uv は Brewfile で管理する) |
+| CLI / GUI アプリを追加したい (macOS) | リポジトリ直下の `Brewfile` に `brew "foo"` / `cask "foo"` を追記する。次の `chezmoi apply` で `brew bundle` が走る。private は `~/.config/private/Brewfile` (全マシン共通) か `~/.config/private/Brewfile.<machineProfile>` (profile 別。`work` / `personal` など) に書く (ccgate は mise で管理するので書かない。go / uv は Brewfile で管理する) |
 | private リポジトリに設定を追加したい | [private-repo.md](./private-repo.md) のスロットに従ってファイルを置く。新しい種類はスロット追加の手順で公開側にフックを足す |
 | macOS の LaunchAgent を追加したい | `home/private_Library/private_LaunchAgents/` に plist を置き、`run_onchange` スクリプトで再ロードする (既存の cleanup-caches を参照) |
 | `docker compose` が `unknown command` になる | `~/.docker/cli-plugins/` にアンインストール済み Docker Desktop 由来のリンク切れ symlink が残っていないか確認する。`home/.chezmoiscripts/run_onchange_after_docker-cli-plugins.sh` がそれらを掃除し、Homebrew の `docker-compose` / `docker-buildx` が使えるようになる |
@@ -282,7 +282,7 @@ sh -c "$(curl -fsLS get.chezmoi.io)" -- init --apply \
 ### 3. apply で自動的に行われること
 
 - `home/.chezmoiexternal.toml.tmpl`: tpm (`~/.tmux/plugins/tpm`) と zimfw 本体 (`~/.zim/zimfw.zsh`) を配置する。`privateRepo` を設定していれば `~/.config/private` に private リポジトリを clone する
-- `run_onchange_after_brew-bundle.sh.tmpl`: `Brewfile` と `~/.config/private/Brewfile` を `brew bundle` する (macOS で brew がある場合)
+- `run_onchange_after_brew-bundle.sh.tmpl`: `Brewfile` → `~/.config/private/Brewfile` → `~/.config/private/Brewfile.<machineProfile>` の順に `brew bundle` する (macOS で brew がある場合。private 側の 2 つは存在するときだけ。`machineProfile` が空ならスキップ)
 - `run_onchange_after_private-links.sh.tmpl`: private の `aws/config` を `~/.aws/config` にシンボリックリンクする (存在する場合)
 - `run_onchange_after_load-launchagents.sh.tmpl`: `cleanup-caches` の LaunchAgent を登録する (macOS)
 - `modify_settings.json.tmpl`: `~/.claude/settings.json` を 4 層でマージする
