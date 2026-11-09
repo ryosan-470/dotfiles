@@ -4,6 +4,16 @@ case `uname` in
         if (($+commands[brew])); then
             alias update="brew update -v && brew upgrade -vy"
         fi
+        # pnpm (グローバルの bin を PATH に入れる)
+        export PNPM_HOME="$HOME/Library/pnpm"
+        case ":$PATH:" in
+            *":$PNPM_HOME/bin:"*) ;;
+            *) export PATH="$PNPM_HOME/bin:$PATH" ;;
+        esac
+        # dory (Docker ランタイム) が起動していれば、その socket を Docker CLI に向ける
+        if [ -S "$HOME/.dory/dory.sock" ]; then
+            export DOCKER_HOST="unix://$HOME/.dory/dory.sock"
+        fi
         ;;
     "Linux")
         #For Linux General
