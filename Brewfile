@@ -13,6 +13,7 @@ brew "nano"
 brew "peco"
 brew "ghq"
 brew "tig"
+brew "direnv"
 
 # GNU 系ツール (make は gmake として入る。他の g プレフィックス無し版は PATH 調整が必要)
 brew "make"
@@ -51,6 +52,7 @@ brew "docker-credential-helper"
 # Claude Code と、その hooks から呼ばれるツール (ccgate は mise で管理)
 cask "claude-code@latest"
 brew "rtk"
+brew "jq"
 
 # 1Password
 cask "1password"

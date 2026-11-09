@@ -34,3 +34,7 @@ zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}'
 autoload -Uz edit-command-line
 zle -N edit-command-line
 bindkey '^xe' edit-command-line
+# direnv: ディレクトリ移動時に .envrc を読み込む (direnv が無ければ何もしない)
+if (($+commands[direnv])); then
+  eval "$(direnv hook zsh)"
+fi
