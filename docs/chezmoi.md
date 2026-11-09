@@ -169,6 +169,14 @@ LINE (Mac App Store id `539883307`) は `mas` で管理しない。mas 7 はイ�
 - `permissions` の `allow` / `ask` / `deny` / `additionalDirectories` は 4 層の和集合
 - `hooks` はイベントごとに 4 層を合わせる。ただしリポジトリ側と同じ command を含むローカルのエントリはリポジトリ側で置き換える
 - それ以外のキーはリポジトリ側の値が優先 (ローカルで `/config` から変えても apply で戻る)
+- 各層のトップレベルに `"$replace": ["env"]` のようにキー名を列挙すると、そのキーは前の層 (ローカルを含む) と深いマージせず、その層の値で丸ごと置き換える。その層に値が無ければキーごと消える。`"$replace"` 自体は出力されない。`permissions` / `hooks` は上記ルールが優先されるので対象外
+
+  ```json
+  // ~/.config/private/claude/settings.json: base の env もローカルに残った古い env も捨てて、これだけにする
+  { "$replace": ["env"], "env": { "ANTHROPIC_BASE_URL": "http://localhost:20128" } }
+  ```
+
+  後ろの層 (profile 別) が `"$replace"` なしで同じキーを持つ場合は、置き換え後の値に深いマージされる
 
 注意点:
 

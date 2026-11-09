@@ -77,6 +77,28 @@ out=$(run "")
 check "profile file absent" \
     '.env.A == "private" and .hooks.Stop[0].hooks[0].command == "p.sh"' "$out"
 
+# 5c. "$replace" で列挙したキーは深いマージせず置き換える (ローカル・base の残りを消す)
+printf '%s' '{"$replace": ["env", "permissions"], "env": {"P": "private"}, "permissions": {"allow": ["Bash(private *)"]}}' >"$private_file"
+out=$(run '{"env": {"STALE": "1"}, "permissions": {"allow": ["Read"]}}')
+check "replace overrides env entirely" \
+    '.env == {"P": "private"} and (has("$replace") | not) and (.permissions.allow | index("Read")) and (.permissions.allow | index("Bash(private *)"))' "$out"
+twice=$(run "$out")
+if [ "$(printf '%s' "$out" | jq -S .)" = "$(printf '%s' "$twice" | jq -S .)" ]; then
+    echo "ok   - replace idempotent"
+else
+    echo "FAIL - replace idempotent"; fail=1
+fi
+# profile 層は replace 後の private の値に深いマージされる
+printf '%s' '{"env": {"Q": "profile"}}' >"$private_profile_file"
+out=$(run '{"env": {"STALE": "1"}}')
+check "profile merges onto replaced env" '.env == {"P": "private", "Q": "profile"}' "$out"
+# profile 層の replace で値を持たないキーは削除される
+printf '%s' '{"$replace": ["env"]}' >"$private_profile_file"
+out=$(run '{"env": {"STALE": "1"}}')
+check "replace without value removes key" '(has("env") | not)' "$out"
+rm -f "$private_profile_file"
+printf '%s' '{"env": {"A": "private"}, "permissions": {"allow": ["Bash(private *)"]}, "hooks": {"Stop": [{"hooks": [{"type": "command", "command": "p.sh"}]}]}}' >"$private_file"
+
 # 6. 冪等性
 once=$(run '{"permissions": {"allow": ["Z"]}, "hooks": {"Stop": [{"hooks": [{"type": "command", "command": "l.sh"}]}]}}')
 twice=$(run "$once")

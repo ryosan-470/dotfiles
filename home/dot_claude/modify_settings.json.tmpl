@@ -12,6 +12,10 @@
 # hooks はイベントごとに 4 層を合わせる。ただしリポジトリ側 (2, 3, 4) と同じ command を含む
 # ローカルのエントリはリポジトリ側で置き換える (timeout 等の変更が重複しないように)。
 # 既存の設定は消さない方針なので、リポジトリから削除した権限/hook は既存マシンには残る。
+# 例外として、各層のトップレベルに "$replace": ["env", ...] を書くと、列挙したキーは
+# それより前の層 (ローカルを含む) と深いマージをせず、その層の値で丸ごと置き換える
+# (その層に値が無ければキーごと削除)。"$replace" 自体は出力しない。
+# permissions / hooks は上記の和集合ルールが優先されるため "$replace" の対象外。
 set -euo pipefail
 
 base={{ joinPath .chezmoi.sourceDir "dot_claude" "settings.base.json" | quote }}
@@ -44,11 +48,15 @@ jq -n \
     --slurpfile profile "$private_profile_settings" '
 def dedupe: reduce .[] as $x ([]; if any(.[]; . == $x) then . else . + [$x] end);
 def cmds: [.hooks[]?.command];
+# 層 $l を重ねる。$l の "$replace" に列挙したキーは深いマージせずに置き換える
+def overlay($l):
+  (($l["$replace"] // []) - ["permissions", "hooks"]) as $r
+  | delpaths([$r[] | [.]]) * ($l | del(.["$replace"]));
 
 $base[0] as $b
 | ($private[0] // {}) as $p
 | ($profile[0] // {}) as $pp
-| ($cur * $b * $p * $pp)
+| reduce ($b, $p, $pp) as $l ($cur | del(.["$replace"]); overlay($l))
 | reduce ("allow", "ask", "deny", "additionalDirectories") as $k (.;
     ([$cur, $b, $p, $pp] | map(.permissions[$k] // []) | add | dedupe) as $v
     | if ($v | length) > 0 then .permissions[$k] = $v else . end)
