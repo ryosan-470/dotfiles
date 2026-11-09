@@ -41,7 +41,7 @@ This is a personal dotfiles repository for managing shell configurations, primar
 
 **Private layer** (`~/.config/private/`, cloned by `.chezmoiexternal`):
 - Contract: `docs/private-repo.md`
-- Slots: `zsh/*.zsh`, `gitconfig`, `tmux.conf`, `claude/CLAUDE.md`, `claude/settings.json`, `Brewfile`, `aws/config`
+- Slots: `zsh/*.zsh`, `gitconfig`, `tmux.conf`, `claude/CLAUDE.md`, `claude/settings.json`, `claude/settings.<profile>.json`, `Brewfile`, `Brewfile.<profile>`, `aws/config`
 - File slots (`aws/*`) are symlinked by `home/.chezmoiscripts/run_onchange_after_private-links.sh.tmpl`
 - The private repository must not contain secrets
 
@@ -55,7 +55,7 @@ This is a personal dotfiles repository for managing shell configurations, primar
   - `zim.zsh` - Zim framework integration
 
 **Dependency Management**:
-- `Brewfile` (repo root, not deployed) + `home/.chezmoiscripts/run_onchange_after_brew-bundle.sh.tmpl` run `brew bundle` on macOS when the Brewfile (or `~/.config/private/Brewfile`) changes; skipped when `CI` is set or brew is missing
+- `Brewfile` (repo root, not deployed) + `home/.chezmoiscripts/run_onchange_after_brew-bundle.sh.tmpl` run `brew bundle` on macOS when the Brewfile (or `~/.config/private/Brewfile` / `~/.config/private/Brewfile.<machineProfile>`) changes; applied in that order, and the profile one is skipped when `machineProfile` is empty or the file is missing; skipped when `CI` is set or brew is missing
 - `home/.chezmoiscripts/run_onchange_after_docker-cli-plugins.sh` removes dangling symlinks left in `~/.docker/cli-plugins/` (e.g. from an uninstalled Docker Desktop) so Homebrew's `docker-compose` / `docker-buildx` plugins are visible to the brew docker CLI. `~/.docker/config.json` is not managed because it holds credentials
 - Uses Zim framework for zsh (`home/dot_config/zsh/zimrc`)
 - Uses TPM (Tmux Plugin Manager) for tmux plugins (tpm itself is cloned by chezmoi external)

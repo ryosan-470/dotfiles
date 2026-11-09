@@ -211,6 +211,9 @@ test_private_layer() {
     echo '{"permissions":{"allow":["Bash(e2e-profile-allow *)"]}}' > "$seed/claude/settings.work.json"
     echo '{"permissions":{"allow":["Bash(e2e-other-profile *)"]}}' > "$seed/claude/settings.personal.json"
     printf '[profile e2e]\nregion = ap-northeast-1\n# e2e-private-aws\n' > "$seed/aws/config"
+    echo 'brew "e2e-private-common"' > "$seed/Brewfile"
+    echo 'brew "e2e-profile-work"' > "$seed/Brewfile.work"
+    echo 'brew "e2e-profile-personal"' > "$seed/Brewfile.personal"
     git -C "$seed" init -q -b main
     git -C "$seed" add -A
     git -C "$seed" -c user.name=e2e -c user.email=e2e@example.com commit -q -m seed
@@ -275,6 +278,55 @@ test_private_layer() {
             pass "private: private/aws/config が ~/.aws/config にリンクされる"
         else
             fail "private: private/aws/config が ~/.aws/config にリンクされない"; rc=1
+        fi
+        # brew-bundle: machineProfile と一致する Brewfile.<profile> だけがスクリプトに含まれる
+        # (macOS 専用のスクリプト。Linux ではテンプレートが空になる。CI では brew bundle 自体はスキップされるのでレンダリング結果だけを見る)
+        if [ "$(uname -s)" = Darwin ]; then
+            local tmpl="$REPO_ROOT/home/.chezmoiscripts/run_onchange_after_brew-bundle.sh.tmpl" rendered order want_hash
+            if rendered=$(chezmoi execute-template --source "$REPO_ROOT" < "$tmpl"); then
+                if grep -q '^brew bundle .*/\.config/private/Brewfile\.work"$' <<< "$rendered"; then
+                    pass "private: brew-bundle が Brewfile.<machineProfile> を bundle する"
+                else
+                    fail "private: brew-bundle に Brewfile.<machineProfile> が含まれない"; rc=1
+                fi
+                # 適用順: 公開 Brewfile → private Brewfile → private Brewfile.<profile>
+                order=$(sed -n 's/^brew bundle .*--file="\(.*\)"$/\1/p' <<< "$rendered" \
+                    | sed -e 's|^.*/\.config/private/|private:|' -e 's|^.*/Brewfile$|public:Brewfile|' | paste -sd' ' -)
+                if [ "$order" = "public:Brewfile private:Brewfile private:Brewfile.work" ]; then
+                    pass "private: brew-bundle の適用順が 公開 → private → private profile になっている"
+                else
+                    fail "private: brew-bundle の適用順が想定と違う: ${order}"; rc=1
+                fi
+                # 変更検知用の hash がコメントに埋め込まれている (run_onchange の発火条件)
+                want_hash=$(shasum -a 256 "$HOME/.config/private/Brewfile.work" | cut -d' ' -f1)
+                if grep -qF "# private Brewfile.work hash: $want_hash" <<< "$rendered"; then
+                    pass "private: brew-bundle に Brewfile.<machineProfile> の hash が埋め込まれる"
+                else
+                    fail "private: brew-bundle に Brewfile.<machineProfile> の hash が無い"; rc=1
+                fi
+                # machineProfile と一致しない profile の Brewfile は含まれない
+                if grep -q 'Brewfile\.personal' <<< "$rendered"; then
+                    fail "private: 一致しない profile の Brewfile が brew-bundle に含まれている"; rc=1
+                else
+                    pass "private: 一致しない profile の Brewfile は brew-bundle に含まれない"
+                fi
+            else
+                fail "private: brew-bundle テンプレートのレンダリングに失敗"; rc=1
+            fi
+            # machineProfile が空 / 未設定 (古い chezmoi.toml) でもエラーにならず、profile 別 Brewfile は含まれない
+            local data cfg
+            for data in 'machineProfile = ""' 'privateRepo = ""'; do
+                cfg="$TMP_ROOT/brew-profile.toml"
+                printf 'sourceDir = "%s"\n[data]\n    %s\n' "$REPO_ROOT" "$data" > "$cfg"
+                if rendered=$(chezmoi -c "$cfg" execute-template --source "$REPO_ROOT" < "$tmpl") \
+                    && ! grep -q 'Brewfile\.' <<< "$rendered"; then
+                    pass "private: brew-bundle は [data] が ${data} だと profile 別 Brewfile をスキップする"
+                else
+                    fail "private: brew-bundle が [data] ${data} でエラー、または profile 別 Brewfile を含む"; rc=1
+                fi
+            done
+        else
+            echo "skip: private: brew-bundle のレンダリング確認は macOS のみ"
         fi
         exit "$rc"
     ) || FAILED=1
