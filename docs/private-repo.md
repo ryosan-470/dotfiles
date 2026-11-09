@@ -54,7 +54,7 @@ private リポジトリの直下に置く。すべて任意で、無いものは
 | `gitconfig` | `~/.gitconfig` から include | 公開 → private → `~/.gitconfig.local` の順 |
 | `tmux.conf` | `~/.tmux.conf` から source-file | 公開 → private → `~/.tmux.local.conf` の順 |
 | `claude/CLAUDE.md` | `~/.claude/CLAUDE.md` から `@` import | |
-| `claude/settings.json` | `~/.claude/settings.json` にマージ | 全マシン共通。permissions は和集合、hooks は base + private |
+| `claude/settings.json` | `~/.claude/settings.json` にマージ | 全マシン共通。permissions は和集合、hooks は base + private。`"$replace": ["env"]` で列挙したキーは深いマージせず置き換える |
 | `claude/settings.<profile>.json` | `~/.claude/settings.json` に追加マージ | `machineProfile` と一致するファイルだけ読み込む。仕事用・個人用で分けたい marketplace / enabledPlugins を置く |
 | `Brewfile` | macOS で `brew bundle` | 公開 Brewfile の後に適用 |
 | `aws/config` | `~/.aws/config` へシンボリックリンク | 600。`aws configure` の変更も private 側に入る |
@@ -74,7 +74,7 @@ private リポジトリの直下に置く。すべて任意で、無いものは
 - zsh: 公開 `~/.config/zsh/*.zsh` (`.zshrc` で固定順) → private `zsh/*.zsh` (ファイル名順) → `~/.local.zsh`
 - git: 公開 `~/.gitconfig` → private `gitconfig` → `~/.gitconfig.local`
 - tmux: 公開 `~/.tmux.conf` → private `tmux.conf` → `~/.tmux.local.conf`
-- Claude Code: 現在の `~/.claude/settings.json` を土台に、公開 `settings.base.json` → private `claude/settings.json` → private `claude/settings.<profile>.json` の順で上書きする。`permissions` は 4 層の和集合
+- Claude Code: 現在の `~/.claude/settings.json` を土台に、公開 `settings.base.json` → private `claude/settings.json` → private `claude/settings.<profile>.json` の順で上書きする。`permissions` は 4 層の和集合。`"$replace"` に列挙したキーはその層の値で置き換える
 - Brewfile: 公開 `Brewfile` → private `Brewfile`
 - AWS: private のみ (シンボリックリンク)
 
