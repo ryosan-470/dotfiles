@@ -319,7 +319,7 @@ git config --get commit.gpgsign   # true なら有効
   ```sh
   mise use -g aqua:tak848/ccgate
   ```
-  mise の shim を有効にするには `~/.local.zsh` に `eval "$(mise activate zsh)"` を書く
+  `mise activate zsh` は `home/dot_config/zsh/config.zsh` が (mise がある場合のみ) 有効にする。マシンごとに書く必要はない
 
 #### アプリの初回起動 (macOS)
 
