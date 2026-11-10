@@ -1,19 +1,14 @@
-{{- $awsConfig := joinPath .chezmoi.homeDir ".config/private/aws/config" -}}
-{{- $awsConfigWork := joinPath .chezmoi.homeDir ".config/private/aws/config.work" -}}
-{{- $ccgateConfig := joinPath .chezmoi.homeDir ".config/private/claude/ccgate.jsonnet" -}}
 {{- /* machineProfile が未設定の古い chezmoi.toml でもエラーにならないよう index で参照する */ -}}
 {{- $machineProfile := index . "machineProfile" | default "" -}}
 #!/bin/bash
 # private リポジトリ (~/.config/private) の素材を HOME 配下へ配置する。
-# private 側のファイルが変わったときだけ実行する (ファイルのハッシュをコメントに埋め込む)。
-#
-# aws/config hash: {{ if stat $awsConfig }}{{ include $awsConfig | sha256sum }}{{ else }}absent{{ end }}
-# aws/config.work hash: {{ if stat $awsConfigWork }}{{ include $awsConfigWork | sha256sum }}{{ else }}absent{{ end }}
-# claude/ccgate.jsonnet hash: {{ if stat $ccgateConfig }}{{ include $ccgateConfig | sha256sum }}{{ else }}absent{{ end }}
+# run_onchange_ ではなく run_after_ にして、chezmoi apply のたびに実行する。
+# 配置先の状態 (rm で消したリンクなど) は chezmoi のハッシュ管理から見えないため、
+# 毎回「あるべき状態か」を調べ、足りないものだけ作る (冪等)。通信はしない。
 #
 # 方針:
 # - private 側にファイルが無ければ何もしない
-# - リンク先に実ファイルがある場合は上書きしない (手動で退避してから apply する)
+# - リンク先に実ファイルがある場合は上書きしない。あるべき状態と違うときだけ警告する (手動で退避してから apply する)
 # - private 側のファイルを編集すると、リンク先からそのまま見える (コピーしない)
 # - 秘密情報 (トークン・秘密鍵・AWS の access key) は private 側にも置かない
 # - AWS: machineProfile = work で aws/config.work があるマシンは、aws/config と結合した実ファイルを作る (merge_aws_config)
@@ -96,7 +91,10 @@ merge_aws_config() {
             return 0
         fi
     elif [ -e "$dst" ]; then
-        echo "private-links: $dst が既に存在するためスキップ (退避してから chezmoi apply)" >&2
+        # 生成結果と同じなら配置済み。違うときだけ警告する (上書きはしない)
+        if ! cmp -s "$tmp" "$dst"; then
+            echo "private-links: $dst が private 側の定義と異なるためスキップ (退避してから chezmoi apply)" >&2
+        fi
         rm -f "$tmp"
         return 0
     fi

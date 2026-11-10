@@ -156,9 +156,10 @@ test_dangerous_command_guard() {
 test_idempotent() {
     chezmoi apply --no-tty
     local diff
-    diff=$(chezmoi diff --no-pager 2>&1 || true)
+    # 毎回実行する run_after_ スクリプトは常に差分として出るので除外する (ファイルの冪等性だけ見る)
+    diff=$(chezmoi diff --no-pager --exclude=scripts 2>&1 || true)
     if [ -z "$diff" ]; then
-        pass "2 回目の chezmoi apply 後に chezmoi diff が空"
+        pass "2 回目の chezmoi apply 後に chezmoi diff が空 (scripts を除く)"
     else
         fail "冪等でない。chezmoi diff:"
         echo "$diff" >&2
@@ -208,8 +209,9 @@ private_init_home() {
     printf '[data]\n    privateRepo = "file://%s"\n    machineProfile = "%s"\n' "$bare" "$profile" > "$home/.config/chezmoi/chezmoi.toml"
     : > "$home.log"
     for _ in 1 2; do
-        # 2 回目は run_onchange のスクリプトが再実行されないので、警告は 1 回目のログに残る (追記で残す)
-        HOME="$home" XDG_CONFIG_HOME="$home/.config" chezmoi init --apply --no-tty --source "$REPO_ROOT" >>"$home.log" 2>&1 || return 1
+        # 1 回目・2 回目の警告をどちらも残す (追記)
+        # CI=1: ローカルで E2E_ALLOW_LOCAL=1 実行しても、実機の brew bundle と launchctl bootstrap が走らないようにする
+        CI=1 HOME="$home" XDG_CONFIG_HOME="$home/.config" chezmoi init --apply --no-tty --source "$REPO_ROOT" >>"$home.log" 2>&1 || return 1
     done
 }
 
@@ -240,7 +242,8 @@ test_private_layer() {
     git clone -q --bare "$seed" "$bare"
 
     (
-        export HOME="$private_home" XDG_CONFIG_HOME="$private_home/.config" TMUX=dummy TERM=xterm-256color
+        # CI=1: brew bundle / launchctl bootstrap をスキップさせる (private_init_home と同じ理由。このサブシェルに閉じる)
+        export HOME="$private_home" XDG_CONFIG_HOME="$private_home/.config" TMUX=dummy TERM=xterm-256color CI=1
         unset ZDOTDIR
         # promptStringOnce は既存の data を優先するので、事前に chezmoi.toml へ privateRepo と machineProfile を書いておく
         mkdir -p "$XDG_CONFIG_HOME/chezmoi"
@@ -330,7 +333,7 @@ test_private_layer() {
         if private_init_home "$home_existing" "$bare" work \
             && [ "$(aws_config_kind "$home_existing/.aws/config")" = file ] \
             && grep -qx '# e2e-existing-config' "$home_existing/.aws/config" \
-            && grep -q '既に存在するためスキップ' "$home_existing.log"; then
+            && grep -q 'private 側の定義と異なるためスキップ' "$home_existing.log"; then
             pass "private: 既存の ~/.aws/config 実ファイルを上書きせず、スキップを警告する"
         else
             fail "private: 既存の ~/.aws/config 実ファイルを上書きした、または警告が出ない"; rc=1
@@ -367,6 +370,17 @@ test_private_layer() {
             pass "private: claude/ccgate.jsonnet が ~/.claude/ccgate.jsonnet へのシンボリックリンクになる"
         else
             fail "private: ~/.claude/ccgate.jsonnet が private/claude/ccgate.jsonnet へのリンクになっていない"; rc=1
+        fi
+        # private-links: 配置先を消しても次の apply で復元される (run_onchange_ ではなく run_after_ で毎回実行するため)
+        rm -f "$HOME/.claude/ccgate.jsonnet" "$HOME/.aws/config"
+        if chezmoi apply --no-tty >/dev/null \
+            && [ -L "$HOME/.claude/ccgate.jsonnet" ] \
+            && [ "$(readlink "$HOME/.claude/ccgate.jsonnet")" = "$HOME/.config/private/claude/ccgate.jsonnet" ] \
+            && [ "$(aws_config_kind "$HOME/.aws/config")" = file ] \
+            && grep -q '^# e2e-private-aws-work$' "$HOME/.aws/config"; then
+            pass "private: 消した ~/.claude/ccgate.jsonnet (リンク) と ~/.aws/config (結合ファイル) が次の apply で復元される"
+        else
+            fail "private: ~/.claude/ccgate.jsonnet と ~/.aws/config を消したあとの apply で復元されない"; rc=1
         fi
         # private-links (ccgate): 既存の実ファイルは上書きせず、スキップを警告する
         local home_ccgate="$TMP_ROOT/ccgate-home"

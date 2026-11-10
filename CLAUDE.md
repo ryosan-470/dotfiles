@@ -42,7 +42,7 @@ This is a personal dotfiles repository for managing shell configurations, primar
 **Private layer** (`~/.config/private/`, cloned by `.chezmoiexternal`):
 - Contract: `docs/private-repo.md`
 - Slots: `zsh/*.zsh`, `gitconfig`, `tmux.conf`, `claude/CLAUDE.md`, `claude/settings.json`, `claude/settings.<profile>.json`, `claude/ccgate.jsonnet`, `Brewfile`, `Brewfile.<profile>`, `aws/config`
-- File slots (`aws/*`) are symlinked by `home/.chezmoiscripts/run_onchange_after_private-links.sh.tmpl`
+- File slots (`aws/*`) are symlinked by `home/.chezmoiscripts/run_after_private-links.sh.tmpl` (runs on every apply; idempotent)
 - The private repository must not contain secrets
 
 **Shell Configuration** (`home/dot_config/zsh/` → `~/.config/zsh/`):
