@@ -38,7 +38,8 @@ jobs:
           done
           test ! -e "$HOME/.claude/settings.base.json"
           jq empty "$HOME/.claude/settings.json"
-          chezmoi verify
+          # 毎回実行する run_after_ スクリプトは「適用済みか」を検証できず常に差分扱いになるので除外する
+          chezmoi verify --exclude=scripts
       - name: Test modify_settings.json.tmpl merge logic
         run: tests/modify_settings.sh
       - name: Test dangerous-command-guard hook

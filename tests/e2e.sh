@@ -208,7 +208,7 @@ private_init_home() {
     printf '[data]\n    privateRepo = "file://%s"\n    machineProfile = "%s"\n' "$bare" "$profile" > "$home/.config/chezmoi/chezmoi.toml"
     : > "$home.log"
     for _ in 1 2; do
-        # 2 回目は run_onchange のスクリプトが再実行されないので、警告は 1 回目のログに残る (追記で残す)
+        # 1 回目・2 回目の警告をどちらも残す (追記)
         HOME="$home" XDG_CONFIG_HOME="$home/.config" chezmoi init --apply --no-tty --source "$REPO_ROOT" >>"$home.log" 2>&1 || return 1
     done
 }
@@ -330,7 +330,7 @@ test_private_layer() {
         if private_init_home "$home_existing" "$bare" work \
             && [ "$(aws_config_kind "$home_existing/.aws/config")" = file ] \
             && grep -qx '# e2e-existing-config' "$home_existing/.aws/config" \
-            && grep -q '既に存在するためスキップ' "$home_existing.log"; then
+            && grep -q 'private 側の定義と異なるためスキップ' "$home_existing.log"; then
             pass "private: 既存の ~/.aws/config 実ファイルを上書きせず、スキップを警告する"
         else
             fail "private: 既存の ~/.aws/config 実ファイルを上書きした、または警告が出ない"; rc=1
