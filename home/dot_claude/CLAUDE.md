@@ -14,6 +14,13 @@
 - この環境に Grep/Glob ツールは存在しない。ファイル内容検索は `grep`/`rg`、ファイル検索は `find` を Bash 経由で使うこと。
 - GOPATH/pkg/mod の Go 依存ソース参照・`.claude/plugins/cache` 配下・兄弟リポジトリの `git show`・`/tmp` scratch など、読み取り専用と分かっている既知の境界外調査は、素朴に Bash を実行して "Accessing paths outside the current repository/worktree" のブロックで失敗するより先に、その Bash 呼び出しに `dangerouslyDisableSandbox: true` を能動的に付けること。書き込み系コマンドやリポジトリ外への削除には適用しない。
 
+## Git コミット
+- コミットメッセージ (subject と本文) は英語で書くこと
+- [Conventional Commits](https://www.conventionalcommits.org/) の形式に従うこと: `<type>(<scope>): <description>` (scope は任意)
+  - 主な type: `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `build`, `ci`, `chore`, `revert`
+  - 例: `feat(zsh): add ghq alias`, `fix(claude): correct hook path`, `docs: update setup guide`
+- description は動詞の原形で始めて末尾に句点を付けないこと (`added` や `adds` ではなく `add`)
+
 ## References
 
 @RTK.md
