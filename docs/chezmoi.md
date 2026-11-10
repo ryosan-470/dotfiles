@@ -283,7 +283,7 @@ sh -c "$(curl -fsLS get.chezmoi.io)" -- init --apply \
 
 - `home/.chezmoiexternal.toml.tmpl`: tpm (`~/.tmux/plugins/tpm`) と zimfw 本体 (`~/.zim/zimfw.zsh`) を配置する。`privateRepo` を設定していれば `~/.config/private` に private リポジトリを clone する
 - `run_onchange_after_brew-bundle.sh.tmpl`: `Brewfile` → `~/.config/private/Brewfile` → `~/.config/private/Brewfile.<machineProfile>` の順に `brew bundle` する (macOS で brew がある場合。private 側の 2 つは存在するときだけ。`machineProfile` が空ならスキップ)
-- `run_onchange_after_private-links.sh.tmpl`: private の `aws/config` を `~/.aws/config` にシンボリックリンクする (存在する場合)
+- `run_onchange_after_private-links.sh.tmpl`: private の AWS 設定を `~/.aws/config` に配置する。`machineProfile = work` かつ `aws/config.work` があれば `aws/config` と結合した実ファイル (600)、それ以外は `aws/config` のシンボリックリンク (存在する場合)。詳細は [private-repo.md の AWS 節](./private-repo.md#aws)
 - `run_onchange_after_load-launchagents.sh.tmpl`: `cleanup-caches` の LaunchAgent を登録する (macOS)
 - `modify_settings.json.tmpl`: `~/.claude/settings.json` を 4 層でマージする
 
