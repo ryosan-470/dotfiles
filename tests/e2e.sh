@@ -156,9 +156,10 @@ test_dangerous_command_guard() {
 test_idempotent() {
     chezmoi apply --no-tty
     local diff
-    diff=$(chezmoi diff --no-pager 2>&1 || true)
+    # 毎回実行する run_after_ スクリプトは常に差分として出るので除外する (ファイルの冪等性だけ見る)
+    diff=$(chezmoi diff --no-pager --exclude=scripts 2>&1 || true)
     if [ -z "$diff" ]; then
-        pass "2 回目の chezmoi apply 後に chezmoi diff が空"
+        pass "2 回目の chezmoi apply 後に chezmoi diff が空 (scripts を除く)"
     else
         fail "冪等でない。chezmoi diff:"
         echo "$diff" >&2
