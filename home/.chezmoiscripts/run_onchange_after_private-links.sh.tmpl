@@ -1,19 +1,25 @@
 {{- $awsConfig := joinPath .chezmoi.homeDir ".config/private/aws/config" -}}
+{{- $awsConfigWork := joinPath .chezmoi.homeDir ".config/private/aws/config.work" -}}
+{{- /* machineProfile が未設定の古い chezmoi.toml でもエラーにならないよう index で参照する */ -}}
+{{- $machineProfile := index . "machineProfile" | default "" -}}
 #!/bin/bash
-# private リポジトリ (~/.config/private) の素材を HOME 配下へシンボリックリンクする。
+# private リポジトリ (~/.config/private) の素材を HOME 配下へ配置する。
 # private 側のファイルが変わったときだけ実行する (ファイルのハッシュをコメントに埋め込む)。
 #
 # aws/config hash: {{ if stat $awsConfig }}{{ include $awsConfig | sha256sum }}{{ else }}absent{{ end }}
+# aws/config.work hash: {{ if stat $awsConfigWork }}{{ include $awsConfigWork | sha256sum }}{{ else }}absent{{ end }}
 #
 # 方針:
 # - private 側にファイルが無ければ何もしない
 # - リンク先に実ファイルがある場合は上書きしない (手動で退避してから apply する)
 # - private 側のファイルを編集すると、リンク先からそのまま見える (コピーしない)
 # - 秘密情報 (トークン・秘密鍵・AWS の access key) は private 側にも置かない
+# - AWS: machineProfile = work で aws/config.work があるマシンは、aws/config と結合した実ファイルを作る (merge_aws_config)
 set -euo pipefail
 
 PRIVATE_DIR="$HOME/.config/private"
 [ -d "$PRIVATE_DIR" ] || exit 0
+MACHINE_PROFILE={{ $machineProfile | quote }}
 
 # 作成するディレクトリを自分だけが読めるようにする
 umask 077
@@ -38,7 +44,74 @@ link_slot() {
     if [ -n "$mode" ]; then chmod "$mode" "$src" 2>/dev/null || true; fi
 }
 
+# aws/config.work (仕事用) と aws/config (個人用) を 1 つの ~/.aws/config 実ファイル (600) にまとめる。
+# - 先頭に置く aws/config.work の [default] を残し、aws/config 側の [default] は捨てる
+# - それ以外のセクション名が両方にあればエラーにして何も書かない (AWS CLI は重複セクションで失敗する)
+# - 生成物は通常のファイル。aws configure の書き込みは private 側には戻らない (docs/private-repo.md の AWS 節)
+merge_aws_config() {
+    local dst="$HOME/.aws/config" tmp src
+    local -a srcs=()
+    for src in "$AWS_WORK" "$AWS_PERSONAL"; do
+        [ -f "$src" ] && srcs+=("$src")
+    done
+    mkdir -p "$(dirname "$dst")"
+    tmp="$(mktemp "$HOME/.aws/.config.XXXXXX")"
+    if ! {
+        printf '%s\n' "# private-links が aws/config.work と aws/config から生成した実ファイル (machineProfile = work)" \
+            "# ここを直接編集しても private 側には戻らない。元の定義を変えたら、このファイルを退避してから chezmoi apply する"
+        for src in "${srcs[@]}"; do
+            cat "$src"
+            printf '\n'
+        done
+    } | awk '
+        /^\[/ {
+            name = $0
+            sub(/[[:blank:]]+$/, "", name)
+            skip = 0
+            if (name in seen) {
+                if (name != "[default]") {
+                    print "private-links: セクション " name " が aws/config.work と aws/config の両方にある" > "/dev/stderr"
+                    exit 1
+                }
+                skip = 1
+            }
+            seen[name] = 1
+        }
+        !skip
+    ' > "$tmp"; then
+        rm -f "$tmp"
+        echo "private-links: 重複したセクションがあるため ~/.aws/config を生成しない" >&2
+        return 0
+    fi
+    chmod 600 "$tmp"
+    if [ -L "$dst" ]; then
+        if [ "$(readlink "$dst")" = "$AWS_PERSONAL" ]; then
+            # 以前の link_slot が張った個人用 aws/config へのリンクは、結合ファイルに置き換える
+            rm -f "$dst"
+        else
+            echo "private-links: $dst は別のリンク先を指しているためスキップ" >&2
+            rm -f "$tmp"
+            return 0
+        fi
+    elif [ -e "$dst" ]; then
+        echo "private-links: $dst が既に存在するためスキップ (退避してから chezmoi apply)" >&2
+        rm -f "$tmp"
+        return 0
+    fi
+    mv "$tmp" "$dst"
+}
+
+AWS_PERSONAL="$PRIVATE_DIR/aws/config"
+AWS_WORK="$PRIVATE_DIR/aws/config.work"
+
 # --- スロット定義 ---
 # 追加するときは link_slot <private 側> <HOME 側> [パーミッション] を 1 行足す。
 # 例: link_slot "$PRIVATE_DIR/ssh/config" "$HOME/.ssh/config" 600
-link_slot "$PRIVATE_DIR/aws/config" "$HOME/.aws/config" 600
+
+# machineProfile = work かつ aws/config.work があるマシンは結合して実ファイルを作る。
+# それ以外 (個人用・profile 未設定・aws/config.work が無い) は従来どおり aws/config をシンボリックリンクする。
+if [ "$MACHINE_PROFILE" = work ] && [ -f "$AWS_WORK" ]; then
+    merge_aws_config
+else
+    link_slot "$AWS_PERSONAL" "$HOME/.aws/config" 600
+fi

@@ -54,7 +54,8 @@ tmux.conf               # sourced by ~/.tmux.conf
 claude/CLAUDE.md        # imported by ~/.claude/CLAUDE.md
 claude/settings.json    # merged into ~/.claude/settings.json
 Brewfile                # installed by brew bundle (macOS)
-aws/config              # symlinked to ~/.aws/config (600)
+aws/config              # symlinked to ~/.aws/config (600); merged with aws/config.work on work machines
+aws/config.work         # work profile: merged into ~/.aws/config when machineProfile = work (600)
 ```
 
 ### Claude Code settings

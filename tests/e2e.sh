@@ -200,6 +200,24 @@ test_settings_preserved() {
         || fail "settings.json: dangerous-command-guard hook が ${dup} 個ある"
 }
 
+# privateRepo (bare) を使って一時 HOME を init し、2 回 apply する (1 回目は private clone より後に処理されるものがあるため)
+# 引数: <home> <bare> <machineProfile>。出力 (スクリプトの警告を含む) は <home>.log に残す
+private_init_home() {
+    local home="$1" bare="$2" profile="$3"
+    mkdir -p "$home/.config/chezmoi"
+    printf '[data]\n    privateRepo = "file://%s"\n    machineProfile = "%s"\n' "$bare" "$profile" > "$home/.config/chezmoi/chezmoi.toml"
+    : > "$home.log"
+    for _ in 1 2; do
+        # 2 回目は run_onchange のスクリプトが再実行されないので、警告は 1 回目のログに残る (追記で残す)
+        HOME="$home" XDG_CONFIG_HOME="$home/.config" chezmoi init --apply --no-tty --source "$REPO_ROOT" >>"$home.log" 2>&1 || return 1
+    done
+}
+
+# ~/.aws/config の種類を返す: link (シンボリックリンク) / file (実ファイル) / none (無い)
+aws_config_kind() {
+    if [ -L "$1" ]; then echo link; elif [ -f "$1" ]; then echo file; else echo none; fi
+}
+
 test_private_layer() {
     # 一時 HOME に閉じた環境で、ダミーの privateRepo (ローカルの bare リポジトリ) を使って init する
     local private_home="$TMP_ROOT/private-home" seed="$TMP_ROOT/private-seed" bare="$TMP_ROOT/private.git"
@@ -210,7 +228,8 @@ test_private_layer() {
     echo '{"permissions":{"allow":["Bash(e2e-private-allow *)"]}}' > "$seed/claude/settings.json"
     echo '{"permissions":{"allow":["Bash(e2e-profile-allow *)"]}}' > "$seed/claude/settings.work.json"
     echo '{"permissions":{"allow":["Bash(e2e-other-profile *)"]}}' > "$seed/claude/settings.personal.json"
-    printf '[profile e2e]\nregion = ap-northeast-1\n# e2e-private-aws\n' > "$seed/aws/config"
+    printf '[default]\nlogin_session = e2e-personal-default\n[profile e2e-personal]\nregion = ap-northeast-1\n# e2e-private-aws-personal\n' > "$seed/aws/config"
+    printf '[default]\noutput = e2e-work-default\n[profile e2e-work]\nregion = ap-northeast-1\n# e2e-private-aws-work\n' > "$seed/aws/config.work"
     echo 'brew "e2e-private-common"' > "$seed/Brewfile"
     echo 'brew "e2e-profile-work"' > "$seed/Brewfile.work"
     echo 'brew "e2e-profile-personal"' > "$seed/Brewfile.personal"
@@ -273,11 +292,72 @@ test_private_layer() {
         else
             pass "private: 一致しない profile の settings はマージされない"
         fi
-        # private-links: aws/config が ~/.aws/config にリンクされる
-        if [ -L "$HOME/.aws/config" ] && grep -q 'e2e-private-aws' "$HOME/.aws/config"; then
-            pass "private: private/aws/config が ~/.aws/config にリンクされる"
+        # private-links (AWS): machineProfile = work で aws/config.work があれば、aws/config と結合した実ファイル (600) を作る
+        if [ "$(aws_config_kind "$HOME/.aws/config")" = file ] \
+            && [ -n "$(find "$HOME/.aws/config" -maxdepth 0 -perm 600)" ] \
+            && grep -q '^# e2e-private-aws-work$' "$HOME/.aws/config" \
+            && grep -q '^# e2e-private-aws-personal$' "$HOME/.aws/config" \
+            && [ "$(grep -c '^\[default\]$' "$HOME/.aws/config")" = 1 ] \
+            && grep -q 'e2e-work-default' "$HOME/.aws/config" \
+            && ! grep -q 'e2e-personal-default' "$HOME/.aws/config"; then
+            pass "private: machineProfile = work で aws/config と aws/config.work が 600 の実ファイルに結合される ([default] は 1 つ)"
         else
-            fail "private: private/aws/config が ~/.aws/config にリンクされない"; rc=1
+            fail "private: machineProfile = work の ~/.aws/config の結合結果が想定と違う"; rc=1
+        fi
+        # private-links (AWS): machineProfile = personal は従来どおり aws/config をリンクし、aws/config.work は使わない
+        local home_personal="$TMP_ROOT/personal-home"
+        if private_init_home "$home_personal" "$bare" personal \
+            && [ "$(aws_config_kind "$home_personal/.aws/config")" = link ] \
+            && [ "$(readlink "$home_personal/.aws/config")" = "$home_personal/.config/private/aws/config" ] \
+            && ! grep -q 'e2e-private-aws-work' "$home_personal/.aws/config"; then
+            pass "private: machineProfile = personal は aws/config を ~/.aws/config にリンクする (aws/config.work は使わない)"
+        else
+            fail "private: machineProfile = personal の ~/.aws/config がリンクになっていない"; rc=1
+        fi
+        # private-links (AWS): personal → work に切り替えると、以前のリンクは結合ファイルに置き換わる
+        if private_init_home "$home_personal" "$bare" work \
+            && [ "$(aws_config_kind "$home_personal/.aws/config")" = file ] \
+            && grep -q '^# e2e-private-aws-work$' "$home_personal/.aws/config"; then
+            pass "private: personal → work への切り替えで、以前のリンクが結合ファイルに置き換わる"
+        else
+            fail "private: personal → work への切り替えで ~/.aws/config が結合ファイルに置き換わらない"; rc=1
+        fi
+        # private-links (AWS): 既存の実ファイルは上書きせず、スキップを警告する
+        local home_existing="$TMP_ROOT/existing-home"
+        mkdir -p "$home_existing/.aws"
+        echo '# e2e-existing-config' > "$home_existing/.aws/config"
+        if private_init_home "$home_existing" "$bare" work \
+            && [ "$(aws_config_kind "$home_existing/.aws/config")" = file ] \
+            && grep -qx '# e2e-existing-config' "$home_existing/.aws/config" \
+            && grep -q '既に存在するためスキップ' "$home_existing.log"; then
+            pass "private: 既存の ~/.aws/config 実ファイルを上書きせず、スキップを警告する"
+        else
+            fail "private: 既存の ~/.aws/config 実ファイルを上書きした、または警告が出ない"; rc=1
+        fi
+        # private-links (AWS): 両方に同じセクション名があれば生成せず警告する (AWS CLI は重複セクションで失敗するため)
+        local dup_seed="$TMP_ROOT/dup-seed" dup_bare="$TMP_ROOT/dup.git" home_dup="$TMP_ROOT/dup-home"
+        cp -R "$seed" "$dup_seed"
+        printf '[profile e2e-personal]\nregion = us-east-1\n' >> "$dup_seed/aws/config.work"
+        git -C "$dup_seed" -c user.name=e2e -c user.email=e2e@example.com commit -q -am dup
+        git clone -q --bare "$dup_seed" "$dup_bare"
+        if private_init_home "$home_dup" "$dup_bare" work \
+            && [ "$(aws_config_kind "$home_dup/.aws/config")" = none ] \
+            && grep -q '重複' "$home_dup.log"; then
+            pass "private: 重複セクションがあれば ~/.aws/config を生成せず警告する"
+        else
+            fail "private: 重複セクションがあるのに ~/.aws/config を生成した、または警告が出ない"; rc=1
+        fi
+        # private-links (AWS): machineProfile = work でも aws/config.work が無ければ従来どおり aws/config をリンクする
+        local nowork_seed="$TMP_ROOT/nowork-seed" nowork_bare="$TMP_ROOT/nowork.git" home_nowork="$TMP_ROOT/nowork-home"
+        cp -R "$seed" "$nowork_seed"
+        git -C "$nowork_seed" rm -q aws/config.work
+        git -C "$nowork_seed" -c user.name=e2e -c user.email=e2e@example.com commit -q -m nowork
+        git clone -q --bare "$nowork_seed" "$nowork_bare"
+        if private_init_home "$home_nowork" "$nowork_bare" work \
+            && [ "$(aws_config_kind "$home_nowork/.aws/config")" = link ]; then
+            pass "private: aws/config.work が無い work マシンは aws/config をリンクする"
+        else
+            fail "private: aws/config.work が無い work マシンで ~/.aws/config がリンクにならない"; rc=1
         fi
         # brew-bundle: machineProfile と一致する Brewfile.<profile> だけがスクリプトに含まれる
         # (macOS 専用のスクリプト。Linux ではテンプレートが空になる。CI では brew bundle 自体はスキップされるのでレンダリング結果だけを見る)

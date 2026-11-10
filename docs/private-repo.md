@@ -58,7 +58,8 @@ private リポジトリの直下に置く。すべて任意で、無いものは
 | `claude/settings.<profile>.json` | `~/.claude/settings.json` に追加マージ | `machineProfile` と一致するファイルだけ読み込む。仕事用・個人用で分けたい marketplace / enabledPlugins を置く |
 | `Brewfile` | macOS で `brew bundle` | 全マシン共通。公開 Brewfile の後に適用 |
 | `Brewfile.<profile>` | macOS で `brew bundle` | `machineProfile` と一致するファイルだけ、private `Brewfile` の後に適用。仕事用・個人用で分けたいパッケージを置く |
-| `aws/config` | `~/.aws/config` へシンボリックリンク | 600。`aws configure` の変更も private 側に入る |
+| `aws/config` | `~/.aws/config` へシンボリックリンク (`machineProfile = work` かつ `aws/config.work` があるマシンでは結合) | 600。リンクのときは `aws configure` の変更も private 側に入る。結合のときは入らない (AWS 節を参照) |
+| `aws/config.work` | `machineProfile = work` のマシンだけ、`aws/config` と結合して `~/.aws/config` の実ファイル (600) を作る | 仕事用の profile を置く。`[default]` は両方にあるため `aws/config.work` 側を残す |
 
 > [!NOTE]
 > `Brewfile` は全マシンで共通に適用される。profile ごとに分けたいパッケージは `Brewfile.<profile>` に書く。`machineProfile` が空、または一致するファイルが無い場合は、profile 別の Brewfile はスキップされる。ホスト単位 (同じ profile 内のマシン差) で分けたいものは、そのマシンで手動で入れる。
@@ -77,7 +78,7 @@ private リポジトリの直下に置く。すべて任意で、無いものは
 - tmux: 公開 `~/.tmux.conf` → private `tmux.conf` → `~/.tmux.local.conf`
 - Claude Code: 現在の `~/.claude/settings.json` を土台に、公開 `settings.base.json` → private `claude/settings.json` → private `claude/settings.<profile>.json` の順で上書きする。`permissions` は 4 層の和集合。`"$replace"` に列挙したキーはその層の値で置き換える
 - Brewfile: 公開 `Brewfile` → private `Brewfile` → private `Brewfile.<profile>` (いずれも `brew bundle --no-upgrade`。後のファイルは前のファイルの内容を打ち消さず、追加でインストールする)
-- AWS: private のみ (シンボリックリンク)
+- AWS: private のみ。`machineProfile = work` かつ `aws/config.work` があれば `aws/config` と結合した実ファイル、それ以外は `aws/config` のシンボリックリンク
 
 ## 仕事用と個人用の同居
 
@@ -143,11 +144,18 @@ Brewfile.personal    # machineProfile = personal のマシンだけ
 
 ## AWS
 
-- `aws/config` を private に置くと `~/.aws/config` にリンクされる
+- `aws/config` を private に置くと、`~/.aws/config` にリンクされる (個人用・profile 未設定のマシン、および `aws/config.work` が無い仕事用マシン)
+- `machineProfile = work` のマシンで `aws/config.work` があると、`aws/config.work` と `aws/config` を結合して `~/.aws/config` の実ファイル (600) を作る (`merge_aws_config`、`run_onchange_after_private-links.sh.tmpl`)
+  - 結合の方式は chezmoi テンプレート (`create_` / `modify_`) ではなく run_onchange スクリプトにした。リンクと同じ「既存の実ファイルは上書きしない」規則を揃えるため、また private 側のファイルはスクリプト実行時にしか clone されず、テンプレートの `include` だと初回 apply で参照できないことがあるため
+  - `[default]` は両方にあるので 1 つにまとめ、`aws/config.work` 側を残す (仕事用マシンの既定 profile にする)。`aws/config` 側の `[default]` は捨てる
+  - `[default]` 以外のセクション名 (`[profile <name>]`、`[sso-session <name>]`) が両方にあると、何も書かずに警告する。AWS CLI は重複セクションがあると失敗するため
+- 結合ファイルは生成時点のスナップショットになる。private 側を後から編集しても既存の `~/.aws/config` は更新されない (実ファイルは上書きしない)。反映するには `~/.aws/config` を退避してから `chezmoi apply` する
+- 結合ファイルに `aws configure` などで書き込んだ内容は private 側に戻らない。仕事用の変更は `aws/config.work` を直接編集して commit / push し、上の手順で結合ファイルを作り直す
+- 個人用 → 仕事用に profile を切り替えたときは、以前の `aws/config` へのリンク (private の `aws/config` を指すもの) だけを結合ファイルに置き換える。別の場所を指すリンクや実ファイルは触らず、警告する
 - AWS CLI のプロファイルは `~/.aws/config` の `[profile <name>]` (default は `[default]`) で定義する。`~/.aws/profile` という標準ファイルは無い
 - `~/.aws/credentials` はサポートしない (access key は秘密情報)。SSO か `credential_process` を使う
-- 既存の `~/.aws/config` が実ファイルの場合は上書きしない。中身を `~/.config/private/aws/config` に移し、元ファイルを退避してから `chezmoi apply` する
-- `aws configure` などで書き換えた内容は private 側のファイルに入る。`dot private` で移動して commit / push する
+- 既存の `~/.aws/config` が実ファイルの場合は上書きしない。中身を `~/.config/private/aws/config` (個人用) または `~/.config/private/aws/config.work` (仕事用) に移し、元ファイルを退避してから `chezmoi apply` する
+- リンクの状態で `aws configure` などで書き換えた内容は private 側のファイルに入る。`dot private` で移動して commit / push する
 - ツールがリンクを実ファイルに置き換えた場合は、内容を確認してから実ファイルを退避し、`chezmoi apply` でリンクを張り直す
 
 ## 新しいスロットを追加する
@@ -179,6 +187,7 @@ link_slot "$PRIVATE_DIR/ssh/config" "$HOME/.ssh/config" 600
 
 ## テスト
 
-`tests/e2e.sh private_layer` が、ローカルの bare リポジトリを privateRepo として init し、zsh / git / tmux / Claude / AWS リンクを検証する。
+`tests/e2e.sh private_layer` が、ローカルの bare リポジトリを privateRepo として init し、zsh / git / tmux / Claude を検証する。AWS は `machineProfile` ごとに一時 HOME を分けて、work の結合 (600・`[default]` は 1 つ)、personal のリンク、personal → work の切り替え、既存の実ファイルの保護、重複セクションの拒否、`aws/config.work` が無い work のリンクを確認する。
+ローカルで実行するときは、brew bundle が実際に走らないよう `brew` を PATH から外す (テストの Brewfile に架空の formula を入れているため、brew があると失敗する)。`CI` の環境変数を代わりに使うと、CI 用の sudo 処理も走るので避ける。
 `Brewfile.<profile>` は、brew bundle 自体は CI ではスキップされるため、`run_onchange_after_brew-bundle.sh.tmpl` のレンダリング結果 (適用順・hash・一致しない profile の除外) だけを macOS で確認する。
 CI では private リポジトリを使わない (`privateRepo` は空)。
