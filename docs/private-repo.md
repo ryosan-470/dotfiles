@@ -56,6 +56,7 @@ private リポジトリの直下に置く。すべて任意で、無いものは
 | `claude/CLAUDE.md` | `~/.claude/CLAUDE.md` から `@` import | |
 | `claude/settings.json` | `~/.claude/settings.json` にマージ | 全マシン共通。permissions は和集合、hooks は base + private。`"$replace": ["env"]` で列挙したキーは深いマージせず置き換える |
 | `claude/settings.<profile>.json` | `~/.claude/settings.json` に追加マージ | `machineProfile` と一致するファイルだけ読み込む。仕事用・個人用で分けたい marketplace / enabledPlugins を置く |
+| `claude/ccgate.jsonnet` | `~/.claude/ccgate.jsonnet` へシンボリックリンク | ccgate (Claude Code の PermissionRequest hook) のグローバル設定。リンクなので private 側の編集がそのまま反映される。既存の実ファイルがあればスキップする (ccgate 節を参照) |
 | `Brewfile` | macOS で `brew bundle` | 全マシン共通。公開 Brewfile の後に適用 |
 | `Brewfile.<profile>` | macOS で `brew bundle` | `machineProfile` と一致するファイルだけ、private `Brewfile` の後に適用。仕事用・個人用で分けたいパッケージを置く |
 | `aws/config` | `~/.aws/config` へシンボリックリンク (`machineProfile = work` かつ `aws/config.work` があるマシンでは結合) | 600。リンクのときは `aws configure` の変更も private 側に入る。結合のときは入らない (AWS 節を参照) |
@@ -79,6 +80,7 @@ private リポジトリの直下に置く。すべて任意で、無いものは
 - Claude Code: 現在の `~/.claude/settings.json` を土台に、公開 `settings.base.json` → private `claude/settings.json` → private `claude/settings.<profile>.json` の順で上書きする。`permissions` は 4 層の和集合。`"$replace"` に列挙したキーはその層の値で置き換える
 - Brewfile: 公開 `Brewfile` → private `Brewfile` → private `Brewfile.<profile>` (いずれも `brew bundle --no-upgrade`。後のファイルは前のファイルの内容を打ち消さず、追加でインストールする)
 - AWS: private のみ。`machineProfile = work` かつ `aws/config.work` があれば `aws/config` と結合した実ファイル、それ以外は `aws/config` のシンボリックリンク
+- ccgate: private のみ。`claude/ccgate.jsonnet` を `~/.claude/ccgate.jsonnet` にシンボリックリンクする (公開側に同名のファイルは無い)
 
 ## 仕事用と個人用の同居
 
@@ -158,6 +160,15 @@ Brewfile.personal    # machineProfile = personal のマシンだけ
 - リンクの状態で `aws configure` などで書き換えた内容は private 側のファイルに入る。`dot private` で移動して commit / push する
 - ツールがリンクを実ファイルに置き換えた場合は、内容を確認してから実ファイルを退避し、`chezmoi apply` でリンクを張り直す
 
+## ccgate
+
+- `claude/ccgate.jsonnet` を private に置くと、`~/.claude/ccgate.jsonnet` にリンクされる (全マシン共通。profile 別の `ccgate.<profile>.jsonnet` は未対応)
+- ccgate はシンボリックリンク越しに設定を読む。リンク先の jsonnet を評価することを ccgate 0.11.1 の実機で確認している。private 側を編集すると、次の hook 実行からそのまま反映される
+- リンクは `run_onchange_after_private-links.sh.tmpl` の `link_slot` で張る。private 側のファイルの hash がスクリプトのコメントに埋め込まれているため、ファイルを追加・編集すると次の `chezmoi apply` でスクリプトが再実行され、リンクが張られる
+- 既存の `~/.claude/ccgate.jsonnet` が実ファイルの場合は上書きしない (警告してスキップする)。中身を `~/.config/private/claude/ccgate.jsonnet` に移し、元ファイルを退避してから `chezmoi apply` する
+- 設定に秘密情報は書かない。provider の認証は環境変数か、`auth` で参照する外部ファイル・コマンドで指定する
+- ccgate 本体は mise で管理する (公開側の手順は [chezmoi.md](./chezmoi.md) を参照)。ここで扱うのは設定ファイルだけ
+
 ## 新しいスロットを追加する
 
 1. 公開リポジトリ側に読み込みフックを追加する
@@ -187,7 +198,7 @@ link_slot "$PRIVATE_DIR/ssh/config" "$HOME/.ssh/config" 600
 
 ## テスト
 
-`tests/e2e.sh private_layer` が、ローカルの bare リポジトリを privateRepo として init し、zsh / git / tmux / Claude を検証する。AWS は `machineProfile` ごとに一時 HOME を分けて、work の結合 (600・`[default]` は 1 つ)、personal のリンク、personal → work の切り替え、既存の実ファイルの保護、重複セクションの拒否、`aws/config.work` が無い work のリンクを確認する。
+`tests/e2e.sh private_layer` が、ローカルの bare リポジトリを privateRepo として init し、zsh / git / tmux / Claude を検証する。AWS は `machineProfile` ごとに一時 HOME を分けて、work の結合 (600・`[default]` は 1 つ)、personal のリンク、personal → work の切り替え、既存の実ファイルの保護、重複セクションの拒否、`aws/config.work` が無い work のリンクを確認する。ccgate は seed の `claude/ccgate.jsonnet` から `~/.claude/ccgate.jsonnet` へのリンクになること、既存の実ファイルが上書きされず中身が保たれることを確認する。
 ローカルで実行するときは、brew bundle が実際に走らないよう `brew` を PATH から外す (テストの Brewfile に架空の formula を入れているため、brew があると失敗する)。`CI` の環境変数を代わりに使うと、CI 用の sudo 処理も走るので避ける。
 `Brewfile.<profile>` は、brew bundle 自体は CI ではスキップされるため、`run_onchange_after_brew-bundle.sh.tmpl` のレンダリング結果 (適用順・hash・一致しない profile の除外) だけを macOS で確認する。
 CI では private リポジトリを使わない (`privateRepo` は空)。

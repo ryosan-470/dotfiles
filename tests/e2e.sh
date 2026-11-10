@@ -230,6 +230,7 @@ test_private_layer() {
     echo '{"permissions":{"allow":["Bash(e2e-other-profile *)"]}}' > "$seed/claude/settings.personal.json"
     printf '[default]\nlogin_session = e2e-personal-default\n[profile e2e-personal]\nregion = ap-northeast-1\n# e2e-private-aws-personal\n' > "$seed/aws/config"
     printf '[default]\noutput = e2e-work-default\n[profile e2e-work]\nregion = ap-northeast-1\n# e2e-private-aws-work\n' > "$seed/aws/config.work"
+    printf '// e2e-private-ccgate\n{ provider: { name: "anthropic" } }\n' > "$seed/claude/ccgate.jsonnet"
     echo 'brew "e2e-private-common"' > "$seed/Brewfile"
     echo 'brew "e2e-profile-work"' > "$seed/Brewfile.work"
     echo 'brew "e2e-profile-personal"' > "$seed/Brewfile.personal"
@@ -358,6 +359,26 @@ test_private_layer() {
             pass "private: aws/config.work が無い work マシンは aws/config をリンクする"
         else
             fail "private: aws/config.work が無い work マシンで ~/.aws/config がリンクにならない"; rc=1
+        fi
+        # private-links (ccgate): claude/ccgate.jsonnet を ~/.claude/ccgate.jsonnet へシンボリックリンクする
+        if [ -L "$HOME/.claude/ccgate.jsonnet" ] \
+            && [ "$(readlink "$HOME/.claude/ccgate.jsonnet")" = "$HOME/.config/private/claude/ccgate.jsonnet" ] \
+            && grep -qx '// e2e-private-ccgate' "$HOME/.claude/ccgate.jsonnet"; then
+            pass "private: claude/ccgate.jsonnet が ~/.claude/ccgate.jsonnet へのシンボリックリンクになる"
+        else
+            fail "private: ~/.claude/ccgate.jsonnet が private/claude/ccgate.jsonnet へのリンクになっていない"; rc=1
+        fi
+        # private-links (ccgate): 既存の実ファイルは上書きせず、スキップを警告する
+        local home_ccgate="$TMP_ROOT/ccgate-home"
+        mkdir -p "$home_ccgate/.claude"
+        echo '// e2e-existing-ccgate' > "$home_ccgate/.claude/ccgate.jsonnet"
+        if private_init_home "$home_ccgate" "$bare" work \
+            && [ -f "$home_ccgate/.claude/ccgate.jsonnet" ] && [ ! -L "$home_ccgate/.claude/ccgate.jsonnet" ] \
+            && grep -qx '// e2e-existing-ccgate' "$home_ccgate/.claude/ccgate.jsonnet" \
+            && grep -qF "$home_ccgate/.claude/ccgate.jsonnet が既に存在するためスキップ" "$home_ccgate.log"; then
+            pass "private: 既存の ~/.claude/ccgate.jsonnet 実ファイルを上書きせず、スキップを警告する"
+        else
+            fail "private: 既存の ~/.claude/ccgate.jsonnet 実ファイルを上書きした、または警告が出ない"; rc=1
         fi
         # brew-bundle: machineProfile と一致する Brewfile.<profile> だけがスクリプトに含まれる
         # (macOS 専用のスクリプト。Linux ではテンプレートが空になる。CI では brew bundle 自体はスキップされるのでレンダリング結果だけを見る)
