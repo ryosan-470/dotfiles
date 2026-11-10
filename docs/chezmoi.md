@@ -89,6 +89,7 @@ brew bundle --file={{ joinPath .chezmoi.workingTree "Brewfile" | quote }}
 
 - `after_` を付けるとファイル配置の後に、`before_` を付けると前に実行される
 - 中身が空になるスクリプト (上の例の Linux) は実行されない
+- 配置先の状態 (rm で消したリンクなど) は検知できない。そのような「あるべき状態に揃える」冪等スクリプトは `run_onchange_` ではなく `run_after_` にして毎回実行する (例: `run_after_private-links.sh.tmpl`)。ただし `chezmoi diff` に全文が毎回出る
 
 ## どのレイヤーに書くか
 
@@ -283,7 +284,7 @@ sh -c "$(curl -fsLS get.chezmoi.io)" -- init --apply \
 
 - `home/.chezmoiexternal.toml.tmpl`: tpm (`~/.tmux/plugins/tpm`) と zimfw 本体 (`~/.zim/zimfw.zsh`) を配置する。`privateRepo` を設定していれば `~/.config/private` に private リポジトリを clone する
 - `run_onchange_after_brew-bundle.sh.tmpl`: `Brewfile` → `~/.config/private/Brewfile` → `~/.config/private/Brewfile.<machineProfile>` の順に `brew bundle` する (macOS で brew がある場合。private 側の 2 つは存在するときだけ。`machineProfile` が空ならスキップ)
-- `run_onchange_after_private-links.sh.tmpl`: private の AWS 設定を `~/.aws/config` に配置する。`machineProfile = work` かつ `aws/config.work` があれば `aws/config` と結合した実ファイル (600)、それ以外は `aws/config` のシンボリックリンク (存在する場合)。private の `claude/ccgate.jsonnet` は `~/.claude/ccgate.jsonnet` へのシンボリックリンクにする (存在する場合)。詳細は [private-repo.md の AWS 節](./private-repo.md#aws) と [ccgate 節](./private-repo.md#ccgate)
+- `run_after_private-links.sh.tmpl` (毎回の apply で実行する冪等スクリプト): private の AWS 設定を `~/.aws/config` に配置する。`machineProfile = work` かつ `aws/config.work` があれば `aws/config` と結合した実ファイル (600)、それ以外は `aws/config` のシンボリックリンク (存在する場合)。private の `claude/ccgate.jsonnet` は `~/.claude/ccgate.jsonnet` へのシンボリックリンクにする (存在する場合)。詳細は [private-repo.md の AWS 節](./private-repo.md#aws) と [ccgate 節](./private-repo.md#ccgate)
 - `run_onchange_after_load-launchagents.sh.tmpl`: `cleanup-caches` の LaunchAgent を登録する (macOS)
 - `modify_settings.json.tmpl`: `~/.claude/settings.json` を 4 層でマージする
 

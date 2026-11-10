@@ -147,11 +147,11 @@ Brewfile.personal    # machineProfile = personal のマシンだけ
 ## AWS
 
 - `aws/config` を private に置くと、`~/.aws/config` にリンクされる (個人用・profile 未設定のマシン、および `aws/config.work` が無い仕事用マシン)
-- `machineProfile = work` のマシンで `aws/config.work` があると、`aws/config.work` と `aws/config` を結合して `~/.aws/config` の実ファイル (600) を作る (`merge_aws_config`、`run_onchange_after_private-links.sh.tmpl`)
-  - 結合の方式は chezmoi テンプレート (`create_` / `modify_`) ではなく run_onchange スクリプトにした。リンクと同じ「既存の実ファイルは上書きしない」規則を揃えるため、また private 側のファイルはスクリプト実行時にしか clone されず、テンプレートの `include` だと初回 apply で参照できないことがあるため
+- `machineProfile = work` のマシンで `aws/config.work` があると、`aws/config.work` と `aws/config` を結合して `~/.aws/config` の実ファイル (600) を作る (`merge_aws_config`、`run_after_private-links.sh.tmpl`)
+  - 結合の方式は chezmoi テンプレート (`create_` / `modify_`) ではなく run_after スクリプトにした。リンクと同じ「既存の実ファイルは上書きしない」規則を揃えるため、また private 側のファイルはスクリプト実行時にしか clone されず、テンプレートの `include` だと初回 apply で参照できないことがあるため
   - `[default]` は両方にあるので 1 つにまとめ、`aws/config.work` 側を残す (仕事用マシンの既定 profile にする)。`aws/config` 側の `[default]` は捨てる
   - `[default]` 以外のセクション名 (`[profile <name>]`、`[sso-session <name>]`) が両方にあると、何も書かずに警告する。AWS CLI は重複セクションがあると失敗するため
-- 結合ファイルは生成時点のスナップショットになる。private 側を後から編集しても既存の `~/.aws/config` は更新されない (実ファイルは上書きしない)。反映するには `~/.aws/config` を退避してから `chezmoi apply` する
+- 結合ファイルは生成時点のスナップショットになる。private 側を後から編集しても既存の `~/.aws/config` は更新されない (実ファイルは上書きしない)。private 側の定義と結果が異なるときは、apply のたびに警告が出る。反映するには `~/.aws/config` を退避してから `chezmoi apply` する
 - 結合ファイルに `aws configure` などで書き込んだ内容は private 側に戻らない。仕事用の変更は `aws/config.work` を直接編集して commit / push し、上の手順で結合ファイルを作り直す
 - 個人用 → 仕事用に profile を切り替えたときは、以前の `aws/config` へのリンク (private の `aws/config` を指すもの) だけを結合ファイルに置き換える。別の場所を指すリンクや実ファイルは触らず、警告する
 - AWS CLI のプロファイルは `~/.aws/config` の `[profile <name>]` (default は `[default]`) で定義する。`~/.aws/profile` という標準ファイルは無い
@@ -164,7 +164,7 @@ Brewfile.personal    # machineProfile = personal のマシンだけ
 
 - `claude/ccgate.jsonnet` を private に置くと、`~/.claude/ccgate.jsonnet` にリンクされる (全マシン共通。profile 別の `ccgate.<profile>.jsonnet` は未対応)
 - ccgate はシンボリックリンク越しに設定を読む。リンク先の jsonnet を評価することを ccgate 0.11.1 の実機で確認している。private 側を編集すると、次の hook 実行からそのまま反映される
-- リンクは `run_onchange_after_private-links.sh.tmpl` の `link_slot` で張る。private 側のファイルの hash がスクリプトのコメントに埋め込まれているため、ファイルを追加・編集すると次の `chezmoi apply` でスクリプトが再実行され、リンクが張られる
+- リンクは `run_after_private-links.sh.tmpl` の `link_slot` で張る。スクリプトは `chezmoi apply` のたびに実行され、配置先が無ければ作る。配置済みなら何もしないので、配置先を rm しても次の apply で張り直される
 - 既存の `~/.claude/ccgate.jsonnet` が実ファイルの場合は上書きしない (警告してスキップする)。中身を `~/.config/private/claude/ccgate.jsonnet` に移し、元ファイルを退避してから `chezmoi apply` する
 - 設定に秘密情報は書かない。provider の認証は環境変数か、`auth` で参照する外部ファイル・コマンドで指定する
 - ccgate 本体は mise で管理する (公開側の手順は [chezmoi.md](./chezmoi.md) を参照)。ここで扱うのは設定ファイルだけ
@@ -173,7 +173,7 @@ Brewfile.personal    # machineProfile = personal のマシンだけ
 
 1. 公開リポジトリ側に読み込みフックを追加する
    - source / include 系: `.zshrc`, `.gitconfig`, `.tmux.conf`, `CLAUDE.md`, `modify_settings.json.tmpl` など
-   - ファイルリンク系: `home/.chezmoiscripts/run_onchange_after_private-links.sh.tmpl` に `link_slot` を 1 行追加する
+   - ファイルリンク系: `home/.chezmoiscripts/run_after_private-links.sh.tmpl` に `link_slot` を 1 行追加する
 2. `docs/chezmoi.md` とこのファイルに追記する
 3. `tests/e2e.sh` の `test_private_layer` に検証を追加する
 
