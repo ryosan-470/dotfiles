@@ -14,6 +14,7 @@ brew "peco"
 brew "ghq"
 brew "tig"
 brew "direnv"
+brew "ripgrep"
 
 # GNU 系ツール (make は gmake として入る。他の g プレフィックス無し版は PATH 調整が必要)
 brew "make"
