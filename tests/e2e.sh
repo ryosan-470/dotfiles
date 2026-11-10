@@ -210,7 +210,8 @@ private_init_home() {
     : > "$home.log"
     for _ in 1 2; do
         # 1 回目・2 回目の警告をどちらも残す (追記)
-        HOME="$home" XDG_CONFIG_HOME="$home/.config" chezmoi init --apply --no-tty --source "$REPO_ROOT" >>"$home.log" 2>&1 || return 1
+        # CI=1: ローカルで E2E_ALLOW_LOCAL=1 実行しても、実機の brew bundle と launchctl bootstrap が走らないようにする
+        CI=1 HOME="$home" XDG_CONFIG_HOME="$home/.config" chezmoi init --apply --no-tty --source "$REPO_ROOT" >>"$home.log" 2>&1 || return 1
     done
 }
 
@@ -241,7 +242,8 @@ test_private_layer() {
     git clone -q --bare "$seed" "$bare"
 
     (
-        export HOME="$private_home" XDG_CONFIG_HOME="$private_home/.config" TMUX=dummy TERM=xterm-256color
+        # CI=1: brew bundle / launchctl bootstrap をスキップさせる (private_init_home と同じ理由。このサブシェルに閉じる)
+        export HOME="$private_home" XDG_CONFIG_HOME="$private_home/.config" TMUX=dummy TERM=xterm-256color CI=1
         unset ZDOTDIR
         # promptStringOnce は既存の data を優先するので、事前に chezmoi.toml へ privateRepo と machineProfile を書いておく
         mkdir -p "$XDG_CONFIG_HOME/chezmoi"
