@@ -369,6 +369,17 @@ test_private_layer() {
         else
             fail "private: ~/.claude/ccgate.jsonnet が private/claude/ccgate.jsonnet へのリンクになっていない"; rc=1
         fi
+        # private-links: 配置先を消しても次の apply で復元される (run_onchange_ ではなく run_after_ で毎回実行するため)
+        rm -f "$HOME/.claude/ccgate.jsonnet" "$HOME/.aws/config"
+        if chezmoi apply --no-tty >/dev/null \
+            && [ -L "$HOME/.claude/ccgate.jsonnet" ] \
+            && [ "$(readlink "$HOME/.claude/ccgate.jsonnet")" = "$HOME/.config/private/claude/ccgate.jsonnet" ] \
+            && [ "$(aws_config_kind "$HOME/.aws/config")" = file ] \
+            && grep -q '^# e2e-private-aws-work$' "$HOME/.aws/config"; then
+            pass "private: 消した ~/.claude/ccgate.jsonnet (リンク) と ~/.aws/config (結合ファイル) が次の apply で復元される"
+        else
+            fail "private: ~/.claude/ccgate.jsonnet と ~/.aws/config を消したあとの apply で復元されない"; rc=1
+        fi
         # private-links (ccgate): 既存の実ファイルは上書きせず、スキップを警告する
         local home_ccgate="$TMP_ROOT/ccgate-home"
         mkdir -p "$home_ccgate/.claude"
