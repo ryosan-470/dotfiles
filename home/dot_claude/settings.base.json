@@ -169,7 +169,8 @@
     "pr-review-toolkit@claude-plugins-official": true,
     "code-simplifier@claude-plugins-official": true,
     "context7@claude-plugins-official": true,
-    "cclens@cclens": true
+    "cclens@cclens": true,
+    "yomiyasu@yomiyasu": true
   },
   "extraKnownMarketplaces": {
     "cclens": {
@@ -177,6 +178,14 @@
         "source": "github",
         "repo": "lambdalisue/cclens",
         "ref": "v0.1.1"
+      },
+      "autoUpdate": false
+    },
+    "yomiyasu": {
+      "source": {
+        "source": "github",
+        "repo": "nanaism/yomiyasu",
+        "ref": "v2.5.0"
       },
       "autoUpdate": false
     }
