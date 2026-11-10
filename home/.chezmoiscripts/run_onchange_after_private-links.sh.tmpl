@@ -1,5 +1,6 @@
 {{- $awsConfig := joinPath .chezmoi.homeDir ".config/private/aws/config" -}}
 {{- $awsConfigWork := joinPath .chezmoi.homeDir ".config/private/aws/config.work" -}}
+{{- $ccgateConfig := joinPath .chezmoi.homeDir ".config/private/claude/ccgate.jsonnet" -}}
 {{- /* machineProfile が未設定の古い chezmoi.toml でもエラーにならないよう index で参照する */ -}}
 {{- $machineProfile := index . "machineProfile" | default "" -}}
 #!/bin/bash
@@ -8,6 +9,7 @@
 #
 # aws/config hash: {{ if stat $awsConfig }}{{ include $awsConfig | sha256sum }}{{ else }}absent{{ end }}
 # aws/config.work hash: {{ if stat $awsConfigWork }}{{ include $awsConfigWork | sha256sum }}{{ else }}absent{{ end }}
+# claude/ccgate.jsonnet hash: {{ if stat $ccgateConfig }}{{ include $ccgateConfig | sha256sum }}{{ else }}absent{{ end }}
 #
 # 方針:
 # - private 側にファイルが無ければ何もしない
@@ -115,3 +117,6 @@ if [ "$MACHINE_PROFILE" = work ] && [ -f "$AWS_WORK" ]; then
 else
     link_slot "$AWS_PERSONAL" "$HOME/.aws/config" 600
 fi
+
+# ccgate (Claude Code の PermissionRequest hook) のグローバル設定。秘密情報ではないのでパーミッションは付けない
+link_slot "$PRIVATE_DIR/claude/ccgate.jsonnet" "$HOME/.claude/ccgate.jsonnet"
