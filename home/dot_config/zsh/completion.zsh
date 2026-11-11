@@ -60,7 +60,8 @@ compdef _uv uv
 # 遅延ローディング
 function _uvx() {
   unfunction "$0"
-  eval "$(uvx generate-shell-completion zsh)"
+  # uvx は引数をツール名として実行するため、サブコマンドではなくオプション (--generate-shell-completion) で呼ぶ
+  eval "$(uvx --generate-shell-completion zsh)"
   $0 "$@"
 }
 compdef _uvx uvx
