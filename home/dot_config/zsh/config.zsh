@@ -38,7 +38,7 @@ bindkey '^xe' edit-command-line
 if (($+commands[direnv])); then
   eval "$(direnv hook zsh)"
 fi
-# mise: ツールのバージョン切り替え (ツール定義は ~/.config/mise/config.toml, 未インストールなら何もしない)
+# mise: ツールのバージョン切り替え (ツール定義は ~/.config/mise/conf.d/*.toml と config.toml, 未インストールなら何もしない)
 if (($+commands[mise])); then
   eval "$(mise activate zsh)"
 fi

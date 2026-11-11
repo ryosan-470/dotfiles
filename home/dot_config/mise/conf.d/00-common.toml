@@ -1,0 +1,13 @@
+# mise で入れる全マシン共通のツール (公開)。
+# 優先順位は conf.d 内がファイル名の後ろ勝ち、~/.config/mise/config.toml (マシンローカル・管理外) が最優先。
+# 同じツールを複数のファイルに書かないこと (docs/chezmoi.md の mise 節を参照)。
+# 会社名や社内ツールを含むものは書かず、private の mise/config.toml か mise/config.<profile>.toml に置く。
+[tools]
+"aqua:tak848/ccgate" = "latest"
+bun = "latest"
+go = "1.27.3"
+golangci-lint = "2.15.0"
+node = "26"
+npm = "12.2.2"
+pnpm = "12.18.0"
+uv = "latest"

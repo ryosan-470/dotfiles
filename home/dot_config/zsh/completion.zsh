@@ -47,22 +47,21 @@ fi
 
 # uv コマンドの補完を有効にする
 # 遅延ローディング
-if (($+commands[uv])); then
-  function _uv() {
-    unfunction "$0"
-    eval "$(uv generate-shell-completion zsh)"
-    $0 "$@"
-  }
-  compdef _uv uv
-fi
+# uv は mise 管理で、この時点ではまだ mise activate (config.zsh) が走っておらず PATH に無い。
+# そのため commands[uv] の有無では判定しない (関数は uv を補完するときに初めて評価される)
+function _uv() {
+  unfunction "$0"
+  eval "$(uv generate-shell-completion zsh)"
+  $0 "$@"
+}
+compdef _uv uv
 
-# uvx コマンドの補完を有効にする
+# uvx コマンドの補完を有効にする (uv と同じ理由で commands[uvx] では判定しない)
 # 遅延ローディング
-if (($+commands[uvx])); then
-  function _uvx() {
-    unfunction "$0"
-    eval "$(uvx generate-shell-completion zsh)"
-    $0 "$@"
-  }
-  compdef _uvx uvx
-fi
+function _uvx() {
+  unfunction "$0"
+  # uvx は引数をツール名として実行するため、サブコマンドではなくオプション (--generate-shell-completion) で呼ぶ
+  eval "$(uvx --generate-shell-completion zsh)"
+  $0 "$@"
+}
+compdef _uvx uvx

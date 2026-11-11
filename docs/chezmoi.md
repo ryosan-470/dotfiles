@@ -59,7 +59,8 @@ home/dot_config/zsh/alias.zsh  →  ~/.config/zsh/alias.zsh
 | 外部のツール / リポジトリを置きたい | `home/.chezmoiexternal.toml.tmpl` に追記する。サプライチェーン対策として、ブランチ先頭 (`git-repo`) ではなくタグ固定の `archive` / `file` + `checksum.sha256` で取り込む (tpm / zimfw と同じ書き方。checksum は 0 埋めで apply して出る SHA256 mismatch の値を使う) |
 | Claude Code の設定を変える | `home/dot_claude/settings.base.json` を編集する (後述) |
 | GUI アプリの設定を管理したい | Karabiner は `home/dot_config/private_karabiner/`、BTT はプリセットを `home/dot_btt_autoload_preset.json` に置く (後述)。Raycast はテキスト設定が無いので Brewfile のみ |
-| CLI / GUI アプリを追加したい (macOS) | リポジトリ直下の `Brewfile` に `brew "foo"` / `cask "foo"` を追記する。次の `chezmoi apply` で `brew bundle` が走る。private は `~/.config/private/Brewfile` (全マシン共通) か `~/.config/private/Brewfile.<machineProfile>` (profile 別。`work` / `personal` など) に書く (ccgate は mise で管理するので書かない。go / uv は Brewfile で管理する) |
+| CLI / GUI アプリを追加したい (macOS) | リポジトリ直下の `Brewfile` に `brew "foo"` / `cask "foo"` を追記する。次の `chezmoi apply` で `brew bundle` が走る。private は `~/.config/private/Brewfile` (全マシン共通) か `~/.config/private/Brewfile.<machineProfile>` (profile 別。`work` / `personal` など) に書く (ccgate / go / uv などの言語・開発ツールは mise で管理するので書かない。次の行を参照) |
+| 言語・開発ツール (go / node / uv / ccgate など) を追加したい | `home/dot_config/mise/conf.d/00-common.toml` の `[tools]` に追記する。次の `chezmoi apply` で `mise install` が走る (`run_onchange_after_tools-mise-install.sh.tmpl`)。private は `~/.config/private/mise/config.toml` (全マシン共通) か `~/.config/private/mise/config.<machineProfile>.toml` (profile 別) に書く。詳細は「mise のツール定義」節 |
 | private リポジトリに設定を追加したい | [private-repo.md](./private-repo.md) のスロットに従ってファイルを置く。新しい種類はスロット追加の手順で公開側にフックを足す |
 | macOS の LaunchAgent を追加したい | `home/private_Library/private_LaunchAgents/` に plist を置き、`run_onchange` スクリプトで再ロードする (既存の cleanup-caches を参照) |
 | `docker compose` が `unknown command` になる | `~/.docker/cli-plugins/` にアンインストール済み Docker Desktop 由来のリンク切れ symlink が残っていないか確認する。`home/.chezmoiscripts/run_onchange_after_docker-cli-plugins.sh` がそれらを掃除し、Homebrew の `docker-compose` / `docker-buildx` が使えるようになる |
@@ -313,15 +314,54 @@ chezmoi apply
 git config --get commit.gpgsign   # true なら有効
 ```
 
+#### mise のツール定義
+
+go / node / uv / ccgate などの言語・開発ツールは mise で管理する。mise 本体は Brewfile の `brew "mise"` で入り、`mise activate zsh` は `home/dot_config/zsh/config.zsh` が (mise がある場合のみ) 有効にする。マシンごとに書く必要はない。
+
+`~/.config/mise/` には次の 4 つが並ぶ。優先順位は下ほど高い (mise は `conf.d` 内をファイル名の後ろ勝ち、`config.toml` を `conf.d` より優先して読む)。
+
+| 層 | 場所 | 管理 |
+|---|---|---|
+| 共通 | `conf.d/00-common.toml` | この公開リポジトリ (`home/dot_config/mise/conf.d/00-common.toml`) の実ファイル |
+| private 共通 | `conf.d/10-private.toml` | `~/.config/private/mise/config.toml` へのシンボリックリンク |
+| private profile | `conf.d/20-private-<profile>.toml` | `~/.config/private/mise/config.<profile>.toml` へのシンボリックリンク。`machineProfile` と一致するときだけ |
+| マシンローカル | `config.toml` | chezmoi 管理外。`mise use -g` の書き込み先 |
+
+リンクは `run_after_private-links.sh.tmpl` が毎回の apply で張る。private 側のファイルを消した、または `machineProfile` を変えたときに残る private 向けのリンクも、同じスクリプトが消す (実ファイルや private 以外を指すリンクには触らない)。
+
+`mise install` は `run_onchange_after_tools-mise-install.sh.tmpl` が、3 つの定義ファイルのどれかが変わったときだけ `HOME` で実行する。CI (`CI` が設定されている環境) と mise が無い環境ではスキップする。
+
+- **同じツールを複数の層に書かない**: `config.toml` が `conf.d` に勝つため、ローカルに古い定義が残ると公開側の変更が反映されない
+- `mise unuse -g <tool>` は `config.toml` のツールにしか効かない。`conf.d` のツールを外すときは、元のファイルを編集する
+- `latest` 指定のツールは `mise install` では更新されない。更新は手動で `mise upgrade` を実行する
+- スクリプトの実行順は対象名の昇順で、`brew-bundle` (mise 本体) → `private-links` (private の定義をリンク) → `tools-mise-install` になる。後ろ 2 つの順序に依存するため、スクリプト名を `private-links` より前に変えない
+
+```sh
+mise use -g node@24     # このマシンだけ試す (config.toml に書かれる)
+mise ls -g              # どのファイルの定義が使われているかも出る
+mise upgrade            # latest 指定のツールを更新する
+```
+
+##### 既存マシンの移行
+
+以前は `~/.config/mise/config.toml` に全ツールを書いていた。`conf.d/00-common.toml` に移したので、apply の後に旧ファイルを片付ける。
+
+```sh
+mise ls -g > /tmp/before.txt                 # 念のため、移行前の一覧を控える (apply の前に実行)
+chezmoi apply
+mv ~/.config/mise/config.toml ~/.config/mise/config.toml.bak
+mise install                                  # uv を含む未インストール分を入れる
+mise ls -g                                    # before.txt と同じツール・バージョンか確認する
+brew uninstall go uv                          # Brewfile から外した二重管理の Brew 版を消す
+```
+
+`brew bundle` は `cleanup` をしないので、Brewfile から消しても Brew 版の `go` / `uv` はアンインストールされない。`brew uses --installed go` / `uv` で、他の formula が依存していないことを確認してから消す。
+
 #### chezmoi 管理外のファイル
 
 - `~/.claude/RTK.md`: rtk が `rtk init -g` で生成する。無い場合、`~/.claude/CLAUDE.md` の `@RTK.md` は単に無視される。`rtk hook claude` も rtk が前提 (Brewfile の `brew "rtk"` で入る)
 - `~/.local.zsh`, `~/.gitconfig.local`, `~/.tmux.local.conf`, `~/.claude/CLAUDE.local.md`: マシン固有の設定。必要なら作成する
-- `~/.config/mise/config.toml`: mise で入れるツール。`ccgate` は Brewfile ではなくここで管理する
-  ```sh
-  mise use -g aqua:tak848/ccgate
-  ```
-  `mise activate zsh` は `home/dot_config/zsh/config.zsh` が (mise がある場合のみ) 有効にする。マシンごとに書く必要はない
+- `~/.config/mise/config.toml`: そのマシンだけで使う mise のツール (マシンローカル)。`mise use -g` の書き込み先で、`conf.d` より優先される。共通のツールは書かず、前節の「mise のツール定義」に従う
 
 #### アプリの初回起動 (macOS)
 
