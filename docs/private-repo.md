@@ -61,6 +61,8 @@ private リポジトリの直下に置く。すべて任意で、無いものは
 | `Brewfile.<profile>` | macOS で `brew bundle` | `machineProfile` と一致するファイルだけ、private `Brewfile` の後に適用。仕事用・個人用で分けたいパッケージを置く |
 | `aws/config` | `~/.aws/config` へシンボリックリンク (`machineProfile = work` かつ `aws/config.work` があるマシンでは結合) | 600。リンクのときは `aws configure` の変更も private 側に入る。結合のときは入らない (AWS 節を参照) |
 | `aws/config.work` | `machineProfile = work` のマシンだけ、`aws/config` と結合して `~/.aws/config` の実ファイル (600) を作る | 仕事用の profile を置く。`[default]` は両方にあるため `aws/config.work` 側を残す |
+| `mise/config.toml` | `~/.config/mise/conf.d/10-private.toml` へシンボリックリンク。変更時に `mise install` | 全マシン共通の非公開ツール。mise の `[tools]` 形式 (mise 節を参照) |
+| `mise/config.<profile>.toml` | `machineProfile` と一致するファイルだけ `~/.config/mise/conf.d/20-private-<profile>.toml` へシンボリックリンク | 仕事用・個人用で分けたいツールを置く |
 
 > [!NOTE]
 > `Brewfile` は全マシンで共通に適用される。profile ごとに分けたいパッケージは `Brewfile.<profile>` に書く。`machineProfile` が空、または一致するファイルが無い場合は、profile 別の Brewfile はスキップされる。ホスト単位 (同じ profile 内のマシン差) で分けたいものは、そのマシンで手動で入れる。
@@ -81,6 +83,7 @@ private リポジトリの直下に置く。すべて任意で、無いものは
 - Brewfile: 公開 `Brewfile` → private `Brewfile` → private `Brewfile.<profile>` (いずれも `brew bundle --no-upgrade`。後のファイルは前のファイルの内容を打ち消さず、追加でインストールする)
 - AWS: private のみ。`machineProfile = work` かつ `aws/config.work` があれば `aws/config` と結合した実ファイル、それ以外は `aws/config` のシンボリックリンク
 - ccgate: private のみ。`claude/ccgate.jsonnet` を `~/.claude/ccgate.jsonnet` にシンボリックリンクする (公開側に同名のファイルは無い)
+- mise: 公開 `conf.d/00-common.toml` → private `conf.d/10-private.toml` → private `conf.d/20-private-<profile>.toml` → `~/.config/mise/config.toml` (マシンローカル・管理外)。`conf.d` 内はファイル名の後ろが優先され、`config.toml` が最優先
 
 ## 仕事用と個人用の同居
 
@@ -144,6 +147,30 @@ Brewfile.personal    # machineProfile = personal のマシンだけ
 - `--no-upgrade` で実行し、`cleanup` はしない。ファイルから消したパッケージはアンインストールされない
 - 他のスロットと同様、会社名や社内ツール名を含むパッケージは private に置き、公開 `Brewfile` には書かない
 
+### mise のツールの profile 別設定
+
+公開リポジトリの `conf.d/00-common.toml` が全マシン共通、private の `mise/config.toml` が全マシン共通の非公開分、`mise/config.<profile>.toml` が `machineProfile` の一致するマシンだけの分になる。`machineProfile` の設定方法は前節と同じ。
+
+```
+mise/config.toml            # 全マシン共通 (非公開)
+mise/config.work.toml       # machineProfile = work のマシンだけ
+mise/config.personal.toml   # machineProfile = personal のマシンだけ
+```
+
+中身は mise の `[tools]` 形式。
+
+```toml
+[tools]
+"aqua:example/internal-tool" = "1.2.3"
+```
+
+- 各ファイルは `~/.config/mise/conf.d/` に `10-private.toml` / `20-private-<profile>.toml` としてシンボリックリンクされる。private 側の編集はそのまま反映される
+- 3 つのファイルは、それぞれの内容の hash が `run_onchange_after_tools-mise-install.sh.tmpl` に埋め込まれる。どれか 1 つでも変わると次の `chezmoi apply` で `mise install` が再実行される
+- `machineProfile` が空、または一致するファイルが無い場合は、profile 別のリンクは作られない (エラーにならない)。`machineProfile` を変えたときに残る古い `20-private-*.toml` のリンクは、次の apply で消える
+- 同じツールを複数のファイルに書かない。`~/.config/mise/config.toml` (マシンローカル) は `conf.d` より優先され、`conf.d` 内は後ろのファイル名 (`20-` > `10-` > `00-`) が優先される
+- `mise install` は不足分を入れるだけで、ファイルから消したツールはアンインストールされない。不要になったバージョンは `mise prune` で消す
+- 他のスロットと同様、会社名や社内ツール名を含むものは private に置き、公開の `00-common.toml` には書かない
+
 ## AWS
 
 - `aws/config` を private に置くと、`~/.aws/config` にリンクされる (個人用・profile 未設定のマシン、および `aws/config.work` が無い仕事用マシン)
@@ -198,7 +225,7 @@ link_slot "$PRIVATE_DIR/ssh/config" "$HOME/.ssh/config" 600
 
 ## テスト
 
-`tests/e2e.sh private_layer` が、ローカルの bare リポジトリを privateRepo として init し、zsh / git / tmux / Claude を検証する。AWS は `machineProfile` ごとに一時 HOME を分けて、work の結合 (600・`[default]` は 1 つ)、personal のリンク、personal → work の切り替え、既存の実ファイルの保護、重複セクションの拒否、`aws/config.work` が無い work のリンクを確認する。ccgate は seed の `claude/ccgate.jsonnet` から `~/.claude/ccgate.jsonnet` へのリンクになること、既存の実ファイルが上書きされず中身が保たれることを確認する。
+`tests/e2e.sh private_layer` が、ローカルの bare リポジトリを privateRepo として init し、zsh / git / tmux / Claude を検証する。AWS は `machineProfile` ごとに一時 HOME を分けて、work の結合 (600・`[default]` は 1 つ)、personal のリンク、personal → work の切り替え、既存の実ファイルの保護、重複セクションの拒否、`aws/config.work` が無い work のリンクを確認する。ccgate は seed の `claude/ccgate.jsonnet` から `~/.claude/ccgate.jsonnet` へのリンクになること、既存の実ファイルが上書きされず中身が保たれることを確認する。mise は `conf.d` への配置 (公開 `00-common.toml` は実ファイル、private は `machineProfile` に一致する分だけリンク)、古い private 向けリンクだけを消して実ファイルと他を指すリンクを残すこと、消したリンクの復元、`tools-mise-install` に 3 つの hash が埋め込まれることを確認する。
 ローカルで実行するときは、brew bundle が実際に走らないよう `brew` を PATH から外す (テストの Brewfile に架空の formula を入れているため、brew があると失敗する)。`CI` の環境変数を代わりに使うと、CI 用の sudo 処理も走るので避ける。
 `Brewfile.<profile>` は、brew bundle 自体は CI ではスキップされるため、`run_onchange_after_brew-bundle.sh.tmpl` のレンダリング結果 (適用順・hash・一致しない profile の除外) だけを macOS で確認する。
 CI では private リポジトリを使わない (`privateRepo` は空)。

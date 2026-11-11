@@ -1,0 +1,36 @@
+{{- /* machineProfile が未設定の古い chezmoi.toml でもエラーにならないよう index で参照する */ -}}
+{{- $machineProfile := index . "machineProfile" | default "" -}}
+#!/bin/bash
+# mise のツール定義が変わったときだけ mise install を実行する (chezmoi apply の後に実行)
+#
+# 実行順: chezmoi は after スクリプトを対象名の昇順に実行する。
+# brew-bundle (mise 本体を入れる) → private-links (private の定義を conf.d にリンクする) → このスクリプト
+# の順になるよう、名前を tools- から始めている。名前を変えるときはこの順序を保つこと。
+# (docs/chezmoi.md の mise 節を参照)
+#
+# common hash: {{ include (joinPath .chezmoi.sourceDir "dot_config/mise/conf.d/00-common.toml") | sha256sum }}
+{{- $privateConfig := joinPath .chezmoi.homeDir ".config/private/mise/config.toml" }}
+{{- if stat $privateConfig }}
+# private hash: {{ include $privateConfig | sha256sum }}
+{{- end }}
+{{- if $machineProfile }}
+{{- $profileConfig := joinPath .chezmoi.homeDir ".config/private/mise" (printf "config.%s.toml" $machineProfile) }}
+{{- if stat $profileConfig }}
+# private {{ $machineProfile }} hash: {{ include $profileConfig | sha256sum }}
+{{- end }}
+{{- end }}
+set -eu
+
+# CI はインストールに時間がかかるのでスキップ
+[ -n "${CI:-}" ] && exit 0
+
+# mise 本体は Brewfile で入る (macOS)。無い環境では何もしない
+if ! command -v mise >/dev/null 2>&1; then
+    echo "mise が見つからないので mise install をスキップ"
+    exit 0
+fi
+
+# グローバル定義 (conf.d / config.toml) だけを対象にするため、プロジェクトの設定を拾わない HOME で実行する。
+# 既に入っているバージョンは再インストールしない。latest 指定のツールの更新は手動で mise upgrade を実行する
+cd "$HOME"
+mise install

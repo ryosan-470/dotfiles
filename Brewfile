@@ -1,6 +1,7 @@
 # dotfiles が前提にするツール。macOS で `chezmoi apply` 時に brew bundle で入る
 # (run_onchange_after_brew-bundle.sh.tmpl)。private は ~/.config/private/Brewfile に書く。
-# ccgate は mise で管理するのでここに書かない。go / uv は現状この Brewfile で管理する。
+# ccgate / go / uv などの言語・開発ツールは mise で管理するのでここに書かない
+# (home/dot_config/mise/conf.d/00-common.toml)。
 
 tap "augani/dory"
 tap "stablyai/orca"
@@ -39,10 +40,6 @@ brew "gnupg"
 # dotfiles 管理 / ランタイム管理
 brew "chezmoi"
 brew "mise"
-
-# 言語 / 開発ツール
-brew "go"
-brew "uv"
 
 # コンテナ (ランタイムは cask "augani/dory/dory")
 brew "docker"

@@ -118,3 +118,32 @@ fi
 
 # ccgate (Claude Code の PermissionRequest hook) のグローバル設定。秘密情報ではないのでパーミッションは付けない
 link_slot "$PRIVATE_DIR/claude/ccgate.jsonnet" "$HOME/.claude/ccgate.jsonnet"
+
+# mise のツール定義。conf.d は後ろのファイル名ほど優先されるので、
+# 公開 00-common.toml → private 10-private.toml → private 20-private-<profile>.toml の順で上書きできる。
+# ~/.config/mise/config.toml (マシンローカル・管理外) は conf.d より優先される
+MISE_CONF_D="$HOME/.config/mise/conf.d"
+MISE_PRIVATE_DIR="$PRIVATE_DIR/mise"
+MISE_LINK_COMMON="$MISE_CONF_D/10-private.toml"
+MISE_LINK_PROFILE=""
+link_slot "$MISE_PRIVATE_DIR/config.toml" "$MISE_LINK_COMMON"
+if [ -n "$MACHINE_PROFILE" ]; then
+    MISE_LINK_PROFILE="$MISE_CONF_D/20-private-$MACHINE_PROFILE.toml"
+    link_slot "$MISE_PRIVATE_DIR/config.$MACHINE_PROFILE.toml" "$MISE_LINK_PROFILE"
+fi
+
+# 次のどちらかに当てはまる private 向けのリンクを消す (private を指すものだけ。実ファイルや他を指すリンクには触らない)
+# - private 側のファイルを消した / profile を変えたため、配置対象ではなくなった
+# - リンク先が無くなった (mise がリンク切れの設定を読んで警告を出すのを防ぐ)
+for link in "$MISE_CONF_D"/*.toml; do
+    [ -L "$link" ] || continue
+    case "$(readlink "$link")" in
+        "$MISE_PRIVATE_DIR"/*) ;;
+        *) continue ;;
+    esac
+    if [ "$link" != "$MISE_LINK_COMMON" ] && [ "$link" != "$MISE_LINK_PROFILE" ]; then
+        rm -f "$link"
+    elif [ ! -e "$link" ]; then
+        rm -f "$link"
+    fi
+done

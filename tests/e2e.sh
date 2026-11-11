@@ -236,6 +236,10 @@ test_private_layer() {
     echo 'brew "e2e-private-common"' > "$seed/Brewfile"
     echo 'brew "e2e-profile-work"' > "$seed/Brewfile.work"
     echo 'brew "e2e-profile-personal"' > "$seed/Brewfile.personal"
+    mkdir -p "$seed/mise"
+    printf '[tools]\njq = "1.7.1"\n' > "$seed/mise/config.toml"
+    printf '[tools]\nyq = "4.44.3"\n' > "$seed/mise/config.work.toml"
+    printf '[tools]\nfd = "10.2.0"\n' > "$seed/mise/config.personal.toml"
     git -C "$seed" init -q -b main
     git -C "$seed" add -A
     git -C "$seed" -c user.name=e2e -c user.email=e2e@example.com commit -q -m seed
@@ -393,6 +397,52 @@ test_private_layer() {
             pass "private: 既存の ~/.claude/ccgate.jsonnet 実ファイルを上書きせず、スキップを警告する"
         else
             fail "private: 既存の ~/.claude/ccgate.jsonnet 実ファイルを上書きした、または警告が出ない"; rc=1
+        fi
+        # private-links (mise): conf.d に 公開 00-common.toml (実ファイル) と private のリンクが並ぶ。
+        # machineProfile (work) と一致しない config.personal.toml はリンクされない
+        local mise_d="$HOME/.config/mise/conf.d" mise_p="$HOME/.config/private/mise"
+        if [ -f "$mise_d/00-common.toml" ] && [ ! -L "$mise_d/00-common.toml" ] \
+            && [ "$(readlink "$mise_d/10-private.toml")" = "$mise_p/config.toml" ] \
+            && [ "$(readlink "$mise_d/20-private-work.toml")" = "$mise_p/config.work.toml" ] \
+            && [ ! -e "$mise_d/20-private-personal.toml" ] && [ ! -L "$mise_d/20-private-personal.toml" ]; then
+            pass "private: mise の 00-common.toml (実ファイル) と private の config.toml / config.<profile>.toml (リンク) が conf.d に配置される"
+        else
+            fail "private: mise の conf.d の配置が想定と違う (00-common 実ファイル / 10-private / 20-private-<profile> / 一致しない profile は無し)"; rc=1
+        fi
+        # private-links (mise): profile を変えて残った private 向けの古いリンクだけ消し、実ファイルと private 以外へのリンクには触らない
+        ln -s "$mise_p/config.personal.toml" "$mise_d/20-private-personal.toml"
+        echo '[tools]' > "$mise_d/30-local.toml"
+        ln -s /etc/hosts "$mise_d/40-foreign.toml"
+        if chezmoi apply --no-tty >/dev/null \
+            && [ ! -e "$mise_d/20-private-personal.toml" ] && [ ! -L "$mise_d/20-private-personal.toml" ] \
+            && [ -f "$mise_d/30-local.toml" ] && [ ! -L "$mise_d/30-local.toml" ] \
+            && [ "$(readlink "$mise_d/40-foreign.toml")" = /etc/hosts ] \
+            && [ -L "$mise_d/10-private.toml" ] && [ -L "$mise_d/20-private-work.toml" ]; then
+            pass "private: mise の conf.d で、古い private 向けリンクだけが消え、実ファイルと他を指すリンクは残る"
+        else
+            fail "private: mise の conf.d の掃除で、古いリンクが残った、または関係ないファイルを消した"; rc=1
+        fi
+        rm -f "$mise_d/30-local.toml" "$mise_d/40-foreign.toml"
+        # private-links (mise): 消したリンクが次の apply で復元される
+        rm -f "$mise_d/10-private.toml" "$mise_d/20-private-work.toml"
+        if chezmoi apply --no-tty >/dev/null \
+            && [ "$(readlink "$mise_d/10-private.toml")" = "$mise_p/config.toml" ] \
+            && [ "$(readlink "$mise_d/20-private-work.toml")" = "$mise_p/config.work.toml" ]; then
+            pass "private: 消した mise の conf.d のリンクが次の apply で復元される"
+        else
+            fail "private: 消した mise の conf.d のリンクが次の apply で復元されない"; rc=1
+        fi
+        # tools-mise-install: 公開 / private / 一致する profile の定義の hash が埋め込まれ、一致しない profile は含まれない
+        # (mise install の発火条件。CI=1 ではスクリプト自体がスキップされるのでレンダリング結果だけを見る)
+        local mise_tmpl="$REPO_ROOT/home/.chezmoiscripts/run_onchange_after_tools-mise-install.sh.tmpl" mise_rendered
+        if mise_rendered=$(chezmoi execute-template --source "$REPO_ROOT" < "$mise_tmpl") \
+            && grep -qF "# common hash: $(shasum -a 256 "$REPO_ROOT/home/dot_config/mise/conf.d/00-common.toml" | cut -d' ' -f1)" <<< "$mise_rendered" \
+            && grep -qF "# private hash: $(shasum -a 256 "$mise_p/config.toml" | cut -d' ' -f1)" <<< "$mise_rendered" \
+            && grep -qF "# private work hash: $(shasum -a 256 "$mise_p/config.work.toml" | cut -d' ' -f1)" <<< "$mise_rendered" \
+            && ! grep -q 'personal' <<< "$mise_rendered"; then
+            pass "private: tools-mise-install に公開 / private / 一致する profile の hash が埋め込まれる"
+        else
+            fail "private: tools-mise-install の hash 埋め込みが想定と違う (公開 / private / 一致する profile、一致しない profile は無し)"; rc=1
         fi
         # brew-bundle: machineProfile と一致する Brewfile.<profile> だけがスクリプトに含まれる
         # (macOS 専用のスクリプト。Linux ではテンプレートが空になる。CI では brew bundle 自体はスキップされるのでレンダリング結果だけを見る)
