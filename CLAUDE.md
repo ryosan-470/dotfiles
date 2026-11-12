@@ -96,7 +96,8 @@ This is a personal dotfiles repository for managing shell configurations, primar
 - **Deny(常に拒否)**: `sudo`, `shutdown`(特権昇格・システム停止の防止)
 
 **ファイル操作 / ネットワーク**:
-- **Ask(都度確認)**: `rm`, `mv`(誤削除・誤移動の防止)、`curl`, `wget`(任意のネットワークリクエストの防止)
+- **Ask(都度確認)**: `rm`, `mv`(誤削除・誤移動の防止)
+- **ルール未記載**: `curl`, `wget` は permissions に書かない。前方一致では「HTML を読むだけ」と「`-d @file` などでのデータ送信」を区別できず、allow にすると情報送出を許してしまうため。`defaultMode: auto` と ccgate (`PermissionRequest` hook) の内容ベースの判定に任せる。公開ページの閲覧だけなら `WebFetch(domain:...)` の allow を使う
 - **Deny(常に拒否)**: `rm -rf`(再帰的削除は絶対禁止)
 
 **表記揺れ・複合コマンド対策**:
@@ -108,7 +109,7 @@ This is a personal dotfiles repository for managing shell configurations, primar
 
 **chezmoi のマージに関する注意**: `modify_settings.json.tmpl` は permissions を和集合でマージする。deny の追加は既存マシンにも反映されるが、allow / ask / deny から削除したエントリは既存マシンの `~/.claude/settings.json` に残るため、各マシンで手動削除が必要。今回の変更で手動削除が必要なもの:
 - deny に残る: `Bash(brew *)`, `Bash(wget *)`, `Bash(gh issue close *)`, `Bash(gh pr close *)`, `Bash(gh variable *)`, `Bash(git checkout -- . *)`, `Bash(git clean -fd *)`
-- ask に残る: `Bash(git push)`, `Bash(git push *)`(安全な push を allow にするため)
+- ask に残る: `Bash(git push)`, `Bash(git push *)`(安全な push を allow にするため)、`Bash(curl *)`, `Bash(wget *)`(auto / ccgate の判定に任せるため)
 
 **Customization System**: See "Layers" above. Machine-local files are optional and are not created automatically.
 
