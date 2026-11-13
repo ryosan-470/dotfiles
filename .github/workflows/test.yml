@@ -84,11 +84,18 @@ jobs:
           set -eu
           command -v mise >/dev/null || brew install mise
           cd "$HOME"
-          out="$(mise bootstrap macos defaults status 2>&1)" || true
+          err="$RUNNER_TEMP/mise-defaults.err"
+          out="$(mise bootstrap macos defaults status --json 2>"$err")" || true
           printf '%s\n' "$out"
+          cat "$err" >&2
           # 将来 mise が [bootstrap.macos.*] を廃止したときに気付けるようにする
-          if grep -q 'unknown field' <<< "$out"; then
+          if grep -q 'unknown field' "$err"; then
             echo "mise が bootstrap.macos の綴りを解釈できていません (docs/chezmoi.md の mise 節)" >&2
+            exit 1
+          fi
+          # conf.d が読まれていないと何も検証しないまま通ってしまうので、設定が実際に読めたことを確認する
+          if ! jq -e '.macos_defaults.entries // [] | length > 0' <<< "$out" >/dev/null; then
+            echo "mise が ~/.config/mise/conf.d/00-common.toml の [bootstrap.macos.*] を読めていません (conf.d の配置と mise の探索仕様を確認する)" >&2
             exit 1
           fi
       - name: "Verify Brewfile (インストールはせず、名前が解決できるかだけ確認)"

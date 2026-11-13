@@ -347,7 +347,7 @@ go / node / uv / ccgate などの言語・開発ツールは mise で管理す�
 - `mise bootstrap macos defaults status --missing` で差分の有無を確認できる (差分があれば exit 1)。`mise bootstrap macos defaults apply --dry-run` で書き込む内容を確認できる
 - 適用しても Dock / Finder などの起動中のアプリには反映されない。スクリプトが `killall Dock Finder` するが、他のアプリは再起動が必要
 - 仕事用マシンで MDM の構成プロファイルが優先される設定は、`defaults` で書いても戻されることがある。その場合はプロファイル別に private 側で上書きするか、そのキーを宣言しない
-- `[bootstrap.macos.launchd.agents]` は使わない。ラベルが `dev.mise.<name>` 固定になり、現在の `com.ryosan470.cleanup-caches` の plist にある `Nice` / `LowPriorityIO` を表現できないため、LaunchAgent は chezmoi 管理のままにする
+- `[bootstrap.macos.launchd.agents]` は使わない。ラベルが `dev.mise.<name>` 固定になり、現在の `com.ryosan470.cleanup-caches` というラベルを保てない。`Nice` は `nice` で指定できるが、`LowPriorityIO` は表現できないため、LaunchAgent は chezmoi 管理のままにする
 
 ```sh
 mise use -g node@24     # このマシンだけ試す (config.toml に書かれる)
