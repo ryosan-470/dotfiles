@@ -26,6 +26,9 @@ setopt hist_expand
 setopt inc_append_history
 # zsh 拡張glob
 setopt extendedglob
+# Zim (environment モジュール) が有効にする noclobber を Claude Code の Bash ツールでだけ外す。
+# 既存ファイルへの > が "file exists" で黙って失敗し、古いログを読むのを防ぐため。人間の対話シェルは従来どおり保護する
+[[ -n $CLAUDECODE ]] && unsetopt NO_CLOBBER
 # killコマンドを便利に
 zstyle ':completion:*:processes' command "ps -u $USER -o pid,stat,%cpu,%mem,cputime,command"
 # case insensitive
