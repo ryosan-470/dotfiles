@@ -2,7 +2,8 @@
 case `uname` in
     "Darwin")
         if (($+commands[brew])); then
-            alias update="brew update -v && brew upgrade -vy"
+            # auto_updates の cask (1Password, Chrome, BTT など) は起動中に差し替わるため、brew では upgrade しない
+            alias update="brew update -v && HOMEBREW_NO_UPGRADE_AUTO_UPDATES_CASKS=1 brew upgrade -vy"
         fi
         # pnpm (グローバルの bin を PATH に入れる)
         export PNPM_HOME="$HOME/Library/pnpm"
