@@ -181,7 +181,7 @@
       "source": {
         "source": "github",
         "repo": "nanaism/yomiyasu",
-        "ref": "v2.5.0"
+        "ref": "v3.1.0"
       },
       "autoUpdate": false
     }
