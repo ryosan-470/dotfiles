@@ -16,6 +16,11 @@
 # それより前の層 (ローカルを含む) と深いマージをせず、その層の値で丸ごと置き換える
 # (その層に値が無ければキーごと削除)。"$replace" 自体は出力しない。
 # permissions / hooks は上記の和集合ルールが優先されるため "$replace" の対象外。
+#
+# permissions から古いエントリを消したい場合は、任意の層に
+#   "$remove": {"permissions": {"deny": [...], "ask": [...], "allow": [...]}}
+# を書くと、4 層の和集合から完全一致するエントリを削除する (追加より削除が優先)。
+# "$remove" 自体は出力しない。hooks の削除には対応しない。
 set -euo pipefail
 
 base={{ joinPath .chezmoi.sourceDir "dot_claude" "settings.base.json" | quote }}
@@ -51,15 +56,17 @@ def cmds: [.hooks[]?.command];
 # 層 $l を重ねる。$l の "$replace" に列挙したキーは深いマージせずに置き換える
 def overlay($l):
   (($l["$replace"] // []) - ["permissions", "hooks"]) as $r
-  | delpaths([$r[] | [.]]) * ($l | del(.["$replace"]));
+  | delpaths([$r[] | [.]]) * ($l | del(.["$replace"], .["$remove"]));
 
 $base[0] as $b
 | ($private[0] // {}) as $p
 | ($profile[0] // {}) as $pp
-| reduce ($b, $p, $pp) as $l ($cur | del(.["$replace"]); overlay($l))
+| reduce ($b, $p, $pp) as $l ($cur | del(.["$replace"], .["$remove"]); overlay($l))
 | reduce ("allow", "ask", "deny", "additionalDirectories") as $k (.;
-    ([$cur, $b, $p, $pp] | map(.permissions[$k] // []) | add | dedupe) as $v
-    | if ($v | length) > 0 then .permissions[$k] = $v else . end)
+    ([$cur, $b, $p, $pp] | map(.permissions[$k] // []) | add // [] | dedupe) as $v
+    | ([$cur, $b, $p, $pp] | map(."$remove".permissions[$k] // []) | add // [] | unique) as $rm
+    | ($v - $rm) as $keep
+    | if ($keep | length) > 0 then .permissions[$k] = $keep else del(.permissions[$k]) end)
 | ([$cur, $b, $p, $pp] | map(.hooks // {} | keys) | add | unique) as $events
 | if ($events | length) > 0 then
     .hooks = reduce $events[] as $e ({};

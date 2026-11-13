@@ -99,6 +99,25 @@ check "replace without value removes key" '(has("env") | not)' "$out"
 rm -f "$private_profile_file"
 printf '%s' '{"env": {"A": "private"}, "permissions": {"allow": ["Bash(private *)"]}, "hooks": {"Stop": [{"hooks": [{"type": "command", "command": "p.sh"}]}]}}' >"$private_file"
 
+# 5d. "$remove" で和集合から古いエントリを削除する ("$remove" 自体は出力しない)
+out=$(run '{"permissions": {"allow": ["Read", "Bash(stale *)"]}, "$remove": {"permissions": {"allow": ["Bash(stale *)"]}}}')
+check "remove drops stale entry from union" \
+    '.permissions.allow == ["Read", "Bash(ls *)", "Bash(private *)"] and (has("$remove") | not)' "$out"
+printf '%s' '{"permissions": {"deny": ["Bash(old *)"]}, "$remove": {"permissions": {"deny": ["Bash(sudo *)"]}}}' >"$private_file"
+out=$(run "")
+check "remove applies across layers" '.permissions.deny == ["Bash(old *)"]' "$out"
+printf '%s' '{"permissions": {"deny": ["Bash(sudo *)"]}, "$remove": {"permissions": {"deny": ["Bash(sudo *)"]}}}' >"$private_file"
+out=$(run '{"permissions": {"deny": ["Bash(sudo *)"]}}')
+check "remove all entries drops the key" \
+    '(.permissions | has("deny") | not) and (.permissions.allow | index("Read"))' "$out"
+twice=$(run "$out")
+if [ "$(printf '%s' "$out" | jq -S .)" = "$(printf '%s' "$twice" | jq -S .)" ]; then
+    echo "ok   - remove idempotent"
+else
+    echo "FAIL - remove idempotent"; fail=1
+fi
+printf '%s' '{"env": {"A": "private"}, "permissions": {"allow": ["Bash(private *)"]}, "hooks": {"Stop": [{"hooks": [{"type": "command", "command": "p.sh"}]}]}}' >"$private_file"
+
 # 6. 冪等性
 once=$(run '{"permissions": {"allow": ["Z"]}, "hooks": {"Stop": [{"hooks": [{"type": "command", "command": "l.sh"}]}]}}')
 twice=$(run "$once")

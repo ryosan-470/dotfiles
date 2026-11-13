@@ -5,8 +5,55 @@
     "CLAUDE_CODE_DISABLE_FAST_MODE": "1",
     "CLAUDE_CODE_DISABLE_FEEDBACK_SURVEY": "1"
   },
-  "includeCoAuthoredBy": false,
+  "attribution": {
+    "commit": "",
+    "pr": "",
+    "sessionUrl": false
+  },
   "includeGitInstructions": false,
+  "$remove": {
+    "permissions": {
+      "allow": [
+        "Bash(gh secret list)",
+        "Bash(git push)"
+      ],
+      "deny": [
+        "Bash(gh auth *)",
+        "Bash(brew *)",
+        "Bash(gh issue close *)",
+        "Bash(gh pr close *)",
+        "Bash(gh secret *)",
+        "Bash(gh variable *)",
+        "Bash(git checkout -- . *)",
+        "Bash(git clean -fd *)",
+        "Bash(wget *)"
+      ],
+      "ask": [
+        "Bash(curl *)",
+        "Bash(gh api *)",
+        "Bash(gh api * -X*)",
+        "Bash(gh api * --method*)",
+        "Bash(gh api * -f*)",
+        "Bash(gh api * -F*)",
+        "Bash(gh api * --field*)",
+        "Bash(gh api * --raw-field*)",
+        "Bash(gh api * --input*)",
+        "Bash(gh variable *)",
+        "Bash(git push)",
+        "Bash(git push *)",
+        "Bash(git push --force)",
+        "Bash(git push -f)",
+        "Bash(git push origin --force *)",
+        "Bash(git push origin -f *)",
+        "Bash(git push --force-with-lease)",
+        "Bash(git push --force-if-includes)",
+        "Bash(git reset --hard)",
+        "Bash(git restore)",
+        "Bash(git checkout --)",
+        "Bash(wget *)"
+      ]
+    }
+  },
   "permissions": {
     "allow": [
       "Glob",
@@ -16,11 +63,15 @@
       "WebFetch(domain:github.com)",
       "WebFetch(domain:raw.githubusercontent.com)",
       "WebFetch(domain:docs.anthropic.com)",
+      "WebFetch(domain:code.claude.com)",
+      "WebFetch(domain:platform.claude.com)",
+      "WebFetch(domain:json.schemastore.org)",
       "WebFetch(domain:developer.mozilla.org)",
       "WebFetch(domain:pkg.go.dev)",
       "Bash(mkdir *)",
       "Bash(ls *)",
       "Bash(gh api *)",
+      "Bash(gh auth status *)",
       "Bash(gh issue list *)",
       "Bash(gh issue status *)",
       "Bash(gh issue view *)",
@@ -36,8 +87,9 @@
       "Bash(gh run list *)",
       "Bash(gh run view *)",
       "Bash(gh search *)",
-      "Bash(gh secret list)",
       "Bash(gh secret list *)",
+      "Bash(gh variable get *)",
+      "Bash(gh variable list *)",
       "Bash(gh workflow list *)",
       "Bash(gh workflow view *)",
       "Bash(git branch *)",
@@ -48,19 +100,27 @@
       "Bash(git stash list *)",
       "Bash(git status *)",
       "Bash(git tag *)",
-      "Bash(git push)",
       "Bash(git push *)"
     ],
     "deny": [
       "Read(**/.env*)",
       "Read(~/.aws/**)",
+      "Read(~/.claude/.credentials.json)",
       "Read(~/.config/gh/hosts.yml)",
       "Read(~/.docker/config.json)",
+      "Read(~/.git-credentials)",
       "Read(~/.gnupg/**)",
       "Read(~/.kube/config)",
       "Read(~/.netrc)",
+      "Read(~/.npmrc)",
       "Read(~/.ssh/**)",
-      "Bash(gh auth *)",
+      "Bash(gh auth login *)",
+      "Bash(gh auth logout *)",
+      "Bash(gh auth refresh *)",
+      "Bash(gh auth setup-git *)",
+      "Bash(gh auth status *--show-token*)",
+      "Bash(gh auth switch *)",
+      "Bash(gh auth token *)",
       "Bash(gh gpg-key *)",
       "Bash(gh issue delete *)",
       "Bash(gh pr delete *)",
@@ -90,13 +150,13 @@
     ],
     "ask": [
       "Bash(brew *)",
-      "Bash(gh api * -X*)",
-      "Bash(gh api * --method*)",
-      "Bash(gh api * -f*)",
-      "Bash(gh api * -F*)",
-      "Bash(gh api * --field*)",
-      "Bash(gh api * --raw-field*)",
-      "Bash(gh api * --input*)",
+      "Bash(gh api *-X*)",
+      "Bash(gh api *--method*)",
+      "Bash(gh api *-f *)",
+      "Bash(gh api *-F *)",
+      "Bash(gh api *--field*)",
+      "Bash(gh api *--raw-field*)",
+      "Bash(gh api *--input*)",
       "Bash(gh issue comment *)",
       "Bash(gh issue close *)",
       "Bash(gh issue edit *)",
@@ -106,28 +166,34 @@
       "Bash(gh pr comment *)",
       "Bash(gh pr merge *)",
       "Bash(gh pr review *)",
-      "Bash(gh variable *)",
+      "Bash(gh variable delete *)",
+      "Bash(gh variable set *)",
+      "Bash(git branch -D *)",
+      "Bash(git branch -d *)",
+      "Bash(git branch -f *)",
+      "Bash(git branch -m *)",
       "Bash(git commit *)",
-      "Bash(git push --force)",
       "Bash(git push --force *)",
-      "Bash(git push -f)",
       "Bash(git push -f *)",
-      "Bash(git push origin --force *)",
-      "Bash(git push origin -f *)",
-      "Bash(git push --force-with-lease)",
       "Bash(git push --force-with-lease *)",
-      "Bash(git push --force-if-includes)",
       "Bash(git push --force-if-includes *)",
-      "Bash(git reset --hard)",
+      "Bash(git push --delete *)",
+      "Bash(git push -d *)",
+      "Bash(git push --mirror *)",
+      "Bash(git push --prune *)",
       "Bash(git reset --hard *)",
-      "Bash(git restore)",
       "Bash(git restore *)",
       "Bash(git clean *)",
-      "Bash(git checkout --)",
       "Bash(git checkout -- *)",
       "Bash(git checkout .)",
       "Bash(git checkout -f *)",
       "Bash(git rm *)",
+      "Bash(git tag -d *)",
+      "Bash(git tag -f *)",
+      "Bash(git remote remove *)",
+      "Bash(git remote set-url *)",
+      "Bash(git stash drop *)",
+      "Bash(git stash clear *)",
       "Bash(rm *)",
       "Bash(mv *)"
     ],
@@ -140,7 +206,8 @@
         "hooks": [
           {
             "type": "command",
-            "command": "if command -v ccgate >/dev/null 2>&1; then ccgate claude; fi"
+            "command": "if command -v ccgate >/dev/null 2>&1; then ccgate claude; fi",
+            "timeout": 30
           }
         ]
       }
@@ -151,7 +218,8 @@
         "hooks": [
           {
             "type": "command",
-            "command": "if command -v rtk >/dev/null 2>&1; then rtk hook claude; fi"
+            "command": "if command -v rtk >/dev/null 2>&1; then rtk hook claude; fi",
+            "timeout": 10
           },
           {
             "type": "command",
@@ -186,7 +254,7 @@
       "autoUpdate": false
     }
   },
-  "language": "日本語",
+  "language": "japanese",
   "modelSettings": {
     "claude-sonnet-5-5": {
       "effortLevel": "xhigh",
