@@ -90,6 +90,9 @@ expect none 'find . -exec ls {} \;'
 expect none "bash -c 'echo rm -rf'"
 expect none 'bash script.sh'
 expect none "bash -c 'git log --oneline'"
+expect ask "bash -c 'gh pr merge 1'"
+expect deny "bash -c 'gh secret set FOO'"
+expect ask "bash -c 'cat .env'"
 
 # --- git rm ---
 expect deny 'git rm -rf foo'
@@ -134,6 +137,99 @@ expect ask 'git multi'
 expect ask 'git c -m foo'
 expect ask 'git p'
 expect none 'git plainpush'
+
+# --- git push: 削除 / mirror / refspec ---
+expect ask 'git push --delete origin main'
+expect ask 'git push -d origin main'
+expect ask 'git push --mirror origin'
+expect ask 'git push --prune origin'
+expect ask 'git push origin +main'
+expect ask 'git push origin :main'
+expect none 'git push origin HEAD:main'
+expect none 'git push origin main'
+
+# --- git push: 長オプションの省略形 (git は一意な省略形を受け付ける) ---
+expect ask 'git push --del origin main'
+expect ask 'git push --dele origin main'
+expect ask 'git push --mir origin'
+expect ask 'git push --prune-tags origin'
+
+# --- git branch / tag / remote / stash ---
+expect ask 'git branch -D main'
+expect ask 'git branch -d main'
+expect ask 'git branch -m old new'
+expect ask 'git branch -f main origin/main'
+expect none 'git branch -a'
+expect none 'git branch -vv'
+expect ask 'git branch --delete-merged foo*'
+expect ask 'git branch --mov old new'
+expect ask 'git branch --forc main origin/main'
+expect none 'git branch --merged'
+expect ask 'git tag -d v1'
+expect ask 'git tag -f v1'
+expect ask 'git tag --del v1'
+expect ask 'git tag --forc v1'
+expect none 'git tag -l'
+expect none 'git tag -a v1 -m release'
+expect ask 'git remote remove origin'
+expect ask 'git remote set-url origin git@example.com:x.git'
+expect none 'git remote -v'
+expect none 'git remote show origin'
+expect ask 'git stash drop'
+expect ask 'git stash clear'
+expect none 'git stash list'
+
+# --- gh api: 書き込み系フラグ (rtk に書き換えられても元の入力で判定する) ---
+expect ask 'gh api -X DELETE /repos/o/r'
+expect ask 'gh api --method POST /repos/o/r'
+expect ask 'gh api --method=POST /repos/o/r'
+expect ask 'gh api -f body=x /repos/o/r'
+expect ask 'gh api -F body=@x /repos/o/r'
+expect ask 'gh api --input body.json /repos/o/r'
+expect ask 'gh api /repos/o/r -X DELETE'
+expect ask 'gh api graphql -f query=query'
+expect none 'gh api /repos/o/r'
+expect none 'gh api --paginate /repos/o/r/issues'
+
+# --- gh / brew: settings の ask / deny を guard でも判定する ---
+expect ask 'gh pr merge 1'
+expect ask 'gh pr close 1'
+expect ask 'gh issue close 1'
+expect ask 'gh variable set FOO'
+expect ask 'gh variable delete FOO'
+expect none 'gh variable list'
+expect none 'gh variable get FOO'
+expect none 'gh pr view 1'
+expect none 'gh issue view 1'
+expect none 'gh secret list'
+expect deny 'gh secret set FOO'
+expect deny 'gh secret delete FOO'
+expect deny 'gh auth login'
+expect deny 'gh auth token'
+expect none 'gh auth status'
+expect deny 'gh auth status --show-token'
+expect deny 'gh auth status -t'
+expect deny 'gh auth status -h github.com -t'
+expect deny 'gh auth status -t=true'
+expect deny 'gh auth status -at'
+expect none 'gh auth status -a'
+expect none 'gh auth status -h github.com'
+expect ask 'brew install jq'
+expect none 'rtk gh pr merge 1'   # rtk 経由の文字列は対象外 (元のコマンドで判定する)
+
+# --- 機密ファイルを読むコマンド ---
+expect ask 'cat .env'
+expect ask 'cat ~/.ssh/id_rsa'
+expect ask 'grep -r AWS ~/.aws'
+expect ask 'head -n 5 .env.local'
+expect ask 'base64 ~/.aws/credentials'
+expect ask 'cat .env-prod'
+expect ask 'cat .env-staging.local'
+expect none 'cat foo.env'
+expect none 'cat README.md'
+expect none 'grep -r "ssh" docs'
+expect none 'grep -r "\.env" docs'
+expect none 'sed -n "s/foo/bar/p" README.md'
 
 # --- その他 ---
 expect ask 'mv a b'

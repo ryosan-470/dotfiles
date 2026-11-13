@@ -34,6 +34,25 @@ function token_present(args, want,   n, a, i) {
     return 0
 }
 
+# git の長オプションは一意な省略形 (--del, --mir など) と --opt=value 形式を
+# 受け付けるため、完全一致ではなく前方一致で判定する
+function option_match(t, full) {
+    return t ~ /^--/ && length(t) >= 3 && (index(full, t) == 1 || index(t, full "=") == 1)
+}
+
+# 短オプション (-t, -at など) に指定した 1 文字が含まれるか
+function short_flag_present(args, c,   n, a, i, t) {
+    n = split(args, a, " ")
+    for (i = 1; i <= n; i++) {
+        t = a[i]
+        if (t ~ /^--/)
+            continue
+        if (t ~ /^-[^-]/ && index(substr(t, 2), c) > 0)
+            return 1
+    }
+    return 0
+}
+
 function wrapper_name(t,   b) {
     b = normalize(t)
     if (b == "sudo" || b == "command" || b == "env" || b == "exec" || b == "nohup" || b == "nice" || b == "stdbuf" || b == "timeout" || b == "time" || b == "xargs")
@@ -215,6 +234,10 @@ function analyze_push(args,   n, a, i, t, f) {
             emit(1, "git push の force 系オプションは履歴を書き換えるため確認します")
             return
         }
+        if (option_match(t, "--delete") || option_match(t, "--mirror") || option_match(t, "--prune") || option_match(t, "--prune-tags")) {
+            emit(1, "git push の削除・mirror 系オプションはリモートの ref を消すため確認します")
+            return
+        }
         if (t ~ /^--/)
             continue
         if (t ~ /^-[^-]/) {
@@ -223,9 +246,214 @@ function analyze_push(args,   n, a, i, t, f) {
                 emit(1, "git push -f は履歴を書き換えるため確認します")
                 return
             }
+            if (f ~ /d/) {
+                emit(1, "git push -d はリモートのブランチを消すため確認します")
+                return
+            }
+            continue
+        }
+        # refspec の + は強制更新、先頭の : はリモート ref の削除
+        if (t ~ /^\+/ || t ~ /^:/) {
+            emit(1, "git push の refspec (+ / :) はリモートの ref を強制更新・削除するため確認します")
+            return
         }
     }
     # 通常の push は settings.base.json の allow に従う (安全な push)
+}
+
+function analyze_branch(args,   n, a, i, t, f) {
+    n = split(args, a, " ")
+    for (i = 1; i <= n; i++) {
+        t = a[i]
+        if (option_match(t, "--delete") || option_match(t, "--delete-merged") || option_match(t, "--move") || option_match(t, "--copy") || option_match(t, "--force")) {
+            emit(1, "git branch の削除・移動・強制更新はブランチを書き換えるため確認します")
+            return
+        }
+        if (t ~ /^-[^-]/) {
+            f = substr(t, 2)
+            if (f ~ /[dDmMf]/) {
+                emit(1, "git branch の削除・移動・強制更新はブランチを書き換えるため確認します")
+                return
+            }
+        }
+    }
+}
+
+function analyze_tag(args,   n, a, i, t, f) {
+    n = split(args, a, " ")
+    for (i = 1; i <= n; i++) {
+        t = a[i]
+        if (option_match(t, "--delete") || option_match(t, "--force")) {
+            emit(1, "git tag の削除・付け替えはタグを書き換えるため確認します")
+            return
+        }
+        if (t ~ /^-[^-]/) {
+            f = substr(t, 2)
+            if (f ~ /[dDf]/) {
+                emit(1, "git tag の削除・付け替えはタグを書き換えるため確認します")
+                return
+            }
+        }
+    }
+}
+
+# フラグを読み飛ばして最初の引数 (サブコマンド / アクション) を返す
+function first_token(args,   n, a, i, t) {
+    n = split(args, a, " ")
+    for (i = 1; i <= n; i++) {
+        t = a[i]
+        if (t ~ /^-/)
+            continue
+        return t
+    }
+    return ""
+}
+
+function analyze_remote(args,   act) {
+    act = first_token(args)
+    if (act ~ /^(remove|rm|rename|set-url|set-head)$/)
+        emit(1, "git remote の削除・付け替えは push 先を変えるため確認します")
+}
+
+function analyze_stash(args,   act) {
+    act = first_token(args)
+    if (act == "drop" || act == "clear")
+        emit(1, "git stash の drop / clear は stash を失うため確認します")
+}
+
+# gh のグローバルオプションを読み飛ばしてサブコマンドを取り出す。
+# 残りの引数はグローバル変数 g_rest に入れる。
+function gh_sub(args,   n, a, i, t, scmd, skip) {
+    g_rest = ""
+    n = split(args, a, " ")
+    scmd = ""
+    skip = 0
+    for (i = 1; i <= n; i++) {
+        t = a[i]
+        if (scmd != "") {
+            g_rest = g_rest (g_rest == "" ? "" : " ") t
+            continue
+        }
+        if (skip) {
+            skip = 0
+            continue
+        }
+        if (t == "-R" || t == "--repo") {
+            skip = 1
+            continue
+        }
+        if (t ~ /^-/)
+            continue
+        scmd = t
+    }
+    return scmd
+}
+
+# gh api の書き込み系フラグ (-X / --method / -f / -F / --field / --raw-field / --input)
+function analyze_gh_api(args,   n, a, i, t) {
+    n = split(args, a, " ")
+    for (i = 1; i <= n; i++) {
+        t = a[i]
+        if (t ~ /^-X/ || t ~ /^--method/ || t == "-f" || t == "-F" || t ~ /^-f./ || t ~ /^-F./ || t ~ /^--field/ || t ~ /^--raw-field/ || t ~ /^--input/) {
+            emit(1, "gh api の書き込み系オプション (-X / -f / --input など) は確認します")
+            return
+        }
+    }
+}
+
+function analyze_gh(args,   scmd, rest, act) {
+    scmd = gh_sub(args)
+    rest = g_rest
+    if (scmd == "")
+        return
+    if (scmd == "api") {
+        analyze_gh_api(rest)
+        return
+    }
+    act = first_token(rest)
+    if (scmd == "auth") {
+        # gh auth status は既定ではトークンを出さないので許可する。
+        # トークンを表示する --show-token と短縮形 -t は deny
+        if (act ~ /^(login|logout|token|refresh|setup-git|switch)$/)
+            emit(2, "gh auth の認証情報を変更・表示する操作は禁止されています")
+        else if (act == "status" && (rest ~ /--show-token/ || short_flag_present(rest, "t")))
+            emit(2, "gh auth status のトークン表示 (--show-token / -t) は禁止されています")
+    } else if (scmd == "gpg-key" || scmd == "ssh-key") {
+        emit(2, "gh の鍵操作は禁止されています")
+    } else if (scmd == "issue") {
+        if (act == "delete")
+            emit(2, "gh issue delete は issue を削除するため禁止されています")
+        else if (act ~ /^(close|edit|comment)$/)
+            emit(1, "gh issue の変更操作は確認します")
+    } else if (scmd == "pr") {
+        if (act == "delete")
+            emit(2, "gh pr delete は PR を削除するため禁止されています")
+        else if (act ~ /^(create|close|edit|comment|merge|review)$/)
+            emit(1, "gh pr の変更操作は確認します")
+    } else if (scmd == "release") {
+        if (act == "delete")
+            emit(2, "gh release delete はリリースを削除するため禁止されています")
+    } else if (scmd == "repo") {
+        if (act ~ /^(archive|create|delete|edit|fork|rename)$/)
+            emit(2, "gh repo の作成・変更・削除は禁止されています")
+    } else if (scmd == "secret") {
+        if (act == "set" || act == "delete")
+            emit(2, "gh secret の変更・削除は禁止されています")
+    } else if (scmd == "variable") {
+        if (act == "set" || act == "delete")
+            emit(1, "gh variable の変更・削除は確認します")
+    } else if (scmd == "workflow") {
+        if (act == "enable" || act == "disable")
+            emit(2, "gh workflow の有効化・無効化は禁止されています")
+    }
+}
+
+# 機密ファイルのパスかどうか (Read ツールの deny と同じ対象 + credentials 系)
+function sensitive_path(t) {
+    # Read の deny と同じく「.env で始まるファイル」を対象にする (.env-prod なども含む)
+    if (t ~ /(^|\/)\.env/)
+        return 1
+    if (t ~ /(^|\/)\.ssh($|\/)/)
+        return 1
+    if (t ~ /(^|\/)\.aws($|\/)/)
+        return 1
+    if (t ~ /(^|\/)\.gnupg($|\/)/)
+        return 1
+    if (t ~ /(^|\/)\.netrc$/)
+        return 1
+    if (t ~ /(^|\/)\.git-credentials$/)
+        return 1
+    if (t ~ /(^|\/)\.npmrc$/)
+        return 1
+    if (t ~ /(^|\/)\.credentials\.json$/)
+        return 1
+    if (t ~ /(^|\/)gh\/hosts\.yml$/)
+        return 1
+    if (t ~ /(^|\/)\.docker\/config\.json$/)
+        return 1
+    if (t ~ /(^|\/)\.kube\/config$/)
+        return 1
+    return 0
+}
+
+# 機密ファイルを読むコマンドを検出する。
+# skip_first=1 のときは最初の引数 (grep のパターン、sed / awk のスクリプト) を飛ばす。
+function analyze_read_cmd(args, skip_first,   n, a, i, t, skipped) {
+    n = split(args, a, " ")
+    skipped = 0
+    for (i = 1; i <= n; i++) {
+        t = a[i]
+        if (t ~ /^-/)
+            continue
+        if (skip_first && !skipped) {
+            skipped = 1
+            continue
+        }
+        if (sensitive_path(t)) {
+            emit(1, "機密ファイル (.env / .ssh / .aws など) を読む可能性があるため確認します")
+            return
+        }
+    }
 }
 
 function analyze_git(args,   scmd, rest) {
@@ -248,6 +476,14 @@ function analyze_git(args,   scmd, rest) {
         emit(1, "git restore は作業ツリーの変更を破棄するため確認します")
     } else if (scmd == "push") {
         analyze_push(rest)
+    } else if (scmd == "branch") {
+        analyze_branch(rest)
+    } else if (scmd == "tag") {
+        analyze_tag(rest)
+    } else if (scmd == "remote") {
+        analyze_remote(rest)
+    } else if (scmd == "stash") {
+        analyze_stash(rest)
     } else if (scmd == "commit") {
         emit(1, "git commit は履歴を作成するため確認します")
     }
@@ -294,6 +530,14 @@ function finish_command() {
         emit(1, "mv はファイルを移動するため確認します")
     else if (cmdname == "git")
         analyze_git(args)
+    else if (cmdname == "gh")
+        analyze_gh(args)
+    else if (cmdname == "brew")
+        emit(1, "brew はパッケージを変更するため確認します")
+    else if (cmdname == "cat" || cmdname == "bat" || cmdname == "head" || cmdname == "tail" || cmdname == "less" || cmdname == "more" || cmdname == "base64" || cmdname == "xxd" || cmdname == "od" || cmdname == "strings" || cmdname == "cp" || cmdname == "scp" || cmdname == "rsync" || cmdname == "tar")
+        analyze_read_cmd(args, 0)
+    else if (cmdname == "grep" || cmdname == "egrep" || cmdname == "fgrep" || cmdname == "rg" || cmdname == "ag" || cmdname == "sed" || cmdname == "awk" || cmdname == "gawk")
+        analyze_read_cmd(args, 1)
     else if (cmdname == "eval") {
         if (args != "")
             nested[++nested_n] = args

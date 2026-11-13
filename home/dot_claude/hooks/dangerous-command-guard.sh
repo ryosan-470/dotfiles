@@ -6,10 +6,20 @@
 # git エイリアス経由の破壊的操作を検出して deny / ask を返す。
 #
 # 判定は settings.base.json の方針と揃える:
-#   deny: rm / git rm の再帰的強制削除
+#   deny: rm / git rm の再帰的強制削除、gh の破壊的操作 (auth の変更、auth status の
+#         トークン表示 (--show-token / -t)、鍵、secret set など)
 #   ask : 上記以外の rm / mv、git commit、force push (--force / -f / --force-with-lease)、
-#         git reset --hard、git clean -f、git restore、git checkout -- / . / -f
+#         git push の削除・mirror・refspec (+ / :)、git branch / tag / remote / stash の削除系、
+#         git reset --hard、git clean -f、git restore、git checkout -- / . / -f、
+#         gh の書き込み操作 (pr / issue / variable、gh api の -X / -f / --input など)、
+#         brew、機密ファイル (.env / .ssh / .aws など) を読むコマンド
+# git の長オプションは一意な省略形 (git push --del など) も受け付けるため、
+# 破壊的オプションは前方一致で判定する。
 # 通常の git push は settings.base.json の allow に従う。
+#
+# rtk (`rtk hook claude`) は `gh` / `brew` などを `rtk ...` に書き換えるため、
+# settings.base.json の gh / brew ルールは書き換え後の文字列にマッチしない。
+# 書き換え前の入力を渡されるここで同じ方針を判定する。
 #
 # `bash -c '...'`、`eval`、`find -exec` の中身は再帰的に解析する。
 # 限界: 完全なシェルパーサではない。変数展開や難読化されたコマンド、

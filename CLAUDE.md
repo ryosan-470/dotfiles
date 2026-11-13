@@ -63,7 +63,7 @@ This is a personal dotfiles repository for managing shell configurations, primar
 
 **Claude Code Configuration** (`home/dot_claude/` → `~/.claude/`):
 - `settings.base.json` - Claude Code global settings (not deployed directly)
-- `modify_settings.json.tmpl` - Generates `~/.claude/settings.json` by merging the current file (Claude Code's own changes), `settings.base.json`, and `~/.config/private/claude/settings.json`. Permissions are unioned, hooks are owned by base + private. Requires `jq`.
+- `modify_settings.json.tmpl` - Generates `~/.claude/settings.json` by merging the current file (Claude Code's own changes), `settings.base.json`, and `~/.config/private/claude/settings.json`. Permissions are unioned (with `"$remove"` able to subtract stale entries), hooks are owned by base + private. Requires `jq`.
 - `CLAUDE.md` - Claude Code グローバル CLAUDE.md
 - `hooks/find-guard.sh`, `hooks/dangerous-command-guard.sh`, `statusline.sh` - Referenced from settings as `~/.claude/...`
 - Note: `.claude/settings.json` at the repo root is a separate project-level Claude Code config (permissions for this repo)
@@ -74,20 +74,23 @@ This is a personal dotfiles repository for managing shell configurations, primar
 
 **Claude Code ツール**:
 - **Allow(自動許可)**: `Glob`, `Grep`, `Read`, `WebSearch`(読み取り専用で副作用なし)
-- **Allow(自動許可)**: `WebFetch` はドメイン指定で許可: `github.com`, `raw.githubusercontent.com`, `docs.anthropic.com`, `developer.mozilla.org`, `pkg.go.dev`
-- **Deny(常に拒否)**: `Read(**/.env*)`, `Read(~/.aws/**)`, `Read(~/.config/gh/hosts.yml)`, `Read(~/.docker/config.json)`, `Read(~/.gnupg/**)`, `Read(~/.kube/config)`, `Read(~/.netrc)`, `Read(~/.ssh/**)`(機密ファイルの保護)
+- **Allow(自動許可)**: `WebFetch` はドメイン指定で許可: `github.com`, `raw.githubusercontent.com`, `docs.anthropic.com`, `code.claude.com`, `platform.claude.com`, `json.schemastore.org`, `developer.mozilla.org`, `pkg.go.dev`
+- **Deny(常に拒否)**: `Read(**/.env*)`, `Read(~/.aws/**)`, `Read(~/.claude/.credentials.json)`, `Read(~/.config/gh/hosts.yml)`, `Read(~/.docker/config.json)`, `Read(~/.git-credentials)`, `Read(~/.gnupg/**)`, `Read(~/.kube/config)`, `Read(~/.netrc)`, `Read(~/.npmrc)`, `Read(~/.ssh/**)`(機密ファイルの保護)
+- Note: これらの `Read` deny は Read ツール専用。Bash の `cat` / `grep` などは guard hook が別途 ask する
 - Note: `find` は Claude Code の組み込み read-only コマンドのため deny 対象外。`find -exec`/`find -delete` のような危険な形式は Claude Code が常にプロンプトを表示する仕様
 - Note: `grep` は deny から除外済み。単体検索は専用ツール `Grep` を使い、パイプでの利用(`command | grep`)は都度確認で許可する方針
 
 **gh CLI**:
-- **Allow(自動許可)**: 閲覧・参照系コマンド(`view`, `list`, `status`, `diff`, `checks`, `search` など)、`secret list`(名前と更新日時のみで値は返らない)、`gh api`(既定の GET のみ。下記の書き込みになり得るフラグ付きは ask が優先される)
-- **Ask(都度確認)**: `gh api` のうち `-X`/`--method`、`-f`/`-F`/`--field`/`--raw-field`、`--input` を含むもの(POST などの書き込みになり得る。GraphQL は `-f query=` が必要なので常にここに該当する)、`issue comment/edit/close`, `pr create/edit/comment/merge/review/close`, `variable`
-- **Deny(常に拒否)**: 破壊的・不可逆な操作(`delete`, `archive`, `rename` など)、認証・鍵の操作(`auth`, `ssh-key`, `gpg-key`)、リポジトリ設定の変更(`secret set`)、ワークフロー変更(`workflow enable/disable`)
+- **Allow(自動許可)**: 閲覧・参照系コマンド(`view`, `list`, `status`, `diff`, `checks`, `search` など)、`secret list`(名前と更新日時のみで値は返らない)、`variable list/get`、`auth status`(`--show-token` / `-t` 付きは deny)、`gh api`(既定の GET のみ。下記の書き込みになり得るフラグ付きは ask が優先される)
+- **Ask(都度確認)**: `gh api` のうち `-X`/`--method`、`-f`/`-F`/`--field`/`--raw-field`、`--input` を含むもの(POST などの書き込みになり得る。GraphQL は `-f query=` が必要なので常にここに該当する)、`issue comment/edit/close`, `pr create/edit/comment/merge/review/close`, `variable set/delete`
+- **Deny(常に拒否)**: 破壊的・不可逆な操作(`delete`, `archive`, `rename` など)、認証・鍵の操作(`auth login/logout/token/refresh/setup-git/switch`、`auth status` のトークン表示(`--show-token` / `-t`)、`ssh-key`, `gpg-key`)、リポジトリ設定の変更(`secret set`)、ワークフロー変更(`workflow enable/disable`)
+- Note: `rtk hook claude` は `gh` を `rtk gh ...` に書き換えるため、permissions の gh ルールは書き換え後の文字列にマッチしない。guard hook が書き換え前の入力で同じ deny / ask を判定する
 
 **git**:
-- **Allow(自動許可)**: 閲覧・参照系(`log`, `diff`, `show`, `status`, `branch`, `remote`, `tag`, `stash list`)、`push`(force 系を除く)
-- **Ask(都度確認)**: `commit`, 破壊的な作業ツリー操作(`reset --hard`, `restore`, `clean -f`, `checkout -- / . / -f`, `rm`)、force push(`--force`, `-f`, `--force-with-lease`, `--force-if-includes`)
+- **Allow(自動許可)**: 閲覧・参照系(`log`, `diff`, `show`, `status`, `branch`, `remote`, `tag`, `stash list`)、`push`(force / 削除 / mirror / refspec 系を除く)
+- **Ask(都度確認)**: `commit`, 破壊的な作業ツリー操作(`reset --hard`, `restore`, `clean -f`, `checkout -- / . / -f`, `rm`)、force push(`--force`, `-f`, `--force-with-lease`, `--force-if-includes`)、push の削除・mirror・refspec(`--delete`, `-d`, `--mirror`, `--prune`, `+ref`, `:ref`)、`branch` の削除・移動、`tag` の削除・付け替え、`remote` の削除・付け替え、`stash drop/clear`。git は長オプションの一意な省略形を受け付けるため、`git push --del` / `git tag --del` のような形も同じ扱いにする
 - **Deny(常に拒否)**: 再帰的強制削除(`git rm -rf` など)
+- Note: `git branch` / `tag` / `remote` は allow だが、削除・移動などの破壊的な形は ask ルールと guard hook で確認する
 
 **brew**:
 - **Ask(都度確認)**: 全コマンド(install / upgrade などの実行前に確認)
@@ -101,15 +104,15 @@ This is a personal dotfiles repository for managing shell configurations, primar
 - **Deny(常に拒否)**: `rm -rf`(再帰的削除は絶対禁止)
 
 **表記揺れ・複合コマンド対策**:
-- `permissions` はコマンド文字列の前方一致でしか判定できないため、PreToolUse hook `home/dot_claude/hooks/dangerous-command-guard.sh` が `rm -fr` / `rm -r -f`、`cd x && rm -rf y`、`sudo rm -rf`、git エイリアス越しの破壊的操作を検出して deny / ask を返す
+- `permissions` はコマンド文字列の前方一致でしか判定できないため、PreToolUse hook `home/dot_claude/hooks/dangerous-command-guard.sh` が `rm -fr` / `rm -r -f`、`cd x && rm -rf y`、`sudo rm -rf`、git エイリアス越しの破壊的操作、git push の削除・mirror・refspec、git branch / tag / remote / stash の削除系 (長オプションの省略形 `--del` などを含む) を検出して deny / ask を返す
+- `rtk hook claude` は `gh` / `brew` などを `rtk ...` に書き換えるため、permissions の gh / brew ルールは書き換え後の文字列にマッチしない。guard hook は書き換え前の入力を渡されるので、`gh api` の書き込みフラグ、`gh pr merge` などの書き込み操作、`gh auth` / `gh secret` などの deny、`brew` の ask を guard 側でも判定する
+- 機密ファイル (`.env*`, `~/.ssh`, `~/.aws`, `~/.gnupg`, `~/.netrc`, `~/.git-credentials`, `~/.npmrc`, `~/.claude/.credentials.json`, `gh/hosts.yml`, `~/.docker/config.json`, `~/.kube/config`) を `cat` / `grep` / `sed` / `base64` などで読むコマンドは ask する。`Read` の deny は Read ツールにしか効かないため
 - `bash -c '...'`、`eval`、`find -exec` の中身は再帰的に解析する。ただし完全なシェルパーサではないため、変数展開や難読化されたコマンド、スクリプトファイルの中身までは追跡しない
 - 破壊的な git エイリアス (`nevermind`, `discard`) はこの bypass を防ぐため `home/dot_gitconfig.tmpl` から廃止した
 
 **構文**: 全ルールで非推奨の `:*` サフィックスを廃止し、スペース + `*` 構文に統一
 
-**chezmoi のマージに関する注意**: `modify_settings.json.tmpl` は permissions を和集合でマージする。deny の追加は既存マシンにも反映されるが、allow / ask / deny から削除したエントリは既存マシンの `~/.claude/settings.json` に残るため、各マシンで手動削除が必要。今回の変更で手動削除が必要なもの:
-- deny に残る: `Bash(brew *)`, `Bash(wget *)`, `Bash(gh issue close *)`, `Bash(gh pr close *)`, `Bash(gh variable *)`, `Bash(git checkout -- . *)`, `Bash(git clean -fd *)`, `Bash(gh secret *)`(`secret list` の allow を効かせるため。deny は allow より優先される)
-- ask に残る: `Bash(git push)`, `Bash(git push *)`(安全な push を allow にするため)、`Bash(curl *)`, `Bash(wget *)`(auto / ccgate の判定に任せるため)、`Bash(gh api *)`(参照系を allow にし、書き込みフラグ付きだけを個別の ask ルールにしたため。残したままだと ask が優先されて全件確認のままになる)
+**chezmoi のマージに関する注意**: `modify_settings.json.tmpl` は permissions を和集合でマージし、`settings.base.json` の `"$remove": {"permissions": {...}}` に列挙したエントリを和集合から削除する。`"$remove"` は出力されないが apply のたびに効くため、古い権限の掃除はここに追記すればよい。hooks の削除には対応していないので、hook を消す場合は各マシンの `~/.claude/settings.json` から手で削除する。`$schema` や `includeCoAuthoredBy` のようなローカルに残ったトップレベルキーも自動では消えない (動作に害はない)
 
 **Customization System**: See "Layers" above. Machine-local files are optional and are not created automatically.
 

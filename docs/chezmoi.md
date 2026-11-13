@@ -181,10 +181,12 @@ LINE (Mac App Store id `539883307`) は `mas` で管理しない。mas 7 はイ�
 
   後ろの層 (profile 別) が `"$replace"` なしで同じキーを持つ場合は、置き換え後の値に深いマージされる
 
+- permissions から古いエントリを消したい場合は、任意の層に `"$remove": {"permissions": {"deny": ["Bash(old *)"]}}` のように書くと、4 層の和集合から完全一致するエントリを削除する。追加より削除が優先され、`"$remove"` 自体は出力しない。`settings.base.json` に置けば apply のたびに効くので、既存マシンに残った古いルールの掃除に使う。hooks の削除には対応しない
+
 注意点:
 
 - 「常に許可」で増えた権限はローカルにだけ残る。全マシンで使いたいものは `settings.base.json` にも追記する
-- **`settings.base.json` から削除した権限や hook は、既存マシンからは消えない**。消したい場合は各マシンの `~/.claude/settings.json` からも手で削除する
+- **`settings.base.json` から削除した権限や hook は、既存マシンからは消えない**。権限は `settings.base.json` の `"$remove"` に列挙して apply すれば消える。hook は各マシンの `~/.claude/settings.json` から手で削除する
 - 既存マシンで `machineProfile` が未設定の場合は、`chezmoi init` を再実行するか `~/.config/chezmoi/chezmoi.toml` の `[data]` に追記する。未設定なら profile 別設定は読み込まれない
 - マージには `jq` が必要 (macOS は標準で入っている)。無い場合は既存のファイルをそのまま残す
 - `~/.claude/CLAUDE.md` が参照する `@RTK.md` は chezmoi 管理外。rtk (`rtk init -g`) が生成する `~/.claude/RTK.md` で、無くても `@` 参照が無視されるだけで害はない。hook (`rtk hook claude`) も rtk 本体が前提
@@ -196,11 +198,11 @@ LINE (Mac App Store id `539883307`) は `mas` で管理しない。mas 7 はイ�
 
 これを補うため、`home/dot_claude/hooks/dangerous-command-guard.sh` (解析本体は `dangerous-command-guard.awk`) を PreToolUse hook として登録している。`settings.base.json` の `PreToolUse` (matcher: `Bash`) から `bash ~/.claude/hooks/dangerous-command-guard.sh` で呼ばれ、以下を返す。
 
-- `deny`: `rm` / `git rm` の再帰的強制削除 (`rm -rf`, `rm -fr`, `rm -r -f`, `sudo rm -rf` など)
-- `ask`: 上記以外の `rm` / `mv`、`git commit`、force push (`--force` / `-f` / `--force-with-lease` / `--force-if-includes`)、`git reset --hard`, `git clean -f`, `git restore`, `git checkout -- / . / -f`
-- allow に何も返さない: 通常の `git push` は `settings.base.json` の allow に従う
+- `deny`: `rm` / `git rm` の再帰的強制削除 (`rm -rf`, `rm -fr`, `rm -r -f`, `sudo rm -rf` など)、`gh auth` の認証変更 (トークン表示 `--show-token` / `-t` を含む)、`gh` の鍵操作、`gh secret set/delete`、`gh repo` の作成・変更・削除など
+- `ask`: 上記以外の `rm` / `mv`、`git commit`、force push (`--force` / `-f` / `--force-with-lease` / `--force-if-includes`)、`git push` の削除・mirror・prune・refspec (`--delete` / `-d` / `--mirror` / `--prune` / `+ref` / `:ref`)、`git branch` の削除・移動、`git tag` の削除・付け替え (git が受け付ける長オプションの省略形 `--del` なども含む)、`git remote` の削除・付け替え、`git stash drop/clear`、`git reset --hard`, `git clean -f`, `git restore`, `git checkout -- / . / -f`、`gh` の書き込み操作 (`gh pr merge` など、`gh api` の `-X` / `--method` / `-f` / `-F` / `--input`)、`brew`、機密ファイル (`.env*`, `~/.ssh`, `~/.aws`, `~/.gnupg`, `~/.netrc`, `~/.git-credentials`, `~/.npmrc`, `~/.claude/.credentials.json`, `gh/hosts.yml`, `~/.docker/config.json`, `~/.kube/config`) を読むコマンド
+- allow に何も返さない: 通常の `git push` や `gh` の参照系 (`gh auth status`, `gh variable list` など) は `settings.base.json` の allow に従う
 
-判定は `settings.base.json` の方針に合わせる。`bash -c '...'`、`eval`、`find -exec` の中身は再帰的に解析するが、完全なシェルパーサではないため、変数展開や難読化されたコマンド、スクリプトファイルの中身までは追跡しない。破壊的な git エイリアス (`nevermind`, `discard`) は bypass を防ぐため `home/dot_gitconfig.tmpl` から廃止した。
+`rtk hook claude` は `gh` / `brew` などを `rtk ...` に書き換えるため、`settings.base.json` の gh / brew ルールは書き換え後の文字列にマッチしない。guard hook には書き換え前の入力が渡るので、gh / brew の deny / ask をここでも判定している。判定は `settings.base.json` の方針に合わせる。`bash -c '...'`、`eval`、`find -exec` の中身は再帰的に解析するが、完全なシェルパーサではないため、変数展開や難読化されたコマンド、スクリプトファイルの中身までは追跡しない。破壊的な git エイリアス (`nevermind`, `discard`) は bypass を防ぐため `home/dot_gitconfig.tmpl` から廃止した。
 
 ### プラグイン / マーケットプレイス
 
