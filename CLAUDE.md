@@ -80,9 +80,9 @@ This is a personal dotfiles repository for managing shell configurations, primar
 - Note: `grep` は deny から除外済み。単体検索は専用ツール `Grep` を使い、パイプでの利用(`command | grep`)は都度確認で許可する方針
 
 **gh CLI**:
-- **Allow(自動許可)**: 閲覧・参照系コマンド(`view`, `list`, `status`, `diff`, `checks`, `search` など)、`gh api`(既定の GET のみ。下記の書き込みになり得るフラグ付きは ask が優先される)
+- **Allow(自動許可)**: 閲覧・参照系コマンド(`view`, `list`, `status`, `diff`, `checks`, `search` など)、`secret list`(名前と更新日時のみで値は返らない)、`gh api`(既定の GET のみ。下記の書き込みになり得るフラグ付きは ask が優先される)
 - **Ask(都度確認)**: `gh api` のうち `-X`/`--method`、`-f`/`-F`/`--field`/`--raw-field`、`--input` を含むもの(POST などの書き込みになり得る。GraphQL は `-f query=` が必要なので常にここに該当する)、`issue comment/edit/close`, `pr create/edit/comment/merge/review/close`, `variable`
-- **Deny(常に拒否)**: 破壊的・不可逆な操作(`delete`, `archive`, `rename` など)、認証・鍵の操作(`auth`, `ssh-key`, `gpg-key`)、リポジトリ設定の変更(`secret`)、ワークフロー変更(`workflow enable/disable`)
+- **Deny(常に拒否)**: 破壊的・不可逆な操作(`delete`, `archive`, `rename` など)、認証・鍵の操作(`auth`, `ssh-key`, `gpg-key`)、リポジトリ設定の変更(`secret set`)、ワークフロー変更(`workflow enable/disable`)
 
 **git**:
 - **Allow(自動許可)**: 閲覧・参照系(`log`, `diff`, `show`, `status`, `branch`, `remote`, `tag`, `stash list`)、`push`(force 系を除く)
@@ -108,7 +108,7 @@ This is a personal dotfiles repository for managing shell configurations, primar
 **構文**: 全ルールで非推奨の `:*` サフィックスを廃止し、スペース + `*` 構文に統一
 
 **chezmoi のマージに関する注意**: `modify_settings.json.tmpl` は permissions を和集合でマージする。deny の追加は既存マシンにも反映されるが、allow / ask / deny から削除したエントリは既存マシンの `~/.claude/settings.json` に残るため、各マシンで手動削除が必要。今回の変更で手動削除が必要なもの:
-- deny に残る: `Bash(brew *)`, `Bash(wget *)`, `Bash(gh issue close *)`, `Bash(gh pr close *)`, `Bash(gh variable *)`, `Bash(git checkout -- . *)`, `Bash(git clean -fd *)`
+- deny に残る: `Bash(brew *)`, `Bash(wget *)`, `Bash(gh issue close *)`, `Bash(gh pr close *)`, `Bash(gh variable *)`, `Bash(git checkout -- . *)`, `Bash(git clean -fd *)`, `Bash(gh secret *)`(`secret list` の allow を効かせるため。deny は allow より優先される)
 - ask に残る: `Bash(git push)`, `Bash(git push *)`(安全な push を allow にするため)、`Bash(curl *)`, `Bash(wget *)`(auto / ccgate の判定に任せるため)、`Bash(gh api *)`(参照系を allow にし、書き込みフラグ付きだけを個別の ask ルールにしたため。残したままだと ask が優先されて全件確認のままになる)
 
 **Customization System**: See "Layers" above. Machine-local files are optional and are not created automatically.
