@@ -81,14 +81,14 @@ This is a personal dotfiles repository for managing shell configurations, primar
 - Note: `grep` は deny から除外済み。単体検索は専用ツール `Grep` を使い、パイプでの利用(`command | grep`)は都度確認で許可する方針
 
 **gh CLI**:
-- **Allow(自動許可)**: 閲覧・参照系コマンド(`view`, `list`, `status`, `diff`, `checks`, `search` など)、`secret list`(名前と更新日時のみで値は返らない)、`variable list/get`、`auth status`(`--show-token` 付きは deny)、`gh api`(既定の GET のみ。下記の書き込みになり得るフラグ付きは ask が優先される)
+- **Allow(自動許可)**: 閲覧・参照系コマンド(`view`, `list`, `status`, `diff`, `checks`, `search` など)、`secret list`(名前と更新日時のみで値は返らない)、`variable list/get`、`auth status`(`--show-token` / `-t` 付きは deny)、`gh api`(既定の GET のみ。下記の書き込みになり得るフラグ付きは ask が優先される)
 - **Ask(都度確認)**: `gh api` のうち `-X`/`--method`、`-f`/`-F`/`--field`/`--raw-field`、`--input` を含むもの(POST などの書き込みになり得る。GraphQL は `-f query=` が必要なので常にここに該当する)、`issue comment/edit/close`, `pr create/edit/comment/merge/review/close`, `variable set/delete`
-- **Deny(常に拒否)**: 破壊的・不可逆な操作(`delete`, `archive`, `rename` など)、認証・鍵の操作(`auth login/logout/token/refresh/setup-git/switch`, `ssh-key`, `gpg-key`)、リポジトリ設定の変更(`secret set`)、ワークフロー変更(`workflow enable/disable`)
+- **Deny(常に拒否)**: 破壊的・不可逆な操作(`delete`, `archive`, `rename` など)、認証・鍵の操作(`auth login/logout/token/refresh/setup-git/switch`、`auth status` のトークン表示(`--show-token` / `-t`)、`ssh-key`, `gpg-key`)、リポジトリ設定の変更(`secret set`)、ワークフロー変更(`workflow enable/disable`)
 - Note: `rtk hook claude` は `gh` を `rtk gh ...` に書き換えるため、permissions の gh ルールは書き換え後の文字列にマッチしない。guard hook が書き換え前の入力で同じ deny / ask を判定する
 
 **git**:
 - **Allow(自動許可)**: 閲覧・参照系(`log`, `diff`, `show`, `status`, `branch`, `remote`, `tag`, `stash list`)、`push`(force / 削除 / mirror / refspec 系を除く)
-- **Ask(都度確認)**: `commit`, 破壊的な作業ツリー操作(`reset --hard`, `restore`, `clean -f`, `checkout -- / . / -f`, `rm`)、force push(`--force`, `-f`, `--force-with-lease`, `--force-if-includes`)、push の削除・mirror・refspec(`--delete`, `-d`, `--mirror`, `--prune`, `+ref`, `:ref`)、`branch` の削除・移動、`tag` の削除・付け替え、`remote` の削除・付け替え、`stash drop/clear`
+- **Ask(都度確認)**: `commit`, 破壊的な作業ツリー操作(`reset --hard`, `restore`, `clean -f`, `checkout -- / . / -f`, `rm`)、force push(`--force`, `-f`, `--force-with-lease`, `--force-if-includes`)、push の削除・mirror・refspec(`--delete`, `-d`, `--mirror`, `--prune`, `+ref`, `:ref`)、`branch` の削除・移動、`tag` の削除・付け替え、`remote` の削除・付け替え、`stash drop/clear`。git は長オプションの一意な省略形を受け付けるため、`git push --del` / `git tag --del` のような形も同じ扱いにする
 - **Deny(常に拒否)**: 再帰的強制削除(`git rm -rf` など)
 - Note: `git branch` / `tag` / `remote` は allow だが、削除・移動などの破壊的な形は ask ルールと guard hook で確認する
 
@@ -104,7 +104,7 @@ This is a personal dotfiles repository for managing shell configurations, primar
 - **Deny(常に拒否)**: `rm -rf`(再帰的削除は絶対禁止)
 
 **表記揺れ・複合コマンド対策**:
-- `permissions` はコマンド文字列の前方一致でしか判定できないため、PreToolUse hook `home/dot_claude/hooks/dangerous-command-guard.sh` が `rm -fr` / `rm -r -f`、`cd x && rm -rf y`、`sudo rm -rf`、git エイリアス越しの破壊的操作、git push の削除・mirror・refspec、git branch / tag / remote / stash の削除系を検出して deny / ask を返す
+- `permissions` はコマンド文字列の前方一致でしか判定できないため、PreToolUse hook `home/dot_claude/hooks/dangerous-command-guard.sh` が `rm -fr` / `rm -r -f`、`cd x && rm -rf y`、`sudo rm -rf`、git エイリアス越しの破壊的操作、git push の削除・mirror・refspec、git branch / tag / remote / stash の削除系 (長オプションの省略形 `--del` などを含む) を検出して deny / ask を返す
 - `rtk hook claude` は `gh` / `brew` などを `rtk ...` に書き換えるため、permissions の gh / brew ルールは書き換え後の文字列にマッチしない。guard hook は書き換え前の入力を渡されるので、`gh api` の書き込みフラグ、`gh pr merge` などの書き込み操作、`gh auth` / `gh secret` などの deny、`brew` の ask を guard 側でも判定する
 - 機密ファイル (`.env*`, `~/.ssh`, `~/.aws`, `~/.gnupg`, `~/.netrc`, `~/.git-credentials`, `~/.npmrc`, `~/.claude/.credentials.json`, `gh/hosts.yml`, `~/.docker/config.json`, `~/.kube/config`) を `cat` / `grep` / `sed` / `base64` などで読むコマンドは ask する。`Read` の deny は Read ツールにしか効かないため
 - `bash -c '...'`、`eval`、`find -exec` の中身は再帰的に解析する。ただし完全なシェルパーサではないため、変数展開や難読化されたコマンド、スクリプトファイルの中身までは追跡しない

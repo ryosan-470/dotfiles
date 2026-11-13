@@ -34,6 +34,25 @@ function token_present(args, want,   n, a, i) {
     return 0
 }
 
+# git の長オプションは一意な省略形 (--del, --mir など) と --opt=value 形式を
+# 受け付けるため、完全一致ではなく前方一致で判定する
+function option_match(t, full) {
+    return t ~ /^--/ && length(t) >= 3 && (index(full, t) == 1 || index(t, full "=") == 1)
+}
+
+# 短オプション (-t, -at など) に指定した 1 文字が含まれるか
+function short_flag_present(args, c,   n, a, i, t) {
+    n = split(args, a, " ")
+    for (i = 1; i <= n; i++) {
+        t = a[i]
+        if (t ~ /^--/)
+            continue
+        if (t ~ /^-[^-]/ && index(substr(t, 2), c) > 0)
+            return 1
+    }
+    return 0
+}
+
 function wrapper_name(t,   b) {
     b = normalize(t)
     if (b == "sudo" || b == "command" || b == "env" || b == "exec" || b == "nohup" || b == "nice" || b == "stdbuf" || b == "timeout" || b == "time" || b == "xargs")
@@ -215,7 +234,7 @@ function analyze_push(args,   n, a, i, t, f) {
             emit(1, "git push の force 系オプションは履歴を書き換えるため確認します")
             return
         }
-        if (t == "--delete" || t == "--mirror" || t == "--prune" || t ~ /^--prune=/) {
+        if (option_match(t, "--delete") || option_match(t, "--mirror") || option_match(t, "--prune") || option_match(t, "--prune-tags")) {
             emit(1, "git push の削除・mirror 系オプションはリモートの ref を消すため確認します")
             return
         }
@@ -246,7 +265,7 @@ function analyze_branch(args,   n, a, i, t, f) {
     n = split(args, a, " ")
     for (i = 1; i <= n; i++) {
         t = a[i]
-        if (t == "--delete" || t == "--move" || t == "--copy" || t == "--force") {
+        if (option_match(t, "--delete") || option_match(t, "--delete-merged") || option_match(t, "--move") || option_match(t, "--copy") || option_match(t, "--force")) {
             emit(1, "git branch の削除・移動・強制更新はブランチを書き換えるため確認します")
             return
         }
@@ -264,7 +283,7 @@ function analyze_tag(args,   n, a, i, t, f) {
     n = split(args, a, " ")
     for (i = 1; i <= n; i++) {
         t = a[i]
-        if (t == "--delete" || t == "--force") {
+        if (option_match(t, "--delete") || option_match(t, "--force")) {
             emit(1, "git tag の削除・付け替えはタグを書き換えるため確認します")
             return
         }
@@ -353,11 +372,12 @@ function analyze_gh(args,   scmd, rest, act) {
     }
     act = first_token(rest)
     if (scmd == "auth") {
-        # gh auth status は既定ではトークンを出さないので許可する
+        # gh auth status は既定ではトークンを出さないので許可する。
+        # トークンを表示する --show-token と短縮形 -t は deny
         if (act ~ /^(login|logout|token|refresh|setup-git|switch)$/)
             emit(2, "gh auth の認証情報を変更・表示する操作は禁止されています")
-        else if (rest ~ /--show-token/)
-            emit(2, "gh auth status --show-token はトークンを表示するため禁止されています")
+        else if (act == "status" && (rest ~ /--show-token/ || short_flag_present(rest, "t")))
+            emit(2, "gh auth status のトークン表示 (--show-token / -t) は禁止されています")
     } else if (scmd == "gpg-key" || scmd == "ssh-key") {
         emit(2, "gh の鍵操作は禁止されています")
     } else if (scmd == "issue") {
@@ -390,7 +410,8 @@ function analyze_gh(args,   scmd, rest, act) {
 
 # 機密ファイルのパスかどうか (Read ツールの deny と同じ対象 + credentials 系)
 function sensitive_path(t) {
-    if (t ~ /(^|\/)\.env($|rc|[.])/)
+    # Read の deny と同じく「.env で始まるファイル」を対象にする (.env-prod なども含む)
+    if (t ~ /(^|\/)\.env/)
         return 1
     if (t ~ /(^|\/)\.ssh($|\/)/)
         return 1
