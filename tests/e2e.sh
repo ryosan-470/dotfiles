@@ -490,6 +490,18 @@ test_private_layer() {
                     fail "private: brew-bundle が [data] ${data} でエラー、または profile 別 Brewfile を含む"; rc=1
                 fi
             done
+            # tools-mise-defaults: macOS 専用。3 つの定義ファイルの hash が埋め込まれ、一致しない profile は含まれない
+            # (mise bootstrap macos-defaults の発火条件。CI=1 ではスクリプト自体がスキップされるのでレンダリング結果だけを見る)
+            local defaults_tmpl="$REPO_ROOT/home/.chezmoiscripts/run_onchange_after_tools-mise-defaults.sh.tmpl" defaults_rendered
+            if defaults_rendered=$(chezmoi execute-template --source "$REPO_ROOT" < "$defaults_tmpl") \
+                && grep -qF "# common hash: $(shasum -a 256 "$REPO_ROOT/home/dot_config/mise/conf.d/00-common.toml" | cut -d' ' -f1)" <<< "$defaults_rendered" \
+                && grep -qF "# private hash: $(shasum -a 256 "$mise_p/config.toml" | cut -d' ' -f1)" <<< "$defaults_rendered" \
+                && grep -qF "# private work hash: $(shasum -a 256 "$mise_p/config.work.toml" | cut -d' ' -f1)" <<< "$defaults_rendered" \
+                && ! grep -q 'personal' <<< "$defaults_rendered"; then
+                pass "private: tools-mise-defaults に公開 / private / 一致する profile の hash が埋め込まれる"
+            else
+                fail "private: tools-mise-defaults の hash 埋め込みが想定と違う"; rc=1
+            fi
         else
             echo "skip: private: brew-bundle のレンダリング確認は macOS のみ"
         fi

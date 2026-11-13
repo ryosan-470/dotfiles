@@ -11,3 +11,18 @@ node = "26"
 npm = "12.2.2"
 pnpm = "12.18.0"
 uv = "latest"
+
+# macOS のシステム設定 (Dock / Finder / キーリピート / トラックパッド)。
+# `mise bootstrap --only macos-defaults` が差分だけ書く (run_onchange_after_tools-mise-defaults.sh.tmpl)。
+# 注意:
+# - 2026.11 時点では [bootstrap.macos.*] が有効な綴り。将来 [bootstrap.settings.macos.*] に移る予定なので、
+#   そのときはこの節ごと書き換える (docs/chezmoi.md の mise 節)
+# - 型が厳密に比較される。macOS が実数 (real) で保存しているキーは 2.0 のように実数で書くこと。
+#   整数で書くと毎回差分扱いになり、apply のたびに書き換わる
+[bootstrap.macos.defaults]
+NSGlobalDomain = { KeyRepeat = 2.0, InitialKeyRepeat = 15.0, AppleShowAllExtensions = true }
+"com.apple.dock" = { autohide = true, "show-recents" = false, tilesize = 64.0 }
+"com.apple.finder" = { _FXSortFoldersFirst = true, FXPreferredViewStyle = "Nlsv" }
+
+[bootstrap.macos.trackpad]
+tap_to_click = true

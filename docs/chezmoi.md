@@ -61,6 +61,7 @@ home/dot_config/zsh/alias.zsh  →  ~/.config/zsh/alias.zsh
 | GUI アプリの設定を管理したい | Karabiner は `home/dot_config/private_karabiner/`、BTT はプリセットを `home/dot_btt_autoload_preset.json` に置く (後述)。Raycast はテキスト設定が無いので Brewfile のみ |
 | CLI / GUI アプリを追加したい (macOS) | リポジトリ直下の `Brewfile` に `brew "foo"` / `cask "foo"` を追記する。次の `chezmoi apply` で `brew bundle` が走る。private は `~/.config/private/Brewfile` (全マシン共通) か `~/.config/private/Brewfile.<machineProfile>` (profile 別。`work` / `personal` など) に書く (ccgate / go / uv などの言語・開発ツールは mise で管理するので書かない。次の行を参照) |
 | 言語・開発ツール (go / node / uv / ccgate など) を追加したい | `home/dot_config/mise/conf.d/00-common.toml` の `[tools]` に追記する。次の `chezmoi apply` で `mise install` が走る (`run_onchange_after_tools-mise-install.sh.tmpl`)。private は `~/.config/private/mise/config.toml` (全マシン共通) か `~/.config/private/mise/config.<machineProfile>.toml` (profile 別) に書く。詳細は「mise のツール定義」節 |
+| macOS のシステム設定 (Dock / Finder / キーリピートなど) を管理したい | `home/dot_config/mise/conf.d/00-common.toml` の `[bootstrap.macos.*]` に追記する。次の `chezmoi apply` で `mise bootstrap --only macos-defaults` が差分だけ書く (`run_onchange_after_tools-mise-defaults.sh.tmpl`)。詳細と注意点は「mise のツール定義」節 |
 | private リポジトリに設定を追加したい | [private-repo.md](./private-repo.md) のスロットに従ってファイルを置く。新しい種類はスロット追加の手順で公開側にフックを足す |
 | macOS の LaunchAgent を追加したい | `home/private_Library/private_LaunchAgents/` に plist を置き、`run_onchange` スクリプトで再ロードする (既存の cleanup-caches を参照) |
 | `docker compose` が `unknown command` になる | `~/.docker/cli-plugins/` にアンインストール済み Docker Desktop 由来のリンク切れ symlink が残っていないか確認する。`home/.chezmoiscripts/run_onchange_after_docker-cli-plugins.sh` がそれらを掃除し、Homebrew の `docker-compose` / `docker-buildx` が使えるようになる |
@@ -288,6 +289,7 @@ sh -c "$(curl -fsLS get.chezmoi.io)" -- init --apply \
 - `run_onchange_after_brew-bundle.sh.tmpl`: `Brewfile` → `~/.config/private/Brewfile` → `~/.config/private/Brewfile.<machineProfile>` の順に `brew bundle` する (macOS で brew がある場合。private 側の 2 つは存在するときだけ。`machineProfile` が空ならスキップ)
 - `run_after_private-links.sh.tmpl` (毎回の apply で実行する冪等スクリプト): private の AWS 設定を `~/.aws/config` に配置する。`machineProfile = work` かつ `aws/config.work` があれば `aws/config` と結合した実ファイル (600)、それ以外は `aws/config` のシンボリックリンク (存在する場合)。private の `claude/ccgate.jsonnet` は `~/.claude/ccgate.jsonnet` へのシンボリックリンクにする (存在する場合)。詳細は [private-repo.md の AWS 節](./private-repo.md#aws) と [ccgate 節](./private-repo.md#ccgate)
 - `run_onchange_after_load-launchagents.sh.tmpl`: `cleanup-caches` の LaunchAgent を登録する (macOS)
+- `run_onchange_after_tools-mise-defaults.sh.tmpl`: `[bootstrap.macos.*]` の内容が変わったときだけ `mise bootstrap --only macos-defaults` を実行する (macOS で mise がある場合)。差分が無ければ何もしない。適用後は Dock / Finder を再起動する
 - `modify_settings.json.tmpl`: `~/.claude/settings.json` を 4 層でマージする
 
 ### 4. 実行後の手作業
@@ -334,7 +336,18 @@ go / node / uv / ccgate などの言語・開発ツールは mise で管理す�
 - **同じツールを複数の層に書かない**: `config.toml` が `conf.d` に勝つため、ローカルに古い定義が残ると公開側の変更が反映されない
 - `mise unuse -g <tool>` は `config.toml` のツールにしか効かない。`conf.d` のツールを外すときは、元のファイルを編集する
 - `latest` 指定のツールは `mise install` では更新されない。更新は手動で `mise upgrade` を実行する
-- スクリプトの実行順は対象名の昇順で、`brew-bundle` (mise 本体) → `private-links` (private の定義をリンク) → `tools-mise-install` になる。後ろ 2 つの順序に依存するため、スクリプト名を `private-links` より前に変えない
+- スクリプトの実行順は対象名の昇順で、`brew-bundle` (mise 本体) → `private-links` (private の定義をリンク) → `tools-mise-defaults` → `tools-mise-install` になる。後ろの 3 つの順序に依存するため、スクリプト名を `private-links` より前に変えない
+
+##### macOS のシステム設定 (defaults)
+
+`[bootstrap.macos.*]` で Dock / Finder / キーリピート / トラックパッドなどを宣言する。`run_onchange_after_tools-mise-defaults.sh.tmpl` が、同じ 3 つの定義ファイルのどれかが変わったときだけ `mise bootstrap --only macos-defaults` を実行する。差分が無ければ何もせず、適用したときだけ Dock / Finder を再起動する。
+
+- **2026.11 時点では `[bootstrap.macos.*]` が有効な綴り**。mise のドキュメントでは将来 `[bootstrap.settings.macos.*]` に移る予定 (2027.5 から旧綴りに警告、2028.5 で削除)。旧綴りは 2026.11.7 では動くが新綴りは `unknown field` として無視されるため、移行時は mise のバージョンを確認してから書き換える
+- **型が厳密に比較される**。macOS が実数 (real) で保存しているキー (`KeyRepeat` / `InitialKeyRepeat` / dock の `tilesize` など) は `2.0` のように実数で書く。整数で書くと毎回 `differs` になり、apply のたびに書き換わる。`defaults read-type <domain> <key>` で確認できる
+- `mise bootstrap macos defaults status --missing` で差分の有無を確認できる (差分があれば exit 1)。`mise bootstrap macos defaults apply --dry-run` で書き込む内容を確認できる
+- 適用しても Dock / Finder などの起動中のアプリには反映されない。スクリプトが `killall Dock Finder` するが、他のアプリは再起動が必要
+- 仕事用マシンで MDM の構成プロファイルが優先される設定は、`defaults` で書いても戻されることがある。その場合はプロファイル別に private 側で上書きするか、そのキーを宣言しない
+- `[bootstrap.macos.launchd.agents]` は使わない。ラベルが `dev.mise.<name>` 固定になり、現在の `com.ryosan470.cleanup-caches` の plist にある `Nice` / `LowPriorityIO` を表現できないため、LaunchAgent は chezmoi 管理のままにする
 
 ```sh
 mise use -g node@24     # このマシンだけ試す (config.toml に書かれる)

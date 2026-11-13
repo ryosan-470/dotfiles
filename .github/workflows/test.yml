@@ -70,6 +70,27 @@ jobs:
           chezmoi execute-template --source "$GITHUB_WORKSPACE" < "$script" > "$RUNNER_TEMP/brew-bundle.sh"
           test -s "$RUNNER_TEMP/brew-bundle.sh"
           bash -n "$RUNNER_TEMP/brew-bundle.sh"
+      - name: Check mise-defaults script renders
+        if: runner.os == 'macOS'
+        run: |
+          set -eu
+          script=home/.chezmoiscripts/run_onchange_after_tools-mise-defaults.sh.tmpl
+          chezmoi execute-template --source "$GITHUB_WORKSPACE" < "$script" > "$RUNNER_TEMP/mise-defaults.sh"
+          test -s "$RUNNER_TEMP/mise-defaults.sh"
+          bash -n "$RUNNER_TEMP/mise-defaults.sh"
+      - name: Check mise bootstrap defaults config parses
+        if: runner.os == 'macOS'
+        run: |
+          set -eu
+          command -v mise >/dev/null || brew install mise
+          cd "$HOME"
+          out="$(mise bootstrap macos defaults status 2>&1)" || true
+          printf '%s\n' "$out"
+          # 将来 mise が [bootstrap.macos.*] を廃止したときに気付けるようにする
+          if grep -q 'unknown field' <<< "$out"; then
+            echo "mise が bootstrap.macos の綴りを解釈できていません (docs/chezmoi.md の mise 節)" >&2
+            exit 1
+          fi
       - name: "Verify Brewfile (インストールはせず、名前が解決できるかだけ確認)"
         if: runner.os == 'macOS'
         run: |
