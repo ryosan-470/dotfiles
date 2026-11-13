@@ -61,8 +61,8 @@ private リポジトリの直下に置く。すべて任意で、無いものは
 | `Brewfile.<profile>` | macOS で `brew bundle` | `machineProfile` と一致するファイルだけ、private `Brewfile` の後に適用。仕事用・個人用で分けたいパッケージを置く |
 | `aws/config` | `~/.aws/config` へシンボリックリンク (`machineProfile = work` かつ `aws/config.work` があるマシンでは結合) | 600。リンクのときは `aws configure` の変更も private 側に入る。結合のときは入らない (AWS 節を参照) |
 | `aws/config.work` | `machineProfile = work` のマシンだけ、`aws/config` と結合して `~/.aws/config` の実ファイル (600) を作る | 仕事用の profile を置く。`[default]` は両方にあるため `aws/config.work` 側を残す |
-| `mise/config.toml` | `~/.config/mise/conf.d/10-private.toml` へシンボリックリンク。変更時に `mise install` | 全マシン共通の非公開ツール。mise の `[tools]` 形式 (mise 節を参照) |
-| `mise/config.<profile>.toml` | `machineProfile` と一致するファイルだけ `~/.config/mise/conf.d/20-private-<profile>.toml` へシンボリックリンク | 仕事用・個人用で分けたいツールを置く |
+| `mise/config.toml` | `~/.config/mise/conf.d/10-private.toml` へシンボリックリンク。変更時に `mise install` / `mise bootstrap --only macos-defaults` | 全マシン共通の非公開ツール (`[tools]`) と macOS のシステム設定 (`[bootstrap.macos.*]`)。mise 節を参照 |
+| `mise/config.<profile>.toml` | `machineProfile` と一致するファイルだけ `~/.config/mise/conf.d/20-private-<profile>.toml` へシンボリックリンク | 仕事用・個人用で分けたいツール・システム設定を置く |
 
 > [!NOTE]
 > `Brewfile` は全マシンで共通に適用される。profile ごとに分けたいパッケージは `Brewfile.<profile>` に書く。`machineProfile` が空、または一致するファイルが無い場合は、profile 別の Brewfile はスキップされる。ホスト単位 (同じ profile 内のマシン差) で分けたいものは、そのマシンで手動で入れる。
@@ -170,6 +170,7 @@ mise/config.personal.toml   # machineProfile = personal のマシンだけ
 - 同じツールを複数のファイルに書かない。`~/.config/mise/config.toml` (マシンローカル) は `conf.d` より優先され、`conf.d` 内は後ろのファイル名 (`20-` > `10-` > `00-`) が優先される
 - `mise install` は不足分を入れるだけで、ファイルから消したツールはアンインストールされない。不要になったバージョンは `mise prune` で消す
 - 他のスロットと同様、会社名や社内ツール名を含むものは private に置き、公開の `00-common.toml` には書かない
+- `[bootstrap.macos.*]` (Dock / Finder / キーリピート / トラックパッドなど) も同じ 3 ファイルに書ける。`10-private.toml` / `20-private-<profile>.toml` の値が公開側を上書きする。3 ファイルの hash は `run_onchange_after_tools-mise-defaults.sh.tmpl` にも埋め込まれ、変更時だけ `mise bootstrap --only macos-defaults` が走る。仕事用マシンで MDM の構成プロファイルと衝突する設定は、そのキーを書かないか profile 別ファイルで上書きする
 
 ## AWS
 

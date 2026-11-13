@@ -1,0 +1,53 @@
+{{- /* machineProfile が未設定の古い chezmoi.toml でもエラーにならないよう index で参照する */ -}}
+{{- $machineProfile := index . "machineProfile" | default "" -}}
+{{ if eq .chezmoi.os "darwin" -}}
+#!/bin/bash
+# macOS のシステム設定 (defaults) が変わったときだけ適用する (chezmoi apply の後に実行)
+#
+# 実行順: chezmoi は after スクリプトを対象名の昇順に実行する。
+# brew-bundle (mise 本体を入れる) → private-links (private の定義を conf.d にリンクする) → このスクリプト
+# の順になるよう、名前を tools- から始めている。名前を変えるときはこの順序を保つこと。
+# (docs/chezmoi.md の mise 節を参照)
+#
+# common hash: {{ include (joinPath .chezmoi.sourceDir "dot_config/mise/conf.d/00-common.toml") | sha256sum }}
+{{- $privateConfig := joinPath .chezmoi.homeDir ".config/private/mise/config.toml" }}
+{{- if stat $privateConfig }}
+# private hash: {{ include $privateConfig | sha256sum }}
+{{- end }}
+{{- if $machineProfile }}
+{{- $profileConfig := joinPath .chezmoi.homeDir ".config/private/mise" (printf "config.%s.toml" $machineProfile) }}
+{{- if stat $profileConfig }}
+# private {{ $machineProfile }} hash: {{ include $profileConfig | sha256sum }}
+{{- end }}
+{{- end }}
+set -eu
+
+# CI は実機の設定を書き換えない
+[ -n "${CI:-}" ] && exit 0
+
+# mise 本体は Brewfile で入る (macOS)。無い環境では何もしない
+if ! command -v mise >/dev/null 2>&1; then
+    echo "mise が見つからないので macOS defaults の適用をスキップ"
+    exit 0
+fi
+
+# mise bootstrap が無い古い mise では何もしない (mise は Brewfile で最新が入る想定)
+if ! mise bootstrap macos defaults status --help >/dev/null 2>&1; then
+    echo "mise bootstrap macos defaults が使えないので macOS defaults の適用をスキップ (mise を更新する)"
+    exit 0
+fi
+
+# グローバル定義 (conf.d / config.toml) だけを対象にするため、プロジェクトの設定を拾わない HOME で実行する
+cd "$HOME"
+
+# 差分が無ければ何もしない (Dock / Finder を不必要に再起動しない)
+if mise bootstrap macos defaults status --missing >/dev/null 2>&1; then
+    echo "macOS defaults は適用済み"
+    exit 0
+fi
+
+mise bootstrap --only macos-defaults -y
+
+# Dock と Finder は起動時に設定を読むため、変更を反映するために再起動する
+killall Dock Finder 2>/dev/null || true
+{{ end -}}
