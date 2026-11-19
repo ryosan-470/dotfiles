@@ -96,6 +96,13 @@ This is a personal dotfiles repository for managing shell configurations, primar
 **brew**:
 - **Ask(都度確認)**: 全コマンド(install / upgrade などの実行前に確認)
 
+**MCP(AWS MCP Server)**:
+- `settings.json` に `mcpServers` は書けないため、公式プラグイン `aws-core@claude-plugins-official` を `enabledPlugins` で有効化して導入する。プラグインが `aws-mcp` を `--skip-auth` (認証なし、`uvx` 経由) で定義する
+- **Allow(自動許可)**: ドキュメント・情報系の `search_documentation`, `read_documentation`, `retrieve_skill`, `list_regions`, `get_regional_availability`
+- **ルール未記載**: AWS API を実行しうる `run_script`, `get_presigned_url`, `get_tasks` は permissions に書かない。`defaultMode: auto` と ccgate の判定に任せる。認証なし構成 (`--skip-auth`) のため通常は実行できないが、環境に AWS 認証情報があるとプロキシが署名して送る可能性がある
+- Note: ツール名は `mcp__plugin_aws-core_aws-mcp__aws___<tool>` (プラグイン由来の命名)。プラグインの更新でツール名が変わると allow / deny が外れるので、更新後は `/permissions` で確認する
+- Note: 旧 AWS Knowledge MCP Server (`aws-knowledge-mcp-server`) とはツールが競合するため併用しない
+
 **システム**:
 - **Deny(常に拒否)**: `sudo`, `shutdown`(特権昇格・システム停止の防止)
 

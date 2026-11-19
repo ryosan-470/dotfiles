@@ -212,6 +212,7 @@ LINE (Mac App Store id `539883307`) は `mas` で管理しない。mas 7 はイ�
 - 公開リポジトリに置くのは、全マシンで使うと決めたものだけ。仕事用・プロジェクト固有のマーケットプレイスやプラグインは private レイヤーに置く。個人/仕事を切り替えたいものは `claude/settings.<profile>.json` に置く
 - `extraKnownMarketplaces` の GitHub ソースは `ref` でタグに固定し、`autoUpdate` を `false` にする (タグが無いリポジトリは少なくとも `autoUpdate` を `false` にする)。更新は `claude plugin marketplace update <name>` で明示的に行う。`autoUpdate` の既定値は有効なので、書かないと自動更新になる
 - マーケットプレイスを追加すると、そのリポジトリの `.claude-plugin/marketplace.json` やプラグインの hooks / MCP サーバーが実行されうる。追加前にリポジトリの内容を確認する
+- MCP サーバーは `settings.json` の `mcpServers` では定義できない (`~/.claude.json` / `.mcp.json` / プラグインのいずれか)。`~/.claude.json` は Claude Code 自身が書き換える状態ファイルで chezmoi 管理外なので、共通で使う MCP サーバーはプラグイン経由で `enabledPlugins` に置く。例: AWS MCP Server は `aws-core@claude-plugins-official` (認証なしで使う。ドキュメント・情報系ツールだけ `permissions.allow` し、API 実行系ツールは書かずに auto モード / ccgate に任せる)。プラグイン由来の MCP ツール名は `mcp__plugin_<plugin>_<server>__<tool>`
 - `enabledPlugins` と `extraKnownMarketplaces` は 4 層が深いマージになる。同じキーは base → private 共通 → profile 別の順で上書きされ、ローカルで追加したプラグインは残る。ただし **base から削除したエントリは既存マシンのローカル設定には残る** ので、各マシンの `~/.claude/settings.json` からも手で削除する
 
 ## 新しいマシンのセットアップ

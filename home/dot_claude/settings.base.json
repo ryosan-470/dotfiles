@@ -68,6 +68,11 @@
       "WebFetch(domain:json.schemastore.org)",
       "WebFetch(domain:developer.mozilla.org)",
       "WebFetch(domain:pkg.go.dev)",
+      "mcp__plugin_aws-core_aws-mcp__aws___search_documentation",
+      "mcp__plugin_aws-core_aws-mcp__aws___read_documentation",
+      "mcp__plugin_aws-core_aws-mcp__aws___retrieve_skill",
+      "mcp__plugin_aws-core_aws-mcp__aws___list_regions",
+      "mcp__plugin_aws-core_aws-mcp__aws___get_regional_availability",
       "Bash(mkdir *)",
       "Bash(ls *)",
       "Bash(gh api *)",
@@ -252,6 +257,7 @@
   "enabledPlugins": {
     "commit-commands@claude-plugins-official": true,
     "context7@claude-plugins-official": true,
+    "aws-core@claude-plugins-official": true,
     "yomiyasu@yomiyasu": true
   },
   "extraKnownMarketplaces": {
